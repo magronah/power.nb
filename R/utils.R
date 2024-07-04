@@ -1,8 +1,10 @@
 #' Title
+#'
 #' @param mean
 #' @param dispersion
 #'
-#' @return coefficient of variation
+#' @return
+#'
 #' @examples
 coeff_var <- function(mean, dispersion){
   var = mean*(1 + mean*dispersion)

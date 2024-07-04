@@ -21,3 +21,11 @@ power_fun_ss(
 \description{
 Title
 }
+\examples{
+fit GAM with covariates as tensor product (ie,interaction between
+log mean abundance and absolute log fold changes
+and then a spline for the sample sizes
+log mean abundance and log fold changes are related directly,hence the
+interaction but sample size is not quite related to log mean abundance
+and log fold changes directly
+}

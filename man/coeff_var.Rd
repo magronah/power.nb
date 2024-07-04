@@ -9,9 +9,6 @@ coeff_var(mean, dispersion)
 \arguments{
 \item{dispersion}{}
 }
-\value{
-coefficient of variation
-}
 \description{
 Title
 }

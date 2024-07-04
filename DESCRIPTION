@@ -1,10 +1,15 @@
 Package: power.nb
-Title: What the Package Does (One Line, Title Case)
+Title: Power and Sample Size Calculation for Differential Abundance Microbiome Studies
 Version: 0.0.0.9000
 Authors@R: 
-    person("First", "Last", , "first.last@example.com", role = c("aut", "cre"),
-           comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
+    person("Michael", "Agronah", 
+           email =  "agronahm@mcmaster.ca", role = "aut",
+           comment = c(ORCID = "0009-0007-2655-4094"))
+   person("Ben","Bolker", role="aut", 
+     email =  "bolker@mcmaster.ca"
+   comment=c(ORCID="0000-0002-2127-0443")),
+Description: Calculates power and sample size for differential abundance microbiome studies 
+             based on the negative binomial model
 License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
     license
 Encoding: UTF-8

@@ -2,18 +2,25 @@
 % Please edit documentation in R/fit.R
 \name{dispersion_fit}
 \alias{dispersion_fit}
-\title{Title: fit non-linear model: a  + b/mean_abundance to dispersion estimates}
+\title{Fit the non-linear function to dispersion estimates}
 \usage{
 dispersion_fit(dispersion, logmean)
 }
 \arguments{
-\item{logmean}{vector of log mean abundance}
+\item{dispersion}{dispersion estimates from deseq}
 
-\item{dispersion:}{dispersion estimates from deseq}
+\item{logmean}{vector of log mean abundance}
 }
 \value{
-: param: parameters for the fit with confidence intervals
+A list containing estimates for \code{a} and \code{b} and confidence intervals
 }
 \description{
-Title: fit non-linear model: a  + b/mean_abundance to dispersion estimates
+Dispersion are estimated from the \code{DESeq2} package. The function fitted is of the
+form  \verb{a + b/(mean count)} where \code{a} represents the asymptotic dispersion level
+for high abundance taxa, and \code{b} captures additional dispersion variability.
+}
+\examples{
+logmean    =  rnorm(100)
+dispersion =  abs(rnorm(100))
+dispersion_fit(dispersion,logmean)
 }

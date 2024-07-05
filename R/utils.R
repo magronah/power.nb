@@ -1,94 +1,94 @@
-#' Title
+#' Computes the optimal number of gaussian components for log mean count
 #'
-#' @param mean
-#' @param dispersion
+#' The number of gaussian components is determined using the
+#' using parametric bootstrap
 #'
-#' @return
+#' @param logmean vector of log mean abundances of taxa
+#' @param sig: significance level to compare against p-value
+#' @param max.comp: maximum number of Gaussian components to compare sequentially
+#' @param max.boot: maximum number of bootstraps simulations
+#'
+#' @return The best number of components for fitting the distribution of log mean abundance
+#' @export
 #'
 #' @examples
-coeff_var <- function(mean, dispersion){
-  var = mean*(1 + mean*dispersion)
-  sqrt(var)/mean
-}
-###############################################################################
-unregister_dopar <- function() {
-  env <- foreach:::.foreachGlobals
-  rm(list=ls(name=env), pos=env)
+#' logmean  = rnorm(100)
+#' optimal.comp(logmean,sig=0.05,max.comp=4,max.boot=100)
+
+optimal.comp <- function(logmean,sig=0.05,max.comp=4,max.boot=100){
+  a <- mixtools::boot.comp(y = logmean, max.comp = max.comp, B = max.boot,
+                           mix.type = "normalmix",epsilon = 1e-3)
+
+  pvals=a$p.values; l=length(pvals)
+  ncomp <- if (pvals[length(pvals)]<sig) length(pvals)+1 else length(pvals)
+  return(ncomp)
 }
 
 ###############################################################################
-custom_theme <- function(n) {
-  theme_bw(base_size = n) +
-    theme(
-      plot.title = element_text(hjust = 0.5),
-      text = element_text(size = n, family = "Roboto"),
-      axis.text.x = element_text(family = "Roboto", size = n, color = "black"),
-      axis.text.y = element_text(family = "Roboto", size = n, color = "black")
-    )
-}
-
-###############################################################################
-#' Title
+#' Filter to remove low abundant taxa
 #'
-#' @param countdata:  otu table
-#' @param metadata:
-#' @param abund_thresh: minimum taxa abundance threshold
-#' @param sample_thresh:    minimum sample threshold
-#' @return countdata_filt: filtered otu table
-#'         control_count:  otu table for control group
-#'         treat_count:  otu table for treatment group
-#' @examples
-filter_fun <- function(countdata, metadata,abund_thresh=5, sample_thresh=3){
+#'
+#' Filter to retain only taxa with at least `abund_thresh` counts in at least `sample_thresh` samples
+#'
+#' @param countdata  otu table
+#' @param metadata   dataframe with 2 rows sample names and group names
+#' @param abund_thresh  minimum number of taxa abundance threshold
+#' @param sample_thresh    minimum number of sample threshold
+#' @return filtered otu count data
+#'
+#' @export
+#'
+
+filter_low_count <- function(countdata, metadata,abund_thresh=5, sample_thresh=3){
 
   ## sanity check
   if(all((metadata$Samples)==colnames(countdata)) == FALSE){
     countdata = t(countdata)
   }
 
-  ##########################################
-  # filter
-  dds <- DESeqDataSetFromMatrix(countdata,metadata, ~Groups)
+  dds <- DESeq2::DESeqDataSetFromMatrix(countdata,metadata, ~Groups)
   keep <- rowSums(counts(dds) >= abund_thresh) >= sample_thresh
 
-  dds=dds[keep,]
-  countdata_filt= data.frame(counts(dds))
-  ##########################################
-  # extract control and treatment otu table
-  nt    =  metadata %>%  dplyr::filter(Groups == "NT")  %>%
-    select(Samples) %>%  unlist()
-
-  asd   =  metadata %>% dplyr::filter(Groups == "ASD")  %>%
-    select(Samples) %>% unlist()
-
-  control_count   =   countdata[,colnames(countdata) %in% nt]
-  treat_count     =   countdata[,colnames(countdata) %in% asd]
-
-  # sanity check
-  stopifnot(colnames(control_count) ==  nt)
-  stopifnot(colnames(treat_count)   ==  asd)
-
-  list(countdata_filt =  countdata_filt,
-       control_count  =  control_count,
-       treat_count    =  treat_count)
+  dds    =   dds[keep,]
+  data.frame(counts(dds))
 }
 
 ########################################################
-#' Title
+#' Estimate log fold changes using `DESeq2`.
 #'
-#' @param countdata
-#' @param metadata
-#' @param alpha_level
+#' It is stongly recommended to keep defaults for `minReplicatesForReplace=Inf`,
+#' `cooksCutoff=TRUE`, `independentFiltering=TRUE`, especially when
+#' estimating fold change in order to fit the mixture of Gaussian distributions.
+#'
+#'
+#' @param countdata otu count data
+#' @param metadata dataframe with 2 rows sample names and group names
+#' @param alpha_level significance level
 #' @param ref_name: reference for fold change calculation
-#' @param minReplicatesForReplace: deseq's parameter to control minimum number of
+#' @param minReplicatesForReplace: DESeq2's parameter to control minimum number of
 #'     replicates needed for the replacement of outliers during dispersion estimation.
-#' @param cooksCutoff: deseq's outlier removal or shrinkage
-#' @param independentFiltering: deseq's independent filtering
-#' @param shrinkage_method:  deseq's shrinkage method
+#' @param cooksCutoff: DESeq2's outlier removal or shrinkage.
+#' @param independentFiltering: DESeq2's independent filtering.
+#' @param shrinkage_method:  DESeq2's shrinkage method
 #'
-#' @return
+#' @return  A list
+#'
+#' logfoldchange log fold change estimates
+#'
+#' logmean  is the log mean count for taxa
+#' (arithmetic mean for taxa across all subjects)
+#'
+#' dispersion: dispersion estimates for each taxa
+#'
+#' deseq_estimate is a  dataframe containing results from deseq
+#'         baseMean,log2FoldChange, lfcSE, pvalue, padj
+#'
+#' normalised_count is the normalised count data
 #' @export
 #'
 #' @examples
+#' countdata = matrix(100, ncol = ..)
+#' deseqfun(countdata,metadata)
 deseqfun <- function(countdata,metadata,alpha_level=0.1,ref_name="NT",
                      minReplicatesForReplace = Inf,
                      cooksCutoff = TRUE,
@@ -134,125 +134,28 @@ deseqfun <- function(countdata,metadata,alpha_level=0.1,ref_name="NT",
        normalised_count = normalised_count)
 }
 
-compare_dataset <- function(countdata_sim_list,countdata_obs,method = c("var", "mean"),n=11){
-
-  # Check if method is either "var" or "mean"
-  if (!(method %in% c("var", "mean"))) {
-    stop("Invalid method. Please choose either 'var' or 'mean'.")
-  }
-
-  # Calculate variance or mean based on the chosen method
-  if (method == "var") {
-    calc_func <- stats::var
-    xlab_text <- "$\\log_{10}$(variance of taxa)"
-  } else {
-    calc_func <- mean
-    xlab_text <- "$\\log_{10}$(mean of taxa)"
-  }
-
-  # Create a list combining simulation data and observed data
-  dlist <- list.append(countdata_sim_list, obs_filt = countdata_obs)
-
-  # Calculate variance or mean for each dataset in the list
-  vars <- dlist |> purrr::map(~ apply(., 1, calc_func)) |>
-    purrr::map_dfr(~ tibble(var = .), .id = "type")
-
-  # Separate observed and simulated data
-  vars_obs <- vars[vars$type == "obs_filt", ]
-  vars_sim <- vars[vars$type != "obs_filt", ]
 
 
-  # Create ggplot for visualization
-  p <- ggplot(vars_sim, aes(x = log(var), colour = type)) +
-    geom_density(lwd = 2) +
-    geom_density(data = vars_obs, aes(x = log(var)),
-                 colour = "black", linetype = "dashed", lwd = 3) +
-    #  scale_color_manual(values = okabe_ito_colors) + # Apply manually specified Okabe-Ito colors
-    theme_bw(base_size = n) +
-    theme(
-      plot.title = element_text(hjust = 0.5),
-      text = element_text(size = n, family = "Roboto"),
-      axis.text.x = element_text(family = "Roboto", size = n, color = "black"),
-      axis.text.y = element_text(family = "Roboto", size = n, color = "black")
-    ) +
-    xlab(TeX(xlab_text))
+#' General-purpose log-likelihood function, vectorized sum(pars*x^i)
+#'
+#'
+#' @param pars parameters
+#' @param x log mean count
+#'
+#' @return values representing output for the polynomial fuction (f(x))
+#'
+#'
 
-  return(p)
-}
-
-#zeros for later use
-# hist(zeroes_prop_metaS)
-# # Proportion of zeros
-# zeroes_prop_obs       =    rowMeans(countdata_obs == 0)
-# zeroes_prop_HMP       =    rowMeans(HMP == 0)
-# zeroes_prop_metaS     =    rowMeans(metaSPARSim == 0)
-# zeroes_prop_scaled    =    rowMeans(scaled == 0)
-# zeroes_prop_unscaled  =    rowMeans(unscaled == 0)
-
-read_data <- function(dataset_list, extract_name){
-  extract_data_list= list()
-  for(n in 1:length(dataset_list)){
-    dataset <- dataset_list[[n]]
-    extract_data_list[[n]] <- dataset[[extract_name]]
-  }
-  names(extract_data_list) <- names(dataset_list)
-  extract_data_list
-}
-
-####################################
-unregister_dopar <- function() {
-  env <- foreach:::.foreachGlobals
-  rm(list=ls(name=env), pos=env)
-}
-
-####################################
-# compare_dataset <- function(countdata_sim_list,countdata_obs){
-#   dlist <- list.append(countdata_sim_list,obs_filt=countdata_obs)
-#   vars <-(dlist |> purrr::map(~apply(., 1, stats::var)) |>
-#             purrr::map_dfr(~ tibble(var = .),.id = "type"))
-#
-#   vars_obs <- vars[vars$type == "obs_filt",]
-#   vars_sim <- vars[vars$type != "obs_filt",]
-#
-#   p = ggplot(vars_sim, aes(x = log(var), colour = type)) + geom_density(lwd=1.5) +
-#      geom_density(data=vars_obs, aes(x = log(var)),colour = "black", linetype = "solid",lwd=3) +
-#     xlab(TeX("$\\log_{10}$(variance of taxa)"))
-#
-#   p
-# }
-
-# nc <- max(1, getOption("ncores", round(detectCores()/2)))
-# cl <- makeCluster(ncore)
-
-initial_cond_est <- function(p0,logmean, logfoldchange,
-                             np, sd_ord, ncore,
-                             minval = -5, maxval = 5,
-                             NP = 800, itermax = 1500){
-
-  cl <- makeCluster(ncore)
-  fun_names <- c("polyfun", "dnormmix", "dnormmix0", "genmixpars")
-  clusterExport(cl, c("logmean", "logfoldchange", fun_names))
-
-  opt  <- DEoptim(fn = nllfun, lower = rep(minval, length(p0)), upper = rep(maxval, length(p0)),
-                  vals = logfoldchange, logmean = logmean, np = np, sd_ord = sd_ord,
-                  control = DEoptim.control(NP = NP, itermax = itermax,
-                                            cluster = cl))
-
-  opt$optim$bestmem
-
-}
-
-
-## general-purpose log-likelihood function
-## vectorized sum(pars*x^i)
 polyfun <- function(pars, x) {
   ord <- length(pars)
   xmat <- sapply(0:(ord-1), function(i) x^i)
   xmat |> sweep(MARGIN = 2, FUN = "*", pars) |> rowSums()
 }
 
+
 #' generate normal mixture parameters (prob vector, mean vector, sd vector
 #' for a specified set of 'x' values (logmean)
+#'
 #' @param x independent variable
 #' @param pars parameter vector: first logit-probs (np-1),
 #'             then mean parameters (2 per component: intercepts, slopes),
@@ -261,9 +164,17 @@ polyfun <- function(pars, x) {
 #' @param np number of components in mixture
 #' @param sd_ord order of logsd model (2 = quadratic)
 #'
+#'@return   A list
+#'
+#'      probs: mixture proportions ()
+#'
+#'      muvals: mean values
+#'
+#'      sdvals: standard deviation values
+
 
 genmixpars <- function(x, pars, np = 2, sd_ord = 2){
-  ## FIXME: complain if pars is wrong length
+  ## complain if pars is wrong length
   expected_pars <- (np-1)+2*np+(sd_ord+1)*np
   if (length(pars) != expected_pars) {
     stop(sprintf("number of pars (%d) != expected (%d) (np = %d, sd_ord = %d)",
@@ -287,8 +198,17 @@ genmixpars <- function(x, pars, np = 2, sd_ord = 2){
   list(probs = probs, muvals = muvals, sdvals = exp(logsdvals))
 }
 
-## general-purpose normal-mixture deviate generator: takes _matrices_
-## of probabilities, means, sds
+#' general-purpose normal-mixture deviate generator: takes _matrices_
+#' of probabilities, means, sds
+#'
+#' @param n number of observations
+#' @param probs mixture proportions
+#' @param muvals values for the mean
+#' @param sdvals values for the standard deviation
+#'
+#' @return simulations
+#' @export
+#'
 rnormmix0 <- function(n, probs, muvals, sdvals) {
   np <- length(probs)
   component <- sample(np, size = n, prob = probs, replace = TRUE)
@@ -296,14 +216,37 @@ rnormmix0 <- function(n, probs, muvals, sdvals) {
   rnorm(n, mean = muvals[inds], sd = sdvals[inds])
 }
 
-# logmean <- rnorm(10); par =p0
+
+#' Simulating from a mixture of Gaussian
+#'
+#' @param par parameters (mean, standard deviation and mixture proportion of the mixture of Gaussian)
+#' @param logmean log mean count of taxa
+#' @param ... other parameters taken by `genmixpars`
+#'
+#' @return random values from a  a mixture of Gaussian
+#' @export
+#'
 myrnormmix <- function(par, logmean, ...) {
   g0 <- genmixpars(logmean, par, ...)
   do.call(rnormmix0, c(list(n = length(logmean)), g0))
 }
 
-## takes pars as three vectors (prob, mean, sd), on constrained scale
+#' Density function for the mixture of Gaussian distributions
+#'
+#' takes pars as three vectors (prob, mean, sd), on constrained scale
 ## i.e. prob (0,1); mean; sdvals (0, Inf)
+#'
+#'
+#' @param x vector
+#' @param probs mixture proportions
+#' @param muvals values of the mean
+#' @param sdvals values for standard deviataions
+#' @param log log scale
+#'
+#' @return likelihood
+#' @export
+#'
+
 dnormmix0 <- function(x, probs, muvals, sdvals, log = FALSE) {
   np <- length(probs)
   pmat <- matrix(NA, nrow = length(x), ncol = np)
@@ -314,18 +257,49 @@ dnormmix0 <- function(x, probs, muvals, sdvals, log = FALSE) {
   if (log) log(lik) else lik
 }
 
-## takes a single vector of parameters on the unconstrained scale
-##  (i.e. softmax(prob), mean, log(sd))
+#' Takes a single vector of parameters on the unconstrained scale
+#  (i.e. softmax(prob), mean, log(sd))
+#'
+#'
+#' @param x
+#' @param par   softmax(prob), mean, log(sd) on unconstrained scale
+#' @param logmean
+#' @param ... other input calues taken by `genmixpars`
+#' @param log log scale
+#'
+#' @return
+#'
 dnormmix <- function(x, par, logmean, ..., log = FALSE) {
   g0 <- genmixpars(logmean, par, ...)
   do.call(dnormmix0, c(list(x), g0, list(log = log)))
 }
 
+#' Objective function
+#'
+#' @param par parameters of the mixture of Gaussian
+#' @param vals values of log fold change
+#' @param logmean log mean count
+#' @param np  number of Gaussian components
+#' @param sd_ord order of polynomial function to model standard deviation parameters
+#'               (1 - linear function and 2- quad)
+#'
+#' @return value for the objective function
+#'
 nllfun <- function(par, vals, logmean, np, sd_ord) {
   -sum(dnormmix(x = vals, par, logmean, np = np, sd_ord = sd_ord, log = TRUE))
 }
 
 
+#' mm
+#'
+#' @param np  number of Gaussian components
+#' @param sd_ord order of polynomial function to model standard deviation parameters
+#'               (1 - linear function and 2- quadratic function)
+#'
+#' @return
+#'
+#'
+#'
 gen_parnames <- function(np, sd_ord) {
   ## taken from contr.poly:
   sdlabs <- c(".1", ".L", ".Q", ".C", paste0(".", 4:10))[1:(sd_ord+1)]
@@ -337,19 +311,30 @@ gen_parnames <- function(np, sd_ord) {
 
 
 #############################################################################
-#' Title
+#' Fold change and p-value estimations for a many simulations
 #'
 #' @param metadata_list : list of metadata
-#' @param countdata_list : list of otu tables
+#' @param countdata_list : list of otu count data
 #' @param num_cores : number of cores
 #' @param ref_name reference for fold change calculation
 #'
-#' @return
+#' @return  A list
+#'  logfoldchange log fold change estimates
+#'
+#' logmean  is the log mean count for taxa
+#' (arithmetic mean for taxa across all subjects)
+#'
+#' dispersion: dispersion estimates for each taxa
+#'
+#' deseq_estimate is a  dataframe containing results from deseq
+#'         baseMean,log2FoldChange, lfcSE, pvalue, padj
+#'
+#' normalised_count is the normalised count data
 #' @export
 #'
-#' @examples
+#'
 deseq_fun_est <-function(metadata_list,  countdata_list,
-                         num_cores=10, ref_name= "control"){
+                         num_cores=2, ref_name= "control"){
 
   registerDoParallel(cores = num_cores)
   l = length(countdata_list)
@@ -372,6 +357,16 @@ deseq_fun_est <-function(metadata_list,  countdata_list,
 }
 
 #############################################################
+#' Contour plot for showing predicted power
+#'
+#' @param combined_data data used for fitting gam
+#' @param power_estimate predicted power
+#' @param cont_breaks breaks for contour plot
+#'
+#' @return ggplot object
+#' @export
+#'
+#'
 contour_plot_fun <- function(combined_data,
                              power_estimate,
                              cont_breaks){
@@ -395,153 +390,6 @@ contour_plot_fun <- function(combined_data,
   )
   gg_2dimc
 
-}
-
-#######################################################################
-inverse_fun <- function(target,lmb,abs_lfc, model,xmin, xmax) {
-
-  if (length(target) != length(lmb) || length(target) != length(abs_lfc)) {
-    stop("Lengths of 'target', 'lmb', and 'abs_lfc' must be the same.")
-  }
-
-  # Initialize an empty list to store the roots
-  roots <- list()
-
-  # Loop through each element and solve for the root
-  for (i in 1:length(target)) {
-    roots[[i]] <- uniroot(function(s) {
-      predict(model,
-              type = "response",
-              newdata = data.frame(sample_size = s,
-                                   lmean_abund = lmb[i],
-                                   abs_lfc = abs_lfc[i])
-      ) - target[i]
-    },
-    interval = c(xmin, xmax),
-    extendInt = "yes")$root
-  }
-
-  unlist(roots)
-}
-
-
-uniroot_lmb =  function(target_power,sample_size,abs_lfc,model,xmin,xmax){
-
-  root <- uniroot(function(lmb) {
-    predict(model,
-            type = "response",
-            newdata = data.frame(sample_size = sample_size,
-                                 lmean_abund = lmb,
-                                 abs_lfc = abs_lfc)
-    ) - target_power
-  },
-  interval = c(xmin, xmax),
-  extendInt = "yes")$root
-  root
-}
-
-
-
-inverse_lfc <- function(target,lmb,samp_size, model,xmin, xmax) {
-
-  if (length(target) != length(lmb) || length(target) != length(samp_size)) {
-    stop("Lengths of 'target', 'lmb', and 'abs_lfc' must be the same.")
-  }
-
-  # Initialize an empty list to store the roots
-  roots <- list()
-
-  # Loop through each element and solve for the root
-  for (i in 1:length(target)) {
-    roots[[i]] <- uniroot(function(s) {
-      predict(model,
-              type = "response",
-              newdata = data.frame(sample_size =  samp_size[i],
-                                   lmean_abund =  lmb[i],
-                                   abs_lfc     =  s)
-      ) - target[i]
-    },
-    interval = c(xmin, xmax),
-    extendInt = "yes")$root
-  }
-
-  unlist(roots)
-}
-
-
-
-inverse_lmb <- function(target,abs_lfc,samp_size, model,xmin, xmax) {
-
-  if (length(target) != length(abs_lfc) || length(target) != length(samp_size)) {
-    stop("Lengths of 'target', 'lmb', and 'abs_lfc' must be the same.")
-  }
-
-  # Initialize an empty list to store the roots
-  roots <- list()
-
-  # Loop through each element and solve for the root
-  for (i in 1:length(target)) {
-    roots[[i]] <- uniroot(function(lmb) {
-      predict(model,
-              type = "response",
-              newdata = data.frame(sample_size =  samp_size[i],
-                                   lmean_abund =  lmb,
-                                   abs_lfc     =  abs_lfc[i])
-      ) - target[i]
-    },
-    interval = c(xmin, xmax),
-    extendInt = "yes")$root
-  }
-
-  unlist(roots)
-}
-
-
-
-
-
-uniroot_ss =  function(target_power,lmean_abund, abs_lfc,model,xmin,xmax){
-
-  root <- uniroot(function(ss) {
-    predict(model,
-            type = "response",
-            newdata = data.frame(sample_size = ss,
-                                 lmean_abund = lmean_abund,
-                                 abs_lfc = abs_lfc)
-    ) - target_power
-  },
-  interval = c(xmin, xmax),
-  extendInt = "yes")$root
-  root
-}
-
-# Function to compute the missing input
-power.nb <- function(power, sample_size, logfoldchange, logmean_abundance, gam_mod) {
-
-  if (is.numeric(power) && is.numeric(sample_size) && is.numeric(logfoldchange) && is.numeric(logmean_abundance)) {
-    if (!missing(power) && !missing(sample_size) && !missing(logfoldchange)) {
-      if (missing(logmean_abundance)) {
-        # Compute the missing input
-
-      }
-    } else if (!missing(power) && !missing(sample_size) && !missing(logmean_abundance)) {
-      # Compute the missing input
-      logfoldchange <- logmean_abundance - power - sample_size
-    } else if (!missing(power) && !missing(logfoldchange) && !missing(logmean_abundance)) {
-      # Compute the missing input
-      sample_size <- logmean_abundance - power - logfoldchange
-    } else if (!missing(sample_size) && !missing(logfoldchange) && !missing(logmean_abundance)) {
-      # Compute the missing input
-      power <- logmean_abundance - sample_size - logfoldchange
-    } else {
-      stop("Please specify at least 3 inputs.")
-    }
-
-    # Return the computed inputs
-    return(list(power = power, sample_size = sample_size, logfoldchange = logfoldchange, logmean_abundance = logmean_abundance))
-  } else {
-    stop("Inputs must be numeric values.")
-  }
 }
 
 

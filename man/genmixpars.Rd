@@ -19,6 +19,16 @@ slopes, quad coeffs, etc.)}
 
 \item{sd_ord}{order of logsd model (2 = quadratic)}
 }
+\value{
+A list
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{ probs: mixture proportions ()
+
+ muvals: mean values
+
+ sdvals: standard deviation values
+}\if{html}{\out{</div>}}
+}
 \description{
 generate normal mixture parameters (prob vector, mean vector, sd vector
 for a specified set of 'x' values (logmean)

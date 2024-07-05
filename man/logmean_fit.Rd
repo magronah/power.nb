@@ -2,18 +2,29 @@
 % Please edit documentation in R/fit.R
 \name{logmean_fit}
 \alias{logmean_fit}
-\title{Title}
+\title{Fit a mixture of Gaussian Distributions to log mean count of taxa.}
 \usage{
-logmean_fit(logmean)
+logmean_fit(logmean, sig = 0.05, max.comp = 4, max.boot = 100)
 }
 \arguments{
-\item{logmean:}{vector of log mean abundances}
+\item{logmean}{vector of log mean count of taxa}
+
+\item{sig}{significance level to compare against p-value to be used for
+parametric bootstrap calculation}
+
+\item{max.comp}{maximum number of Gaussian components to compare sequentially}
+
+\item{max.boot}{maximum number of bootstraps simulations}
 }
 \value{
-: components: optimal number of Gaussian components and
-logmean_param: parameters for  Gaussian mixtures
-density_plot: plot comparing simulation from fit with observation
+A list containing the optimal number of Gaussian components fitted; and mean and
+variance parameter estimates from the fit
 }
 \description{
-Title
+The optimal number of components to fit is chosen using parametric bootstrap method
+}
+\examples{
+logmean  = rnorm(100)
+logmean_fit(logmean,sig=0.05,max.comp=4,max.boot=100)
+
 }

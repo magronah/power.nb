@@ -2,7 +2,7 @@
 % Please edit documentation in R/utils.R
 \name{deseqfun}
 \alias{deseqfun}
-\title{Title}
+\title{Estimate log fold changes using \code{DESeq2}.}
 \usage{
 deseqfun(
   countdata,
@@ -16,17 +16,44 @@ deseqfun(
 )
 }
 \arguments{
+\item{countdata}{otu count data}
+
+\item{metadata}{dataframe with 2 rows sample names and group names}
+
+\item{alpha_level}{significance level}
+
 \item{ref_name:}{reference for fold change calculation}
 
-\item{minReplicatesForReplace:}{deseq's parameter to control minimum number of
+\item{minReplicatesForReplace:}{DESeq2's parameter to control minimum number of
 replicates needed for the replacement of outliers during dispersion estimation.}
 
-\item{cooksCutoff:}{deseq's outlier removal or shrinkage}
+\item{cooksCutoff:}{DESeq2's outlier removal or shrinkage.}
 
-\item{independentFiltering:}{deseq's independent filtering}
+\item{independentFiltering:}{DESeq2's independent filtering.}
 
-\item{shrinkage_method:}{deseq's shrinkage method}
+\item{shrinkage_method:}{DESeq2's shrinkage method}
+}
+\value{
+A list
+
+logfoldchange log fold change estimates
+
+logmean  is the log mean count for taxa
+(arithmetic mean for taxa across all subjects)
+
+dispersion: dispersion estimates for each taxa
+
+deseq_estimate is a  dataframe containing results from deseq
+baseMean,log2FoldChange, lfcSE, pvalue, padj
+
+normalised_count is the normalised count data
 }
 \description{
-Title
+It is stongly recommended to keep defaults for \code{minReplicatesForReplace=Inf},
+\code{cooksCutoff=TRUE}, \code{independentFiltering=TRUE}, especially when
+estimating fold change in order to fit the mixture of Gaussian distributions.
+}
+\examples{
+countdata = matrix(100, ncol = ..)
+deseqfun(countdata,metadata)
 }

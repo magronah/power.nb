@@ -2,7 +2,7 @@
 % Please edit documentation in R/fit.R
 \name{logfoldchange_fit}
 \alias{logfoldchange_fit}
-\title{Title}
+\title{Fit a mixture of Gaussian distributions to log fold change}
 \usage{
 logfoldchange_fit(
   logmean,
@@ -18,24 +18,48 @@ logfoldchange_fit(
 )
 }
 \arguments{
-\item{seed}{}
+\item{logmean}{vector of log mean abundance}
 
-\item{logmean:}{vector of log mean abundance}
+\item{logfoldchange}{vector of log fold change}
 
-\item{logfoldchange:}{vector of log fold change}
+\item{ncore}{number of cores to use}
 
-\item{ncore:}{number of cores to use}
-
-\item{max_sd_ord:}{the maximum order of polynomial function to fit to
+\item{max_sd_ord}{the maximum order of polynomial function to fit to
 standard deviation parameter.
 This must be either 1 (linear) or 2(quadratic)}
 
-\item{max_np:}{maximum number of Gaussian components to check for}
+\item{max_np}{maximum number of Gaussian components to check for}
 
-\item{minval:}{minimum value for DEoptim search}
+\item{minval}{minimum value for DEoptim search}
 
-\item{maxval:}{maximum value for DEoptim search}
+\item{maxval}{maximum value for DEoptim search}
+
+\item{itermax}{maximum number of iterations}
+
+\item{NP}{the number of population members for DEoptim}
+
+\item{seed}{seed value}
+}
+\value{
+A list.
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{   par is a vector of the estimates of the mixture proportion,
+   the mean and standard deviation parameters,
+
+   np is the number of gaussian components fitted
+
+   sd_ord is the order for the function for the standard deviation
+
+   aic is the aic of the best fit
+}\if{html}{\out{</div>}}
 }
 \description{
-Title
+The standard deviation parameters are modeled either by linear or quadratic functions of log mean count and the mean parameter is modeled
+by linear functions of log mean count
+}
+\examples{
+logmean        =  rnorm(100)
+logfoldchange  =  rnorm(100)
+logfoldchange_fit(logmean,logfoldchange)
+
 }

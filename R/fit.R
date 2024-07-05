@@ -1,41 +1,25 @@
-##########################################################################
-#' Title: compute the optimal number of components using parametric bootstrap
+#' Fit a mixture of Gaussian Distributions to log mean count of taxa.
 #'
-#' @param logmean
-#' @param sig: significance level
-#' @param max.comp: maximum number of Gaussian components to check
-#' @param max.boot: maximum number of bootstraps  to test
+#' The optimal number of components to fit is chosen using parametric bootstrap method
 #'
-#' @return: ncomp: the optimal number of components for log mean abundance
+#' @param logmean vector of log mean count of taxa
+#' @param sig significance level to compare against p-value to be used for
+#'             parametric bootstrap calculation
+#' @param max.comp maximum number of Gaussian components to compare sequentially
+#' @param max.boot maximum number of bootstraps simulations
+#' @return A list containing the optimal number of Gaussian components fitted; and mean and
+#'          variance parameter estimates from the fit
+
+
 #' @export
 #'
 #' @examples
-optimal.comp <- function(logmean,sig=0.05,max.comp=4,max.boot=100){
-  a <- boot.comp(y = logmean, max.comp = max.comp, B = max.boot,
-                 mix.type = "normalmix",epsilon = 1e-3)
-
-  pvals=a$p.values; l=length(pvals)
-  ncomp <- if (pvals[length(pvals)]<sig) length(pvals)+1 else length(pvals)
-  return(ncomp)
-}
-
-
-##########################################################################
-
-#' Title
+#' logmean  = rnorm(100)
+#' logmean_fit(logmean,sig=0.05,max.comp=4,max.boot=100)
 #'
-#' @param logmean: vector of log mean abundances
-#'
-#' @return: components: optimal number of Gaussian components and
-#'          logmean_param: parameters for  Gaussian mixtures
-#'          density_plot: plot comparing simulation from fit with observation
-#' @export
-#'
-#' @examples
-#'
-logmean_fit <- function(logmean){
+logmean_fit <- function(logmean,sig=0.05,max.comp=4,max.boot=100){
 
-  ncomp_opt = optimal.comp(logmean)
+  ncomp_opt = optimal.comp(logmean,sig,max.comp,max.boot)
   if(length(ncomp_opt) == 0){stop("zero number of component")}
 
   if(ncomp_opt == 1){
@@ -59,29 +43,28 @@ logmean_fit <- function(logmean){
                                 sigma=mixmdl$sigma)
   }
 
-  dat = data.frame(logmean)
-  pp=ggplot(dat, aes(logmean)) +
-    geom_histogram(aes(y=after_stat(density)),color=1, fill = "white") +
-    geom_density(aes(colour="observation"), lwd=1) +
-    geom_density(aes(x=sim_mean, colour="simulation"), lwd=1) +
-    xlab(TeX("$\\log_2$(overall mean abundance)"))
-
-  list(logmean_param=param,
-       density_plot=pp,
-       components=ncomp_opt)
+  list(logmean_param=param,components=ncomp_opt)
 }
 
 
 ##################################################################
-#' Title: fit non-linear model: a  + b/mean_abundance to dispersion estimates
+#' Fit the non-linear function to dispersion estimates
 #'
-#' @param dispersion: dispersion estimates from deseq
-#' @param logmean vector of log mean abundance
+#' Dispersion are estimated from the `DESeq2` package. The function fitted is of the
+#' form  `a + b/(mean count)` where `a` represents the asymptotic dispersion level
+#' for high abundance taxa, and `b` captures additional dispersion variability.
 #'
-#' @return: param: parameters for the fit with confidence intervals
+#' @param dispersion dispersion estimates from deseq
+#' @param logmean  vector of log mean abundance
+#'
+#' @return A list containing estimates for `a` and `b` and confidence intervals
 #' @export
 #'
 #' @examples
+#' logmean    =  rnorm(100)
+#' dispersion =  abs(rnorm(100))
+#' dispersion_fit(dispersion,logmean)
+
 dispersion_fit <- function(dispersion,logmean){
 
   dat = data.frame(dispersion=dispersion,mean_abund = 2^logmean)
@@ -96,25 +79,42 @@ dispersion_fit <- function(dispersion,logmean){
 }
 
 ##################################################################
-#' Title
+#' Fit a mixture of Gaussian distributions to log fold change
 #'
-#' @param logmean: vector of log mean abundance
-#' @param logfoldchange: vector of log fold change
-#' @param ncore: number of cores to use
-#' @param max_sd_ord: the maximum order of polynomial function to fit to
+#' The standard deviation parameters are modeled either by linear or quadratic functions of log mean count and the mean parameter is modeled
+#' by linear functions of log mean count
+#'
+#' @param logmean vector of log mean abundance
+#' @param logfoldchange vector of log fold change
+#' @param ncore number of cores to use
+#' @param max_sd_ord the maximum order of polynomial function to fit to
 #'                    standard deviation parameter.
 #'                    This must be either 1 (linear) or 2(quadratic)
-#' @param max_np: maximum number of Gaussian components to check for
-#' @param minval: minimum value for DEoptim search
-#' @param maxval: maximum value for DEoptim search
-#' @param NP:
-#' @param itermax:
-#' @param seed
+#' @param max_np maximum number of Gaussian components to check for
+#' @param minval minimum value for DEoptim search
+#' @param maxval maximum value for DEoptim search
+#' @param NP the number of population members for DEoptim
+#' @param itermax maximum number of iterations
+#' @param seed  seed value
 #'
-#' @return
+#' @return A list.
+#'
+#'        par is a vector of the estimates of the mixture proportion,
+#'        the mean and standard deviation parameters,
+#'
+#'        np is the number of gaussian components fitted
+#'
+#'        sd_ord is the order for the function for the standard deviation
+#'
+#'        aic is the aic of the best fit
+#'
 #' @export
 #'
 #' @examples
+#' logmean        =  rnorm(100)
+#' logfoldchange  =  rnorm(100)
+#' logfoldchange_fit(logmean,logfoldchange)
+#'
 logfoldchange_fit = function(logmean,logfoldchange,ncore = 2,
                              max_sd_ord = 2, max_np=5,
                              minval = -5, maxval = 5,
@@ -127,11 +127,6 @@ logfoldchange_fit = function(logmean,logfoldchange,ncore = 2,
     for(np in 2:max_np){
 
       l   =  (np-1)+2*np+(sd_ord+1)*np
-      #NP = 10*l
-      #per the recommendation form the authors of DEOptim
-      # Set the number of parents NP to 10 times the number of parameters
-      #https://cran.r-project.org/web/packages/DEoptim/DEoptim.pdf
-      ################################################################
       set.seed(seed)
 
       cl <- makeCluster(ncore)
@@ -159,19 +154,31 @@ logfoldchange_fit = function(logmean,logfoldchange,ncore = 2,
 }
 
 ##################################################################
+#' Title
+#'
+#' @param deseq_est_list a list containing fold change, pvalues and other estimates from `DESeq2`
+#' @param true_lfoldchange_list list containing simulated log fold change used  for simulating the count data
+#' @param true_lmean_list   list containing simulated log mean count used  for simulating the count data
+#' @param grid_len     number of grids for
+#' @param alpha_level significance level for power calculations
+#'
+#' @return A list
+#'
+#' fit_2d is the fitted scam object
+#'
+#' power_estimate predicted power estimated using fit_2d
+#'
+#' combined_data tibble containing pvlaues and used for GAM fit
+
+#' @export
+#'
 gam_fit <- function(deseq_est_list,
                     true_lfoldchange_list,
                     true_lmean_list,
                     grid_len = 50,
                     alpha_level=0.1){
 
-
-  # p_val   =  (deseq_est_list
-  #                   %>% setNames(paste0("padjust",
-  #                                     1:length(deseq_est_list)))
-  #                   %>%  purrr::map_dfr(pull, padj))
-
-  p_val   = foreach(k = 1:length(deseq_est_list),.combine = "c") %do%{
+  p_val   = foreach::foreach(k = 1:length(deseq_est_list),.combine = "c") %do%{
     deseq_est_list[[k]]$padj
   }
 
@@ -183,9 +190,9 @@ gam_fit <- function(deseq_est_list,
                       abs_lfc   =  abs(true_lfoldchange),
                       pval_reject  =  as.numeric(pval_reject))
 
-  #fit scams
-  fit_2d       =    scam(pval_reject ~ s(lmean_abund, abs_lfc, bs="tedmi"),
-                         data = comb, family = binomial)
+
+  fit_2d       =    scam::scam(pval_reject ~ s(lmean_abund, abs_lfc, bs="tedmi"),
+                               data = comb, family = binomial)
 
   pp      =   with(comb,
                    expand.grid(lmean_abund = seq(min(lmean_abund),
@@ -194,73 +201,11 @@ gam_fit <- function(deseq_est_list,
                                abs_lfc   =  seq(min(abs_lfc),
                                                 max(abs_lfc),
                                                 length  =  grid_len)))
-  #predict power
   pp$power <- predict(fit_2d, newdata = pp,type = "response")
 
   p=list(combined_data = comb, power_estimate = pp, fit_2d=fit_2d)
   p
 }
 
-
-
-#' Title
-#'
-#' @param deseq_estimate_list list containing simulations for each sample size
-#' @param true_lfoldchange_list
-#' @param true_lmean_list
-#' @param alpha
-#'
-#' @return
-#' @export
-#'
-#' @examples
-power_fun_ss <- function(deseq_est_list,
-                         true_logfoldchange,
-                         true_logmean,
-                         sample_vec,
-                         alpha=0.1,notu){
-
-  # concatenate all p-values from all the sample size
-  # est_list <- do.call("c", deseq_est_list)
-  # p_val <- do.call("c", lapply(est_list, function(est) est$deseq_estimate$padj))
-
-  # concatenate all log foldchange, logmean from all the sample size
-  #true_logfoldchange <- do.call("c", do.call("c", sim_logfoldchange_list))
-  #true_logmean  <-  do.call("c", do.call("c", sim_logmean_list))
-
-  #deseq_est_list = deseq_sample_size[[1]]
-  # find p-values that were rejected
-  p_val =  deseq_est_list$padj
-
-  pval_reject   =   (!is.na(p_val) & p_val < 0.1)
-  #length(p_val)
-  # create a table with all the information
-  comb   =   tibble(lmean_abund  =   true_logmean,
-                    abs_lfc      =   abs(true_logfoldchange),
-                    pval_reject  =   as.numeric(pval_reject))
-
-  comb$sample_size = deseq_est_list$sample_size #rep(sample_vec, each = nsim*notu)
-  #' fit GAM with covariates as tensor product (ie,interaction between
-  #' log mean abundance and absolute log fold changes
-  #' and then a spline for the sample sizes
-  #' log mean abundance and log fold changes are related directly,hence the
-  #' interaction but sample size is not quite related to log mean abundance
-  #' and log fold changes directly
-
-  df =  length(sample_vec) -1 # degrees of freedom
-  comb$lss = log2(comb$sample_size)
-
-  # fit_3d <- scam(pval_reject ~ s(lmean_abund, abs_lfc,bs="tedmi") + s(lss, k = df),
-  #                data = comb, family = binomial)
-  # fit_3d <- scam(pval_reject ~ s(lmean_abund, abs_lfc,bs="tedmi") + s(sample_size,bs="mpi"),
-  #                data = comb, family = binomial)
-
-  fit_3d <- scam(pval_reject ~ s(lmean_abund, abs_lfc,bs="tedmi") +
-                   s(sample_size,lmean_abund,bs="tedmi") +
-                   s(sample_size,abs_lfc,bs="tedmi"),
-                 data = comb, family = binomial)
-
-  list(combined_data=comb, gam_mod = fit_3d)
-}
 
 

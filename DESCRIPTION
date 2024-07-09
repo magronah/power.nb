@@ -2,15 +2,16 @@ Package: power.nb
 Title: Power and Sample Size Calculation for Differential Abundance Microbiome Studies
 Version: 0.0.0.9000
 Authors@R: 
-    person("Michael", "Agronah", 
-           email =  "agronahm@mcmaster.ca", role = "aut",
-           comment = c(ORCID = "0009-0007-2655-4094"))
+   c(person("Michael", "Agronah", 
+           email =  "agronahm@mcmaster.ca", role = c("aut","cre"),
+           comment = c(ORCID = "0009-0007-2655-4094")),
    person("Ben","Bolker", role="aut", 
-     email =  "bolker@mcmaster.ca"
-   comment=c(ORCID="0000-0002-2127-0443")),
-Description: Calculates power and sample size for differential abundance microbiome studies 
-             based on the negative binomial model
+     email =  "bolker@mcmaster.ca",
+   comment=c(ORCID="0000-0002-2127-0443"))
+   )
+Description: Calculates power and sample size for differential abundance microbiome studies based on the negative binomial model.
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.1
+Imports: DESeq2, fitdistrplus, foreach, mixtools, scam, ggplot2, ggrastr, metR, DEoptim, latex2exp, parallel
+

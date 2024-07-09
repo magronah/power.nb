@@ -25,7 +25,6 @@ gam_fit(
 }
 \value{
 A list
-
 fit_2d is the fitted scam object
 
 power_estimate predicted power estimated using fit_2d

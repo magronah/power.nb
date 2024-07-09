@@ -362,8 +362,9 @@ deseq_fun_est <-function(metadata_list,  countdata_list,
 #' @param combined_data data used for fitting gam
 #' @param power_estimate predicted power
 #' @param cont_breaks breaks for contour plot
-#'
+#' @importFrom ggplot2 ggplot aes geom_contour geom_point xlab ylab scale_colour_manual
 #' @return ggplot object
+#' @importFrom latex2exp TeX
 #' @export
 #'
 #'
@@ -371,18 +372,23 @@ contour_plot_fun <- function(combined_data,
                              power_estimate,
                              cont_breaks){
 
+    ## utils::globalVariables(c("lmean_abund", "abs_lfc"))
+    ## deal with code checking: not sure why 'globalVariables' not working
+    lmean_abund <- abs_lfc <- power <- power_estimate <-
+        pvalue_reject <- level <- NULL
+    
   combined_data$pvalue_reject <- factor(combined_data$pval_reject)
 
   gg_2dimc <- (ggplot(combined_data)
                + aes(lmean_abund, abs_lfc)
-               + rasterise(geom_point(aes(color = pvalue_reject), alpha = 0.5))
+               + ggrastr::rasterise(geom_point(aes(color = pvalue_reject), alpha = 0.5))
                + xlab(TeX("$\\log_2$(mean counts)"))
                + ylab(TeX("|$\\log_2$(fold change)|"))
                + scale_colour_manual(values = c("black", "red"))
                + geom_contour(data = power_estimate,
                               aes(z=power),lwd=1,
                               breaks = cont_breaks)
-               + geom_label_contour(data = power_estimate,
+               + metR::geom_label_contour(data = power_estimate,
                                     aes(z= power,label = sprintf("%.3f", after_stat(level))),
                                     breaks = cont_breaks
                )

@@ -2,7 +2,7 @@
 % Please edit documentation in R/simulate.R
 \name{logfoldchange_sim_fun}
 \alias{logfoldchange_sim_fun}
-\title{Title}
+\title{Simulate Log Fold Change Values}
 \usage{
 logfoldchange_sim_fun(
   logmean_sim,
@@ -12,21 +12,42 @@ logfoldchange_sim_fun(
 )
 }
 \arguments{
-\item{logmean_sim:}{simulated log mean abundance}
+\item{logmean_sim}{A numeric vector of simulated log mean abundances.}
 
-\item{logfoldchange_param:}{list containing the
-par = optimal parameters for log fold change fit
-np = optimal number of components for log fold change
-sd_order: order polynomial for standard deviation parameter
-for log fold change}
+\item{logfoldchange_param}{A list containing parameters for the log fold change simulation:
+\itemize{
+\item \code{par}: Optimal parameters for the log fold change fit.
+\item \code{np}: Optimal number of components for the log fold change model.
+\item \code{sd_ord}: Order of the polynomial used for the standard deviation parameter of the log fold change.
+}}
 
-\item{max_lfc:}{maximum log fold change value to be simulated}
+\item{max_lfc}{A numeric value specifying the maximum allowable absolute log fold change value. Default is 15.}
 
-\item{max_iter:}{maximum iteration while simulating logfoldchange < max_lfc}
+\item{max_iter}{An integer specifying the maximum number of iterations allowed to ensure all simulated LFC values are within the \code{max_lfc} range. Default is 10,000.}
 }
 \value{
-: lfc: vector of  log fold change values
+A numeric vector of simulated log fold change values (\code{lfc}).
 }
 \description{
-Title
+This function generates simulated log fold change (LFC) values based on the provided log mean abundance and LFC parameters.
+The simulation ensures that the generated LFC values remain within a specified maximum range by iterating until convergence or until a maximum iteration limit is reached.
+}
+\examples{
+# Define simulated log mean abundance
+logmean_sim <- rnorm(100, mean = 0, sd = 1)
+
+# Define parameters for log fold change simulation
+logfoldchange_param <- list(
+  par = c(1, -0.5, 0.2), # Example parameters
+  np = 2,                # Number of components
+  sd_ord = 2             # Order of polynomial for SD
+)
+
+# Simulate log fold change values
+logfoldchange_sim_fun(
+  logmean_sim = logmean_sim,
+  logfoldchange_param = logfoldchange_param,
+  max_lfc = 10,
+  max_iter = 5000
+)
 }

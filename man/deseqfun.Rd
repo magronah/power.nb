@@ -16,44 +16,57 @@ deseqfun(
 )
 }
 \arguments{
-\item{countdata}{otu count data}
+\item{countdata}{A matrix of OTU count data where rows represent taxa and columns represent samples.}
 
-\item{metadata}{dataframe with 2 rows sample names and group names}
+\item{metadata}{A dataframe containing sample information with two rows: one for sample names and one for group names.}
 
-\item{alpha_level}{significance level}
+\item{alpha_level}{The significance level for determining differential expression. Default is 0.1.}
 
-\item{ref_name:}{reference for fold change calculation}
+\item{ref_name}{The reference group for calculating fold changes. Default is "NT" (Non-Treatment).}
 
-\item{minReplicatesForReplace:}{DESeq2's parameter to control minimum number of
-replicates needed for the replacement of outliers during dispersion estimation.}
+\item{minReplicatesForReplace}{DESeq2's parameter to control the minimum number of replicates required for replacing outliers during dispersion estimation. Default is \code{Inf} (no replacement).}
 
-\item{cooksCutoff:}{DESeq2's outlier removal or shrinkage.}
+\item{cooksCutoff}{DESeq2's parameter for removing outliers based on Cook's distance. Default is \code{TRUE} (outlier removal enabled).}
 
-\item{independentFiltering:}{DESeq2's independent filtering.}
+\item{independentFiltering}{DESeq2's parameter for independent filtering. Default is \code{TRUE}.}
 
-\item{shrinkage_method:}{DESeq2's shrinkage method}
+\item{shrinkage_method}{DESeq2's shrinkage method for fold changes. Default is \code{"normal"}. Other options include \code{"apeglm"} or \code{"ashr"}.}
 }
 \value{
-A list
-
-logfoldchange log fold change estimates
-
-logmean  is the log mean count for taxa
-(arithmetic mean for taxa across all subjects)
-
-dispersion: dispersion estimates for each taxa
-
-deseq_estimate is a  dataframe containing results from deseq
-baseMean,log2FoldChange, lfcSE, pvalue, padj
-
-normalised_count is the normalised count data
+A list containing the following elements:
+\itemize{
+\item \code{logfoldchange}: A vector of log fold change estimates for each taxa.
+\item \code{logmean}: A vector of log mean counts for each taxa (arithmetic mean for taxa across all subjects).
+\item \code{dispersion}: A vector of dispersion estimates for each taxa.
+\item \code{deseq_estimate}: A dataframe containing DESeq2 results, including \code{baseMean}, \code{log2FoldChange}, \code{lfcSE}, \code{pvalue}, and \code{padj}.
+\item \code{normalised_count}: A matrix of normalized count data.
+}
 }
 \description{
-It is stongly recommended to keep defaults for \code{minReplicatesForReplace=Inf},
-\code{cooksCutoff=TRUE}, \code{independentFiltering=TRUE}, especially when
-estimating fold change in order to fit the mixture of Gaussian distributions.
+This function estimates log fold changes (LFC) for microbiome count data using the DESeq2 package.
+It is strongly recommended to keep the following defaults:
+\itemize{
+\item \code{minReplicatesForReplace=Inf}
+\item \code{cooksCutoff=TRUE}
+\item \code{independentFiltering=TRUE}
+These options are particularly useful when estimating fold changes to fit the mixture of Gaussian distributions.
+}
 }
 \examples{
-countdata = matrix(100, ncol = ..)
-deseqfun(countdata,metadata)
+# Example usage
+countdata <- matrix(100, ncol = 10, nrow = 50)
+# Simulated OTU count data with 50 taxa and 10 samples
+
+metadata <- data.frame(Samples = paste("Sample", 1:10, sep = "_"),
+             Groups = rep(c("Control", "Treatment"), each = 5))
+
+result <- deseqfun(countdata, metadata)
+
+# Examine the results
+result$logfoldchange  # Log fold changes
+result$logmean  # Log mean counts
+result$dispersion  # Dispersion estimates
+result$deseq_estimate  # DESeq2 results
+result$normalised_count  # Normalized count data
+
 }

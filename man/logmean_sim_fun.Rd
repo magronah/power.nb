@@ -2,15 +2,38 @@
 % Please edit documentation in R/simulate.R
 \name{logmean_sim_fun}
 \alias{logmean_sim_fun}
-\title{Title}
+\title{Simulate Log Means for OTUs}
 \usage{
 logmean_sim_fun(logmean_param, notu)
 }
 \arguments{
-\item{logmean_param}{log mean parameter}
+\item{logmean_param}{A list containing the parameters for the distribution:
+\itemize{
+\item \code{mu}: A single value or a vector of mean(s) for the normal or mixture distribution.
+\item \code{sigma}: The standard deviation(s) for the normal or mixture distribution.
+\item \code{lambda}: (Optional) A vector of weights for the components of the mixture distribution. Required only if \code{mu} has more than one value.
+}}
 
-\item{notu}{number of otus}
+\item{notu}{An integer specifying the number of OTUs to simulate.}
+}
+\value{
+A numeric vector of simulated log means for the specified number of OTUs.
 }
 \description{
-Title
+This function generates log means for a specified number of OTUs (Operational Taxonomic Units) based on the provided parameters.
+If a single mean is specified, the log means are drawn from a normal distribution.
+If multiple means and corresponding weights are specified, the log means are drawn from a mixture of normal distributions.
+}
+\examples{
+# Example 1: Single normal distribution
+params_single <- list(mu = 0, sigma = 1)
+logmean_sim_fun(logmean_param = params_single, notu = 100)
+
+# Example 2: Mixture of normal distributions
+params_mixture <- list(
+  mu = c(-1, 1),
+  sigma = c(0.5, 0.5),
+  lambda = c(0.4, 0.6)
+)
+logmean_sim_fun(logmean_param = params_mixture, notu = 100)
 }

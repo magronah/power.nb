@@ -1,13 +1,34 @@
 #######################################################
-#' Title
+#' Simulate Log Means for OTUs
 #'
-#' @param logmean_param log mean parameter
-#' @param notu number of otus
+#' This function generates log means for a specified number of OTUs (Operational Taxonomic Units) based on the provided parameters.
+#' If a single mean is specified, the log means are drawn from a normal distribution.
+#' If multiple means and corresponding weights are specified, the log means are drawn from a mixture of normal distributions.
 #'
-#' @return
+#' @param logmean_param A list containing the parameters for the distribution:
+#' \itemize{
+#'   \item \code{mu}: A single value or a vector of mean(s) for the normal or mixture distribution.
+#'   \item \code{sigma}: The standard deviation(s) for the normal or mixture distribution.
+#'   \item \code{lambda}: (Optional) A vector of weights for the components of the mixture distribution. Required only if \code{mu} has more than one value.
+#' }
+#' @param notu An integer specifying the number of OTUs to simulate.
+#'
+#' @return A numeric vector of simulated log means for the specified number of OTUs.
+#'
 #' @export
 #'
 #' @examples
+#' # Example 1: Single normal distribution
+#' params_single <- list(mu = 0, sigma = 1)
+#' logmean_sim_fun(logmean_param = params_single, notu = 100)
+#'
+#' # Example 2: Mixture of normal distributions
+#' params_mixture <- list(
+#'   mu = c(-1, 1),
+#'   sigma = c(0.5, 0.5),
+#'   lambda = c(0.4, 0.6)
+#' )
+#' logmean_sim_fun(logmean_param = params_mixture, notu = 100)
 logmean_sim_fun = function(logmean_param,notu){
 
   l=length(logmean_param$mu)
@@ -26,21 +47,44 @@ logmean_sim_fun = function(logmean_param,notu){
 }
 
 ##############################################################
-#' Title
+#' Simulate Log Fold Change Values
 #'
-#' @param logmean_sim: simulated log mean abundance
-#' @param logfoldchange_param: list containing the
-#'             par = optimal parameters for log fold change fit
-#'             np = optimal number of components for log fold change
-#'             sd_order: order polynomial for standard deviation parameter
-#'                     for log fold change
-#' @param max_lfc: maximum log fold change value to be simulated
-#' @param max_iter: maximum iteration while simulating logfoldchange < max_lfc
+#' This function generates simulated log fold change (LFC) values based on the provided log mean abundance and LFC parameters.
+#' The simulation ensures that the generated LFC values remain within a specified maximum range by iterating until convergence or until a maximum iteration limit is reached.
 #'
-#' @return: lfc: vector of  log fold change values
+#' @param logmean_sim A numeric vector of simulated log mean abundances.
+#' @param logfoldchange_param A list containing parameters for the log fold change simulation:
+#' \itemize{
+#'   \item \code{par}: Optimal parameters for the log fold change fit.
+#'   \item \code{np}: Optimal number of components for the log fold change model.
+#'   \item \code{sd_ord}: Order of the polynomial used for the standard deviation parameter of the log fold change.
+#' }
+#'
+#' @param max_lfc A numeric value specifying the maximum allowable absolute log fold change value. Default is 15.
+#' @param max_iter An integer specifying the maximum number of iterations allowed to ensure all simulated LFC values are within the \code{max_lfc} range. Default is 10,000.
+#'
+#' @return A numeric vector of simulated log fold change values (\code{lfc}).
+#'
 #' @export
 #'
 #' @examples
+#' # Define simulated log mean abundance
+#' logmean_sim <- rnorm(100, mean = 0, sd = 1)
+#'
+#' # Define parameters for log fold change simulation
+#' logfoldchange_param <- list(
+#'   par = c(1, -0.5, 0.2), # Example parameters
+#'   np = 2,                # Number of components
+#'   sd_ord = 2             # Order of polynomial for SD
+#' )
+#'
+#' # Simulate log fold change values
+#' logfoldchange_sim_fun(
+#'   logmean_sim = logmean_sim,
+#'   logfoldchange_param = logfoldchange_param,
+#'   max_lfc = 10,
+#'   max_iter = 5000
+#' )
 logfoldchange_sim_fun <- function(logmean_sim, logfoldchange_param,
                                   max_lfc = 15, max_iter = 10000) {
 
@@ -65,25 +109,71 @@ logfoldchange_sim_fun <- function(logmean_sim, logfoldchange_param,
 }
 
 ##############################################################
-#' Title
+#' Simulate Count Data for Microbiome Studies
 #'
-#' @param logmean_param :  log mean parameters
-#' @param logfoldchange_param : log fold change parameters
-#' @param dispersion_param : dispersion parameters
-#' @param nsamp_per_group : number of samples per group
-#' @param ncont: number of control samples
-#' @param ntreat: number of treatment samples
-#' @param notu : number of otus
-#' @param nsim :number of simulations
-#' @param disp_scale : scale parameter for dispersion
-#' @param max_lfc : maximum log fold change
-#' @param maxlfc_iter : maximum number of iterations
-#' @param seed : seed for simulation
+#' This function simulates count data for microbiome studies based on log mean, log fold change,
+#' and dispersion parameters. It supports generating data for multiple simulations and allows
+#' flexibility in specifying the number of control and treatment samples or samples per group.
 #'
-#' @return
+#' @param logmean_param A list of parameters for simulating the log mean abundance.
+#' @param logfoldchange_param A list of parameters for simulating log fold change, containing:
+#'   \itemize{
+#'     \item \code{par}: Optimal parameters for log fold change fitting.
+#'     \item \code{np}: Number of components for the log fold change model.
+#'     \item \code{sd_ord}: Order of the polynomial for the standard deviation parameter.
+#'   }
+#' @param dispersion_param A list of dispersion parameters containing:
+#'   \itemize{
+#'     \item \code{asymptDisp}: Asymptotic dispersion parameter.
+#'     \item \code{extraPois}: Additional Poisson variation parameter.
+#'   }
+#' @param nsamp_per_group Number of samples per group (control and treatment). If provided,
+#'   \code{ncont} and \code{ntreat} must not be specified.
+#' @param ncont Number of control samples. Specify along with \code{ntreat} when \code{nsamp_per_group} is not provided.
+#' @param ntreat Number of treatment samples. Specify along with \code{ncont} when \code{nsamp_per_group} is not provided.
+#' @param notu Number of operational taxonomic units (OTUs) to simulate.
+#' @param nsim Number of simulations to run. Default is 1.
+#' @param disp_scale Scale parameter for the dispersion. Default is 0.3.
+#' @param max_lfc Maximum allowable log fold change. Default is 15.
+#' @param maxlfc_iter Maximum number of iterations for ensuring log fold change is within \code{max_lfc}. Default is 1,000.
+#' @param seed Seed value for reproducibility. Default is \code{NULL}.
+#'
+#' @return A list containing:
+#'   \itemize{
+#'     \item \code{countdata_list}: A list of count data matrices for each simulation.
+#'     \item \code{metadata_list}: A list of metadata data frames for each simulation.
+#'     \item \code{logmean_list}: A list of log mean vectors for each simulation.
+#'     \item \code{logfoldchange_list}: A list of log fold change vectors for each simulation.
+#'     \item \code{treat_countdata_list}: A list of treatment count data matrices for each simulation.
+#'     \item \code{control_countdata_list}: A list of control count data matrices for each simulation.
+#'   }
+#'
 #' @export
 #'
 #' @examples
+#' # Load required packages
+#' library(foreach)
+#' library(doParallel)
+#' # Define parameters
+#' logmean_param <- list(mu = 0, sigma = 1)
+#' logfoldchange_param <- list(par = rnorm(11), np = 2, sd_ord = 2)
+#' dispersion_param <- list(asymptDisp = 0.1, extraPois = 0.05)
+#'
+#' # Simulate count data
+#' result <- countdata_sim_fun(
+#'   logmean_param = logmean_param,
+#'   logfoldchange_param = logfoldchange_param,
+#'   dispersion_param = dispersion_param,
+#'   nsamp_per_group = 10,
+#'   notu = 50,
+#'   nsim = 2,
+#'   seed = 123
+#' )
+#'
+#' # Access simulation results
+#' countdata <- result$countdata_list[[1]]
+#' metadata <- result$metadata_list[[1]]
+
 countdata_sim_fun <- function(logmean_param, logfoldchange_param, dispersion_param,
                               nsamp_per_group = NULL, ncont = NULL,ntreat = NULL,
                               notu, nsim = 1,   disp_scale=0.3, max_lfc = 15,
@@ -104,7 +194,6 @@ countdata_sim_fun <- function(logmean_param, logfoldchange_param, dispersion_par
   np      =   logfoldchange_param$np
   sd_ord  =   logfoldchange_param$sd_ord
 
-  pb <- txtProgressBar(0, nsim, style = 3)
   set.seed(seed)
 
   res = foreach(j = 1:nsim,
@@ -112,8 +201,6 @@ countdata_sim_fun <- function(logmean_param, logfoldchange_param, dispersion_par
                             "myrnormmix", "rnormmix0","genmixpars",
                             "dispersion_fun"),
                 .packages = c("stats","purrr", "mixtools"),.verbose = F) %do% {
-
-                  setTxtProgressBar(pb, j)
 
                   ####Simulate log mean and log fold change
                   logmean        =   logmean_sim_fun(logmean_param,notu)
@@ -127,7 +214,7 @@ countdata_sim_fun <- function(logmean_param, logfoldchange_param, dispersion_par
 
                   ####predict dispersion
                   dispersion  =   mean_abund |>
-                    map(function(x) dispersion_fun(x, dispersion_param$asymptDisp,
+                    purrr::map(function(x) dispersion_fun(x, dispersion_param$asymptDisp,
                                                    dispersion_param$extraPois)) |>  unlist()
 
                   dd = data.frame(control = control,
@@ -156,7 +243,7 @@ countdata_sim_fun <- function(logmean_param, logfoldchange_param, dispersion_par
                   }else{
                     n  =  ncont + ntreat
                     countdata = data.frame(apply(dd, 1, function(x) {
-                      rnbinom(n = n,
+                      stats::rnbinom(n = n,
                               mu = rep(c(x["control"],x["treatment"]),
                                        c(ncont,ntreat)),
                               size = 1/(disp_scale*x["dispersion"]))
@@ -199,7 +286,29 @@ countdata_sim_fun <- function(logmean_param, logfoldchange_param, dispersion_par
 }
 
 #######################################################
-dispersion_fun <- function(mean_abund,asymptDisp,extraPois){
-  asymptDisp + extraPois/mean_abund
+#' Calculate Dispersion for Microbiome Data
+#'
+#' This function calculates the dispersion value for microbiome data based on the
+#' provided parameters: mean abundance, asymptotic dispersion, and extra Poisson dispersion.
+#'
+#' The dispersion is calculated using the formula:
+#' \deqn{\text{dispersion} = \text{asymptDisp} + \frac{\text{extraPois}}{\text{mean_abund}}}
+#'
+#' @param mean_abund Numeric value representing the mean abundance of the taxa.
+#' @param asymptDisp Numeric value for the asymptotic dispersion (the dispersion at high abundance).
+#' @param extraPois Numeric value for the extra Poisson dispersion (to model overdispersion).
+#'
+#' @return A numeric value representing the dispersion.
+#'
+#' @examples
+#' mean_abund <- 10
+#' asymptDisp <- 0.1
+#' extraPois <- 0.05
+#' dispersion_fun(mean_abund, asymptDisp, extraPois)
+#'
+#' @export
+dispersion_fun <- function(mean_abund, asymptDisp, extraPois) {
+  asymptDisp + extraPois / mean_abund
 }
+
 

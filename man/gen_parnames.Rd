@@ -2,16 +2,38 @@
 % Please edit documentation in R/utils.R
 \name{gen_parnames}
 \alias{gen_parnames}
-\title{mm}
+\title{Generate Parameter Names for Mixture Model}
 \usage{
 gen_parnames(np, sd_ord)
 }
 \arguments{
-\item{np}{number of Gaussian components}
+\item{np}{Integer. The number of Gaussian components in the mixture model.}
 
-\item{sd_ord}{order of polynomial function to model standard deviation parameters
-(1 - linear function and 2- quadratic function)}
+\item{sd_ord}{Integer. The order of the polynomial function used to model the
+standard deviation parameters. Possible values are:
+\itemize{
+\item \code{1}: Linear function.
+\item \code{2}: Quadratic function.
+}}
+}
+\value{
+A character vector of parameter names, including:
+\itemize{
+\item Logit-transformed probabilities (\code{logitprob_1}, ..., \code{logitprob_(np-1)}).
+\item Mean parameters (\code{mu_int_1}, \code{mu_slope_1}, ..., for each component).
+\item Log-transformed standard deviations (\code{logsd_.1_1}, \code{logsd_.L_1}, ...,
+depending on \code{sd_ord} and \code{np}).
+}
 }
 \description{
-mm
+This function generates parameter names for a Gaussian mixture model based on the number
+of components (\code{np}) and the order of the polynomial function (\code{sd_ord})
+used to model the standard deviation parameters.
+}
+\examples{
+# Generate parameter names for a 3-component mixture with linear standard deviation function
+gen_parnames(np = 3, sd_ord = 1)
+
+# Generate parameter names for a 4-component mixture with quadratic standard deviation function
+gen_parnames(np = 4, sd_ord = 2)
 }

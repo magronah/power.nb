@@ -2,17 +2,42 @@
 % Please edit documentation in R/utils.R
 \name{dnormmix}
 \alias{dnormmix}
-\title{Takes a single vector of parameters on the unconstrained scale}
+\title{Density of a Normal Mixture Model}
 \usage{
 dnormmix(x, par, logmean, ..., log = FALSE)
 }
 \arguments{
-\item{par}{softmax(prob), mean, log(sd) on unconstrained scale}
+\item{x}{Numeric vector of values at which to evaluate the density.}
 
-\item{...}{other input calues taken by \code{genmixpars}}
+\item{par}{A vector of parameters on the unconstrained scale, including:
+\itemize{
+\item \code{softmax(prob)}: Mixture probabilities (on the unconstrained scale, transformed via softmax).
+\item \code{mean}: Means of the normal components.
+\item \code{log(sd)}: Logarithms of standard deviations of the normal components.
+}}
 
-\item{log}{log scale}
+\item{logmean}{Numeric value representing the log of the mean parameter.}
+
+\item{...}{Additional arguments passed to the \code{genmixpars} function.}
+
+\item{log}{Logical. If \code{TRUE}, the logarithm of the density is returned. Default is \code{FALSE}.}
+}
+\value{
+A numeric vector of density values (or log-density values if \code{log = TRUE}) for the mixture model.
 }
 \description{
-Takes a single vector of parameters on the unconstrained scale
+This function calculates the density of a normal mixture model for a given vector of parameters
+on the unconstrained scale (softmax(prob), mean, log(sd)).
+}
+\examples{
+# Example parameters
+x <- seq(-3, 3, length.out = 100)
+par <- c(-0.5, 0.5, log(0.8), log(1.2))  # Example: softmax probabilities, mean, log(sd)
+logmean <- 0.1
+
+# Calculate density
+density <- dnormmix(x, par, logmean)
+
+# Calculate log-density
+log_density <- dnormmix(x, par, logmean, log = TRUE)
 }

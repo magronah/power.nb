@@ -139,7 +139,7 @@ logfoldchange_fit = function(logmean,logfoldchange,ncore = 2,
                                                 cluster = cl))
 
       pn <- gen_parnames(np = np, sd_ord = sd_ord)
-      par <- setNames(opt$optim$bestmem, pn)
+      par <- stats::setNames(opt$optim$bestmem, pn)
       aic = 2*length(par) + 2*opt$optim$bestval
 
 

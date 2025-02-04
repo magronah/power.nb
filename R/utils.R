@@ -56,39 +56,47 @@ filter_low_count <- function(countdata, metadata,abund_thresh=5, sample_thresh=3
 ########################################################
 #' Estimate log fold changes using `DESeq2`.
 #'
-#' It is stongly recommended to keep defaults for `minReplicatesForReplace=Inf`,
-#' `cooksCutoff=TRUE`, `independentFiltering=TRUE`, especially when
-#' estimating fold change in order to fit the mixture of Gaussian distributions.
+#' This function estimates log fold changes (LFC) for microbiome count data using the DESeq2 package.
+#' It is strongly recommended to keep the following defaults:
+#' - `minReplicatesForReplace=Inf`
+#' - `cooksCutoff=TRUE`
+#' - `independentFiltering=TRUE`
+#' These options are particularly useful when estimating fold changes to fit the mixture of Gaussian distributions.
+#' @param countdata A matrix of OTU count data where rows represent taxa and columns represent samples.
+#' @param metadata A dataframe containing sample information with two rows: one for sample names and one for group names.
+#' @param alpha_level The significance level for determining differential expression. Default is 0.1.
+#' @param ref_name The reference group for calculating fold changes. Default is "NT" (Non-Treatment).
+#' @param minReplicatesForReplace DESeq2's parameter to control the minimum number of replicates required for replacing outliers during dispersion estimation. Default is `Inf` (no replacement).
+#' @param cooksCutoff DESeq2's parameter for removing outliers based on Cook's distance. Default is `TRUE` (outlier removal enabled).
+#' @param independentFiltering DESeq2's parameter for independent filtering. Default is `TRUE`.
+#' @param shrinkage_method DESeq2's shrinkage method for fold changes. Default is `"normal"`. Other options include `"apeglm"` or `"ashr"`.
 #'
+#' @return A list containing the following elements:
+#' - `logfoldchange`: A vector of log fold change estimates for each taxa.
+#' - `logmean`: A vector of log mean counts for each taxa (arithmetic mean for taxa across all subjects).
+#' - `dispersion`: A vector of dispersion estimates for each taxa.
+#' - `deseq_estimate`: A dataframe containing DESeq2 results, including `baseMean`, `log2FoldChange`, `lfcSE`, `pvalue`, and `padj`.
+#' - `normalised_count`: A matrix of normalized count data.
 #'
-#' @param countdata otu count data
-#' @param metadata dataframe with 2 rows sample names and group names
-#' @param alpha_level significance level
-#' @param ref_name: reference for fold change calculation
-#' @param minReplicatesForReplace: DESeq2's parameter to control minimum number of
-#'     replicates needed for the replacement of outliers during dispersion estimation.
-#' @param cooksCutoff: DESeq2's outlier removal or shrinkage.
-#' @param independentFiltering: DESeq2's independent filtering.
-#' @param shrinkage_method:  DESeq2's shrinkage method
-#'
-#' @return  A list
-#'
-#' logfoldchange log fold change estimates
-#'
-#' logmean  is the log mean count for taxa
-#' (arithmetic mean for taxa across all subjects)
-#'
-#' dispersion: dispersion estimates for each taxa
-#'
-#' deseq_estimate is a  dataframe containing results from deseq
-#'         baseMean,log2FoldChange, lfcSE, pvalue, padj
-#'
-#' normalised_count is the normalised count data
 #' @export
 #'
 #' @examples
-#' countdata = matrix(100, ncol = ..)
-#' deseqfun(countdata,metadata)
+#' # Example usage
+#' countdata <- matrix(100, ncol = 10, nrow = 50)
+#' # Simulated OTU count data with 50 taxa and 10 samples
+#'
+#' metadata <- data.frame(Samples = paste("Sample", 1:10, sep = "_"),
+#'              Groups = rep(c("Control", "Treatment"), each = 5))
+#'
+#' result <- deseqfun(countdata, metadata)
+#'
+#' # Examine the results
+#' result$logfoldchange  # Log fold changes
+#' result$logmean  # Log mean counts
+#' result$dispersion  # Dispersion estimates
+#' result$deseq_estimate  # DESeq2 results
+#' result$normalised_count  # Normalized count data
+#'
 deseqfun <- function(countdata,metadata,alpha_level=0.1,ref_name="NT",
                      minReplicatesForReplace = Inf,
                      cooksCutoff = TRUE,
@@ -106,20 +114,20 @@ deseqfun <- function(countdata,metadata,alpha_level=0.1,ref_name="NT",
   metadata= metadata[keep, ]
 
   # call deseq
-  dds <- DESeqDataSetFromMatrix(countdata,metadata, ~Groups)
+  dds <- DESeq2::DESeqDataSetFromMatrix(countdata,metadata, ~Groups)
   dds$Groups <- relevel(dds$Groups, ref = ref_name)
 
-  dds <- DESeq(dds,sfType ="poscounts",
+  dds <- DESeq2::DESeq(dds,sfType ="poscounts",
                minReplicatesForReplace = minReplicatesForReplace)
 
-  res <- results(dds, cooksCutoff=cooksCutoff,
+  res <- stats::results(dds, cooksCutoff=cooksCutoff,
                  independentFiltering=independentFiltering,
                  alpha = alpha_level)
 
-  reslt <- lfcShrink(dds, res=res, coef=2, type=shrinkage_method)
+  reslt <- DESeq2::lfcShrink(dds, res=res, coef=2, type=shrinkage_method)
 
   deseq_est = data.frame(reslt)
-  disp = dispersions(dds)
+  disp = DESeq2::dispersions(dds)
 
   logfoldchange = deseq_est$log2FoldChange
   names(logfoldchange) = rownames(deseq_est)
@@ -213,7 +221,7 @@ rnormmix0 <- function(n, probs, muvals, sdvals) {
   np <- length(probs)
   component <- sample(np, size = n, prob = probs, replace = TRUE)
   inds <- cbind(seq(n), component)
-  rnorm(n, mean = muvals[inds], sd = sdvals[inds])
+  stats::rnorm(n, mean = muvals[inds], sd = sdvals[inds])
 }
 
 
@@ -257,18 +265,39 @@ dnormmix0 <- function(x, probs, muvals, sdvals, log = FALSE) {
   if (log) log(lik) else lik
 }
 
-#' Takes a single vector of parameters on the unconstrained scale
-#  (i.e. softmax(prob), mean, log(sd))
+
+#' Density of a Normal Mixture Model
 #'
+#' This function calculates the density of a normal mixture model for a given vector of parameters
+#' on the unconstrained scale (softmax(prob), mean, log(sd)).
 #'
-#' @param x
-#' @param par   softmax(prob), mean, log(sd) on unconstrained scale
-#' @param logmean
-#' @param ... other input calues taken by `genmixpars`
-#' @param log log scale
+#' @param x Numeric vector of values at which to evaluate the density.
+#' @param par A vector of parameters on the unconstrained scale, including:
+#'   \itemize{
+#'     \item \code{softmax(prob)}: Mixture probabilities (on the unconstrained scale, transformed via softmax).
+#'     \item \code{mean}: Means of the normal components.
+#'     \item \code{log(sd)}: Logarithms of standard deviations of the normal components.
+#'   }
+#' @param logmean Numeric value representing the log of the mean parameter.
+#' @param ... Additional arguments passed to the \code{genmixpars} function.
+#' @param log Logical. If \code{TRUE}, the logarithm of the density is returned. Default is \code{FALSE}.
 #'
-#' @return
+#' @return A numeric vector of density values (or log-density values if \code{log = TRUE}) for the mixture model.
 #'
+#' @export
+#'
+#' @examples
+#' # Example parameters
+#' x <- seq(-3, 3, length.out = 100)
+#' par <- c(-0.5, 0.5, log(0.8), log(1.2))  # Example: softmax probabilities, mean, log(sd)
+#' logmean <- 0.1
+#'
+#' # Calculate density
+#' density <- dnormmix(x, par, logmean)
+#'
+#' # Calculate log-density
+#' log_density <- dnormmix(x, par, logmean, log = TRUE)
+
 dnormmix <- function(x, par, logmean, ..., log = FALSE) {
   g0 <- genmixpars(logmean, par, ...)
   do.call(dnormmix0, c(list(x), g0, list(log = log)))
@@ -290,16 +319,37 @@ nllfun <- function(par, vals, logmean, np, sd_ord) {
 }
 
 
-#' mm
+#' Generate Parameter Names for Mixture Model
 #'
-#' @param np  number of Gaussian components
-#' @param sd_ord order of polynomial function to model standard deviation parameters
-#'               (1 - linear function and 2- quadratic function)
+#' This function generates parameter names for a Gaussian mixture model based on the number
+#' of components (\code{np}) and the order of the polynomial function (\code{sd_ord})
+#' used to model the standard deviation parameters.
 #'
-#' @return
+#' @param np Integer. The number of Gaussian components in the mixture model.
+#' @param sd_ord Integer. The order of the polynomial function used to model the
+#'   standard deviation parameters. Possible values are:
+#'   \itemize{
+#'     \item \code{1}: Linear function.
+#'     \item \code{2}: Quadratic function.
+#'   }
 #'
+#' @return A character vector of parameter names, including:
+#'   \itemize{
+#'     \item Logit-transformed probabilities (\code{logitprob_1}, ..., \code{logitprob_(np-1)}).
+#'     \item Mean parameters (\code{mu_int_1}, \code{mu_slope_1}, ..., for each component).
+#'     \item Log-transformed standard deviations (\code{logsd_.1_1}, \code{logsd_.L_1}, ...,
+#'           depending on \code{sd_ord} and \code{np}).
+#'   }
 #'
+#' @export
 #'
+#' @examples
+#' # Generate parameter names for a 3-component mixture with linear standard deviation function
+#' gen_parnames(np = 3, sd_ord = 1)
+#'
+#' # Generate parameter names for a 4-component mixture with quadratic standard deviation function
+#' gen_parnames(np = 4, sd_ord = 2)
+
 gen_parnames <- function(np, sd_ord) {
   ## taken from contr.poly:
   sdlabs <- c(".1", ".L", ".Q", ".C", paste0(".", 4:10))[1:(sd_ord+1)]
@@ -394,4 +444,40 @@ contour_plot_fun <- function(combined_data,
 
 
 
+#' Extract specified data from a list of datasets
+#'
+#' This function extracts a specific component (data) from a list of datasets.
+#' The component to extract is specified by the `extract_name` parameter, and
+#' the function returns a list containing the extracted data from each dataset.
+#'
+#' @param dataset_list A list of datasets from which data will be extracted.
+#' Each element of the list is assumed to be a dataset (typically a list or dataframe).
+#' @param extract_name A string representing the name of the component or column
+#' to be extracted from each dataset in the `dataset_list`. The function looks
+#' for this name within each dataset.
+#'
+#' @return A list containing the extracted data. Each element corresponds to
+#' the extracted component from the datasets in `dataset_list`. The names of
+#' the list elements are taken from the names of `dataset_list`.
+#'
+#' @examples
+#' # Example dataset list
+#' dataset1 <- list(countdata = matrix(1:9, nrow = 3), metadata = data.frame(id = 1:3))
+#' dataset2 <- list(countdata = matrix(10:18, nrow = 3), metadata = data.frame(id = 4:6))
+#' dataset_list <- list(dataset1 = dataset1, dataset2 = dataset2)
+#'
+#' # Extract 'countdata' from each dataset in the list
+#' result <- read_data(dataset_list, "countdata")
+#' print(result)
+#'
+#' @export
 
+read_data <- function(dataset_list, extract_name){
+  extract_data_list= list()
+  for(n in 1:length(dataset_list)){
+    dataset <- dataset_list[[n]]
+    extract_data_list[[n]] <- dataset[[extract_name]]
+  }
+  names(extract_data_list) <- names(dataset_list)
+  extract_data_list
+}

@@ -2,7 +2,7 @@
 % Please edit documentation in R/simulate.R
 \name{countdata_sim_fun}
 \alias{countdata_sim_fun}
-\title{Title}
+\title{Simulate Count Data for Microbiome Studies}
 \usage{
 countdata_sim_fun(
   logmean_param,
@@ -20,30 +20,77 @@ countdata_sim_fun(
 )
 }
 \arguments{
-\item{logmean_param}{:  log mean parameters}
+\item{logmean_param}{A list of parameters for simulating the log mean abundance.}
 
-\item{logfoldchange_param}{: log fold change parameters}
+\item{logfoldchange_param}{A list of parameters for simulating log fold change, containing:
+\itemize{
+\item \code{par}: Optimal parameters for log fold change fitting.
+\item \code{np}: Number of components for the log fold change model.
+\item \code{sd_ord}: Order of the polynomial for the standard deviation parameter.
+}}
 
-\item{dispersion_param}{: dispersion parameters}
+\item{dispersion_param}{A list of dispersion parameters containing:
+\itemize{
+\item \code{asymptDisp}: Asymptotic dispersion parameter.
+\item \code{extraPois}: Additional Poisson variation parameter.
+}}
 
-\item{nsamp_per_group}{: number of samples per group}
+\item{nsamp_per_group}{Number of samples per group (control and treatment). If provided,
+\code{ncont} and \code{ntreat} must not be specified.}
 
-\item{notu}{: number of otus}
+\item{ncont}{Number of control samples. Specify along with \code{ntreat} when \code{nsamp_per_group} is not provided.}
 
-\item{nsim}{:number of simulations}
+\item{ntreat}{Number of treatment samples. Specify along with \code{ncont} when \code{nsamp_per_group} is not provided.}
 
-\item{disp_scale}{: scale parameter for dispersion}
+\item{notu}{Number of operational taxonomic units (OTUs) to simulate.}
 
-\item{max_lfc}{: maximum log fold change}
+\item{nsim}{Number of simulations to run. Default is 1.}
 
-\item{maxlfc_iter}{: maximum number of iterations}
+\item{disp_scale}{Scale parameter for the dispersion. Default is 0.3.}
 
-\item{seed}{: seed for simulation}
+\item{max_lfc}{Maximum allowable log fold change. Default is 15.}
 
-\item{ncont:}{number of control samples}
+\item{maxlfc_iter}{Maximum number of iterations for ensuring log fold change is within \code{max_lfc}. Default is 1,000.}
 
-\item{ntreat:}{number of treatment samples}
+\item{seed}{Seed value for reproducibility. Default is \code{NULL}.}
+}
+\value{
+A list containing:
+\itemize{
+\item \code{countdata_list}: A list of count data matrices for each simulation.
+\item \code{metadata_list}: A list of metadata data frames for each simulation.
+\item \code{logmean_list}: A list of log mean vectors for each simulation.
+\item \code{logfoldchange_list}: A list of log fold change vectors for each simulation.
+\item \code{treat_countdata_list}: A list of treatment count data matrices for each simulation.
+\item \code{control_countdata_list}: A list of control count data matrices for each simulation.
+}
 }
 \description{
-Title
+This function simulates count data for microbiome studies based on log mean, log fold change,
+and dispersion parameters. It supports generating data for multiple simulations and allows
+flexibility in specifying the number of control and treatment samples or samples per group.
+}
+\examples{
+# Load required packages
+library(foreach)
+library(doParallel)
+# Define parameters
+logmean_param <- list(mu = 0, sigma = 1)
+logfoldchange_param <- list(par = rnorm(11), np = 2, sd_ord = 2)
+dispersion_param <- list(asymptDisp = 0.1, extraPois = 0.05)
+
+# Simulate count data
+result <- countdata_sim_fun(
+  logmean_param = logmean_param,
+  logfoldchange_param = logfoldchange_param,
+  dispersion_param = dispersion_param,
+  nsamp_per_group = 10,
+  notu = 50,
+  nsim = 2,
+  seed = 123
+)
+
+# Access simulation results
+countdata <- result$countdata_list[[1]]
+metadata <- result$metadata_list[[1]]
 }

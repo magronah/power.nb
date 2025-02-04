@@ -60,7 +60,7 @@ countdata <- matrix(100, ncol = 10, nrow = 50)
 metadata <- data.frame(Samples = paste("Sample", 1:10, sep = "_"),
              Groups = rep(c("Control", "Treatment"), each = 5))
 
-result <- deseqfun(countdata, metadata)
+result <- deseqfun(countdata, metadata, ref = "Control")
 
 # Examine the results
 result$logfoldchange  # Log fold changes

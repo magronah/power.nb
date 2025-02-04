@@ -149,7 +149,8 @@ logfoldchange_sim_fun <- function(logmean_sim, logfoldchange_param,
 #'   }
 #'
 #' @export
-#'
+#' @importFrom doParallel registerDoParallel stopImplicitCluster
+#' @importFrom foreach %do% %dopar% foreach
 #' @examples
 #' # Load required packages
 #' library(foreach)

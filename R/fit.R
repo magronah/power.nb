@@ -182,6 +182,7 @@ gam_fit <- function(deseq_est_list,
                     grid_len = 50,
                     alpha_level=0.1){
 
+  k  <- NULL
   p_val   = foreach::foreach(k = 1:length(deseq_est_list),.combine = "c") %do%{
     deseq_est_list[[k]]$padj
   }
@@ -190,7 +191,7 @@ gam_fit <- function(deseq_est_list,
   true_lfoldchange    =    unlist(true_lfoldchange_list)
   true_lmean_abund    =    unlist(true_lmean_list)
 
-  comb     =   tibble(lmean_abund  =  true_lmean_abund,
+  comb     =   tibble::tibble(lmean_abund  =  true_lmean_abund,
                       abs_lfc   =  abs(true_lfoldchange),
                       pval_reject  =  as.numeric(pval_reject))
 

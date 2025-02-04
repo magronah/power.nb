@@ -14,7 +14,7 @@ contour_plot_fun(combined_data, power_estimate, cont_breaks)
 \item{cont_breaks}{breaks for contour plot}
 }
 \value{
-ggplot object
+ggplot2 object
 }
 \description{
 Contour plot for showing predicted power

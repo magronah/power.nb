@@ -9,11 +9,11 @@ optimal.comp(logmean, sig = 0.05, max.comp = 4, max.boot = 100)
 \arguments{
 \item{logmean}{vector of log mean abundances of taxa}
 
-\item{sig:}{significance level to compare against p-value}
+\item{sig}{significance level to compare against p-value}
 
-\item{max.comp:}{maximum number of Gaussian components to compare sequentially}
+\item{max.comp}{maximum number of Gaussian components to compare sequentially}
 
-\item{max.boot:}{maximum number of bootstraps simulations}
+\item{max.boot}{maximum number of bootstraps simulations}
 }
 \value{
 The best number of components for fitting the distribution of log mean abundance

@@ -4,9 +4,9 @@
 #' using parametric bootstrap
 #'
 #' @param logmean vector of log mean abundances of taxa
-#' @param sig: significance level to compare against p-value
-#' @param max.comp: maximum number of Gaussian components to compare sequentially
-#' @param max.boot: maximum number of bootstraps simulations
+#' @param sig significance level to compare against p-value
+#' @param max.comp maximum number of Gaussian components to compare sequentially
+#' @param max.boot maximum number of bootstraps simulations
 #'
 #' @return The best number of components for fitting the distribution of log mean abundance
 #' @export
@@ -70,7 +70,7 @@ filter_low_count <- function(countdata, metadata,abund_thresh=5, sample_thresh=3
 #' @param cooksCutoff DESeq2's parameter for removing outliers based on Cook's distance. Default is `TRUE` (outlier removal enabled).
 #' @param independentFiltering DESeq2's parameter for independent filtering. Default is `TRUE`.
 #' @param shrinkage_method DESeq2's shrinkage method for fold changes. Default is `"normal"`. Other options include `"apeglm"` or `"ashr"`.
-#'
+#' @importFrom DESeq2 counts
 #' @return A list containing the following elements:
 #' - `logfoldchange`: A vector of log fold change estimates for each taxa.
 #' - `logmean`: A vector of log mean counts for each taxa (arithmetic mean for taxa across all subjects).
@@ -88,7 +88,7 @@ filter_low_count <- function(countdata, metadata,abund_thresh=5, sample_thresh=3
 #' metadata <- data.frame(Samples = paste("Sample", 1:10, sep = "_"),
 #'              Groups = rep(c("Control", "Treatment"), each = 5))
 #'
-#' result <- deseqfun(countdata, metadata)
+#' result <- deseqfun(countdata, metadata, ref = "Control")
 #'
 #' # Examine the results
 #' result$logfoldchange  # Log fold changes
@@ -120,7 +120,7 @@ deseqfun <- function(countdata,metadata,alpha_level=0.1,ref_name="NT",
   dds <- DESeq2::DESeq(dds,sfType ="poscounts",
                minReplicatesForReplace = minReplicatesForReplace)
 
-  res <- stats::results(dds, cooksCutoff=cooksCutoff,
+  res <- DESeq2::results(dds, cooksCutoff=cooksCutoff,
                  independentFiltering=independentFiltering,
                  alpha = alpha_level)
 
@@ -388,7 +388,7 @@ deseq_fun_est <-function(metadata_list,  countdata_list,
 
   registerDoParallel(cores = num_cores)
   l = length(countdata_list)
-
+  i  <- NULL
   dds  =  foreach(i= 1:l, .packages = "DESeq2", .export = "deseqfun") %dopar%{
     countdata =  countdata_list[[i]]
     metadata  =  metadata_list[[i]]
@@ -401,7 +401,7 @@ deseq_fun_est <-function(metadata_list,  countdata_list,
   }
 
   stopImplicitCluster()
-  unregister_dopar()
+  # unregister_dopar()
   names(dds)  =  names(countdata_list)
   dds
 }
@@ -413,7 +413,8 @@ deseq_fun_est <-function(metadata_list,  countdata_list,
 #' @param power_estimate predicted power
 #' @param cont_breaks breaks for contour plot
 #' @importFrom ggplot2 ggplot aes geom_contour geom_point xlab ylab scale_colour_manual
-#' @return ggplot object
+#' @importFrom ggplot2 after_stat
+#' @return ggplot2 object
 #' @importFrom latex2exp TeX
 #' @export
 #'
@@ -426,7 +427,7 @@ contour_plot_fun <- function(combined_data,
     ## deal with code checking: not sure why 'globalVariables' not working
     lmean_abund <- abs_lfc <- power <- power_estimate <-
         pvalue_reject <- level <- NULL
-    
+
   combined_data$pvalue_reject <- factor(combined_data$pval_reject)
 
   gg_2dimc <- (ggplot(combined_data)

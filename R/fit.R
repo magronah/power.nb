@@ -32,7 +32,7 @@ logmean_fit <- function(logmean,sig=0.05,max.comp=4,max.boot=100){
                      mean = param$mu,
                      sd   = param$sigma)
   }else{
-    mixmdl = normalmixEM(logmean, k=ncomp_opt, maxrestarts=1e3)
+    mixmdl = mixtools::normalmixEM(logmean, k=ncomp_opt, maxrestarts=1e3)
 
     param  = data.frame(lambda =  mixmdl$lambda,
                         sigma =  mixmdl$sigma,
@@ -110,6 +110,8 @@ dispersion_fit <- function(dispersion,logmean){
 #'
 #' @export
 #'
+#' @importFrom DEoptim DEoptim DEoptim.control
+#' @importFrom parallel makeCluster clusterExport
 #' @examples
 #' logmean        =  rnorm(100)
 #' logfoldchange  =  rnorm(100)
@@ -162,8 +164,10 @@ logfoldchange_fit = function(logmean,logfoldchange,ncore = 2,
 #' @param grid_len     number of grids for
 #' @param alpha_level significance level for power calculations
 #'
-#' @return A list
 #'
+#' @importFrom stats binomial coef confint dnorm nls predict relevel rnbinom rnorm setNames
+#' @importFrom utils setTxtProgressBar txtProgressBar
+#' @return A list
 #' fit_2d is the fitted scam object
 #'
 #' power_estimate predicted power estimated using fit_2d

@@ -151,7 +151,8 @@ deseqfun <- function(countdata,metadata,alpha_level=0.1,ref_name="NT",
 #' @param x log mean count
 #'
 #' @return values representing output for the polynomial fuction (f(x))
-#'
+#' @export
+
 #'
 
 polyfun <- function(pars, x) {
@@ -179,6 +180,7 @@ polyfun <- function(pars, x) {
 #'      muvals: mean values
 #'
 #'      sdvals: standard deviation values
+#'@export
 
 
 genmixpars <- function(x, pars, np = 2, sd_ord = 2){

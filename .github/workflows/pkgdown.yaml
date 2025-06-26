@@ -44,6 +44,7 @@ jobs:
           install.packages("BiocManager")
           BiocManager::install("DESeq2")
         shell: Rscript {0}
+      - uses: r-lib/actions/setup-r-dependencies@v2 
       - name: Install pkg
         run: |
           install.packages("devtools")

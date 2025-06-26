@@ -35,6 +35,11 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get -y install libcurl4-openssl-dev libssl-dev libxml2-dev libharfbuzz-dev libfribidi-dev libfontconfig1-dev libfreetype6-dev libpng-dev libtiff5-dev libjpeg-dev libudunits2-dev libcairo2-dev libxt-dev libgdal-dev libgeos-dev libproj-dev libsqlite3-dev
+      - name: Install DESeq2
+        run: |
+          install.packages("BiocManager")
+          BiocManager::install("DESeq2")
+        shell: Rscript {0}
       - name: Install pkg
         run: |
           install.packages("devtools")

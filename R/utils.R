@@ -82,13 +82,14 @@ filter_low_count <- function(countdata, metadata,abund_thresh=5, sample_thresh=3
 #'
 #' @examples
 #' # Example usage
-#' countdata <- matrix(100, ncol = 10, nrow = 50)
+#' set.seed(101)
+#' countdata <- matrix(rpois(500, 3), ncol = 10, nrow = 50)
 #' # Simulated OTU count data with 50 taxa and 10 samples
 #'
 #' metadata <- data.frame(Samples = paste("Sample", 1:10, sep = "_"),
 #'              Groups = rep(c("Control", "Treatment"), each = 5))
 #'
-#' result <- deseqfun(countdata, metadata, ref = "Control")
+#' result <- deseqfun(countdata, metadata, ref = "Control"
 #'
 #' # Examine the results
 #' result$logfoldchange  # Log fold changes

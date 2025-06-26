@@ -34,7 +34,7 @@ jobs:
       - name: extra Linux dependencies
         run: |
           sudo apt-get update
-          sudo apt-get -y install libcurl4-openssl-dev libssl-dev libxml2-dev
+          sudo apt-get -y install libcurl4-openssl-dev libssl-dev libxml2-dev libharfbuzz-dev libfribidi-dev
       - name: Install pkg
         run: |
           install.packages("devtools")

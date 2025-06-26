@@ -9,9 +9,13 @@ Authors@R:
      email =  "bolker@mcmaster.ca",
    comment=c(ORCID="0000-0002-2127-0443"))
    )
+Depends: R (>= 4.1.0)
 Description: Calculates power and sample size for differential abundance microbiome studies based on the negative binomial model.
 License: MIT + file LICENSE
 Encoding: UTF-8
+VignetteBuilder: rmarkdown
 Roxygen: list(markdown = TRUE)
 Imports: DESeq2, fitdistrplus, foreach,tibble, purrr, mixtools, scam, ggplot2, ggrastr, metR, DEoptim, latex2exp, parallel,stats,doParallel
-RoxygenNote: 7.3.2
+Suggests: rmarkdown
+RoxygenNote: 7.3.2.9000
+

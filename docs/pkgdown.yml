@@ -1,6 +1,6 @@
-pandoc: 3.2.1
+pandoc: 3.1.11
 pkgdown: 2.1.3
 pkgdown_sha: ~
 articles:
   stub: stub.html
-last_built: 2025-06-26T18:28Z
+last_built: 2025-06-26T22:35Z

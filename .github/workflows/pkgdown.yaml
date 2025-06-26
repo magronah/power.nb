@@ -3,7 +3,7 @@
 # using https://github.com/r-lib/actions/tree/master/setup-pandoc
 # https://github.com/marketplace/actions/ci-skip-action
 on:
-  workflow_dispatch
+  workflow_dispatch:
   push:
     branches:
       - main

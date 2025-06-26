@@ -34,8 +34,7 @@ jobs:
       - name: Install pkg
         run: devtools::install()
         shell: Rscript {0}
-        shell: Rscript {0}
-      - name: Rebuild site 
+      - name: Rebuild site
         run: |
           pkgdown::build_site(preview=FALSE)
         shell: Rscript {0}

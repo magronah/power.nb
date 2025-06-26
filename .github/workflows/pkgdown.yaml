@@ -34,9 +34,6 @@ jobs:
       - name: Install pkg
         run: devtools::install()
         shell: Rscript {0}
-      - name: Convert NEWS
-        run: |
-          xfun::news2md("power.nb", output = "NEWS.md", category = TRUE)
         shell: Rscript {0}
       - name: Rebuild site 
         run: |
@@ -47,5 +44,5 @@ jobs:
           git config --global user.name 'pkgdown-bot'
           git config --global user.email 'pkgdown-bot@users.noreply.github.com'
           git add --all
-          git commit -am "Site rebuild [skip ci]"
+          git commit -am "Site rebuild"
           git push

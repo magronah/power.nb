@@ -1,11 +1,93 @@
 ---
 title: "Simulation for microbiome power analysis"
 date: "`r Sys.Date()`"
-output: rmarkdown::html_vignette
+output: 
+  rmarkdown::html_vignette:
+    toc: true
+    toc_depth: 2
 vignette: >
   %\VignetteIndexEntry{Simulation for microbiome power analysis}
   %\VignettePackage{power.nb}
   %\VignetteEngine{knitr::knitr}
 ---
 
-Vignette goes here ...
+
+
+## Introduction 
+
+
+**Installation**
+
+Install the package from GitHub using `devtools`:
+
+```{r, eval=FALSE}
+install.packages("devtools")
+devtools::install_github("magronah/power.nb")
+```
+
+### Overview
+
+This package allows you to:
+
+- Fit statistical models to microbiome count data.
+
+- Simulate realistic count datasets with different effect sizes.
+
+- Test for differential abundance.
+
+- Estimate power per taxon.
+
+- Explore sample size and effect size sensitivity.
+
+
+## Model Fitting
+Use your microbiome data to fit a Gaussian mixture model:
+
+### 1. You have data
+
+#### Data preprocessing 
+
+```{r, eval=FALSE}
+library(power.nb)
+fit <- filter()
+
+fit$
+fit$
+```
+
+
+- Fit logmean abundance 
+
+- Estimate log fold change using ``deseq``
+
+
+ 
+```{r, eval=FALSE}
+library(power.nb)
+fit <- logmean_fit()
+
+```
+
+
+### 2. You do not have data
+
+
+## Simulating Data
+
+
+```{r, eval=FALSE}
+sim <- simulate_data(fit,
+                     n_taxa = 1000,
+                     n_per_group = c(30, 30),
+                     fold_changes = c(1.5, 2, 4),
+                     nsim = 100)
+```
+
+
+
+## Estimating Power
+Calculate power for each taxon as the proportion of significant detections:
+
+
+
+## Sample Size Estimation

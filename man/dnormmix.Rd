@@ -18,7 +18,7 @@ dnormmix(x, par, logmean, ..., log = FALSE)
 
 \item{logmean}{Numeric value representing the log of the mean parameter.}
 
-\item{...}{Additional arguments passed to the \code{genmixpars} function.}
+\item{...}{Additional arguments passed to the \code{genmixpars} function. Defaults: two components (\code{np = 2}) and a quadratic model for standard deviation parameters (\code{sd_ord = 2}).}
 
 \item{log}{Logical. If \code{TRUE}, the logarithm of the density is returned. Default is \code{FALSE}.}
 }
@@ -32,8 +32,9 @@ on the unconstrained scale (softmax(prob), mean, log(sd)).
 \examples{
 # Example parameters
 x <- seq(-3, 3, length.out = 100)
-par <- c(-0.5, 0.5, log(0.8), log(1.2))  # Example: softmax probabilities, mean, log(sd)
-logmean <- 0.1
+## par <- c(-0.5, 0.5, log(0.8), log(1.2))  # Example: softmax probabilities, mean, log(sd)
+set.seed(101); par <- rnorm(11)
+logmean <- rep(0.1, length(x))  ## constant log mean
 
 # Calculate density
 density <- dnormmix(x, par, logmean)

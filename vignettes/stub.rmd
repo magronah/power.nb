@@ -4,8 +4,8 @@ date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Simulation for microbiome power analysis}
-  %\VignetteEngine{knitr::rmarkdown}
-  \usepackage[utf8]{inputenc}
+  %\VignettePackage{power.nb}
+  %\VignetteEngine{knitr::knitr}
 ---
 
 Vignette goes here ...

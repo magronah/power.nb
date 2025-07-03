@@ -61,7 +61,11 @@ countdata <- matrix(rpois(500, 3), ncol = 10, nrow = 50)
 metadata <- data.frame(Samples = paste("Sample", 1:10, sep = "_"),
              Groups = rep(c("Control", "Treatment"), each = 5))
 
-result <- deseqfun(countdata, metadata, ref = "Control"
+result <- deseqfun(countdata, metadata, ref = "Control",
+                    minReplicatesForReplace = Inf,
+                    cooksCutoff = TRUE,
+                    independentFiltering = TRUE,
+                    shrinkage_method="normal")
 
 # Examine the results
 result$logfoldchange  # Log fold changes

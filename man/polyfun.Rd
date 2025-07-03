@@ -17,3 +17,7 @@ values representing output for the polynomial fuction (f(x))
 \description{
 General-purpose log-likelihood function, vectorized sum(pars*x^i)
 }
+\examples{
+polyfun(pars = c(1, 2, 3), x = 1:5)
+polyfun(pars = c(1, 0, 3), x = 1)
+}

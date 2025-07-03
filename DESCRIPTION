@@ -16,7 +16,7 @@ VignetteBuilder: knitr
 Roxygen: list(markdown = TRUE)
 Depends: R (>= 4.1.0)
 Imports: DESeq2, fitdistrplus, foreach,tibble, purrr, mixtools, scam, ggplot2, ggrastr, metR, DEoptim, latex2exp, parallel,stats,doParallel
-Suggests: rmarkdown
+Suggests: rmarkdown, knitr
 biocViews:
 RoxygenNote: 7.3.2.9000
 

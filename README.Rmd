@@ -12,7 +12,6 @@ power.nb is an R package with the following features
 
 - A framework for statistical power and sample size calculation for differential abundance microbiome studies
 
-
 ## Microbiome data simulation 
 
 

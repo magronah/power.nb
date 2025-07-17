@@ -68,7 +68,7 @@ on the unconstrained scale (softmax(prob), mean, log(sd)).</p>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
-<dd><p>Additional arguments passed to the <code>genmixpars</code> function.</p></dd>
+<dd><p>Additional arguments passed to the <code>genmixpars</code> function. Defaults: two components (<code>np = 2</code>) and a quadratic model for standard deviation parameters (<code>sd_ord = 2</code>).</p></dd>
 
 
 <dt id="arg-log">log<a class="anchor" aria-label="anchor" href="#arg-log"></a></dt>
@@ -84,16 +84,15 @@ on the unconstrained scale (softmax(prob), mean, log(sd)).</p>
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Example parameters</span></span></span>
 <span class="r-in"><span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="op">-</span><span class="fl">3</span>, <span class="fl">3</span>, length.out <span class="op">=</span> <span class="fl">100</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">par</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">0.5</span>, <span class="fl">0.5</span>, <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fl">0.8</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fl">1.2</span><span class="op">)</span><span class="op">)</span>  <span class="co"># Example: softmax probabilities, mean, log(sd)</span></span></span>
-<span class="r-in"><span><span class="va">logmean</span> <span class="op">&lt;-</span> <span class="fl">0.1</span></span></span>
+<span class="r-in"><span><span class="co">## par &lt;- c(-0.5, 0.5, log(0.8), log(1.2))  # Example: softmax probabilities, mean, log(sd)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">101</span><span class="op">)</span>; <span class="va">par</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">11</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">logmean</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span>  <span class="co">## constant log mean</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Calculate density</span></span></span>
 <span class="r-in"><span><span class="va">density</span> <span class="op">&lt;-</span> <span class="fu">dnormmix</span><span class="op">(</span><span class="va">x</span>, <span class="va">par</span>, <span class="va">logmean</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in genmixpars(logmean, par, ...):</span> number of pars (4) != expected (11) (np = 2, sd_ord = 2)</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Calculate log-density</span></span></span>
 <span class="r-in"><span><span class="va">log_density</span> <span class="op">&lt;-</span> <span class="fu">dnormmix</span><span class="op">(</span><span class="va">x</span>, <span class="va">par</span>, <span class="va">logmean</span>, log <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in genmixpars(logmean, par, ...):</span> number of pars (4) != expected (11) (np = 2, sd_ord = 2)</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

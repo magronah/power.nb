@@ -57,7 +57,7 @@
 
       <h1>Simulation for microbiome power analysis</h1>
             
-            <h4 data-toc-skip class="date">2025-07-03</h4>
+            <h4 data-toc-skip class="date">2025-07-17</h4>
       
 
       <div class="d-none name"><code>stub.rmd</code></div>
@@ -65,8 +65,79 @@
 
     
     
-<p>Vignette goes here …</p>
-  </main>
+<div class="section level2">
+<h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
+</h2>
+<p><strong>Installation</strong></p>
+<p>Install the package from GitHub using <code>devtools</code>:</p>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"devtools"</span><span class="op">)</span></span>
+<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"magronah/power.nb"</span><span class="op">)</span></span></code></pre></div>
+<div class="section level3">
+<h3 id="overview">Overview<a class="anchor" aria-label="anchor" href="#overview"></a>
+</h3>
+<p>This package allows you to:</p>
+<ul>
+<li><p>Fit statistical models to microbiome count data.</p></li>
+<li><p>Simulate realistic count datasets with different effect
+sizes.</p></li>
+<li><p>Test for differential abundance.</p></li>
+<li><p>Estimate power per taxon.</p></li>
+<li><p>Explore sample size and effect size sensitivity.</p></li>
+</ul>
+</div>
+</div>
+<div class="section level2">
+<h2 id="model-fitting">Model Fitting<a class="anchor" aria-label="anchor" href="#model-fitting"></a>
+</h2>
+<p>Use your microbiome data to fit a Gaussian mixture model:</p>
+<div class="section level3">
+<h3 id="you-have-data">1. You have data<a class="anchor" aria-label="anchor" href="#you-have-data"></a>
+</h3>
+<div class="section level4">
+<h4 id="data-preprocessing">Data preprocessing<a class="anchor" aria-label="anchor" href="#data-preprocessing"></a>
+</h4>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="fu">library</span>(power.nb)</span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>fit <span class="ot">&lt;-</span> <span class="fu">filter</span>()</span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a>fit<span class="sc">$</span></span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a>fit<span class="sc">$</span></span></code></pre></div>
+<ul>
+<li><p>Fit logmean abundance</p></li>
+<li><p>Estimate log fold change using <code>deseq</code></p></li>
+</ul>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">power.nb</span><span class="op">)</span></span>
+<span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/logmean_fit.html">logmean_fit</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+</div>
+</div>
+<div class="section level3">
+<h3 id="you-do-not-have-data">2. You do not have data<a class="anchor" aria-label="anchor" href="#you-do-not-have-data"></a>
+</h3>
+</div>
+</div>
+<div class="section level2">
+<h2 id="simulating-data">Simulating Data<a class="anchor" aria-label="anchor" href="#simulating-data"></a>
+</h2>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">sim</span> <span class="op">&lt;-</span> <span class="fu">simulate_data</span><span class="op">(</span><span class="va">fit</span>,</span>
+<span>                     n_taxa <span class="op">=</span> <span class="fl">1000</span>,</span>
+<span>                     n_per_group <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">30</span>, <span class="fl">30</span><span class="op">)</span>,</span>
+<span>                     fold_changes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1.5</span>, <span class="fl">2</span>, <span class="fl">4</span><span class="op">)</span>,</span>
+<span>                     nsim <span class="op">=</span> <span class="fl">100</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="estimating-power">Estimating Power<a class="anchor" aria-label="anchor" href="#estimating-power"></a>
+</h2>
+<p>Calculate power for each taxon as the proportion of significant
+detections:</p>
+</div>
+<div class="section level2">
+<h2 id="sample-size-estimation">Sample Size Estimation<a class="anchor" aria-label="anchor" href="#sample-size-estimation"></a>
+</h2>
+</div>
+  </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
+    </nav></aside>
 </div>
 
 

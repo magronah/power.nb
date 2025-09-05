@@ -71,6 +71,34 @@ fit <- logmean_fit()
 
 ### 2. You do not have data
 
+```{r, echo=FALSE}
+library(knitr)
+library(kableExtra)
+
+# Example data (two rows like in your LaTeX version)
+df <- data.frame(
+  `Data description` = c("Example row 1", "Example row 2"),
+  n1 = c(5, 5),
+  mu1 = c("(2,3,4,5,7)", "(2,3,4,5,7)"),
+  sigma1 = c("(2,3,4,5,7)", "(2,3,4,5,7)"),
+  p1 = c("(2,3,4,5,7)", "(2,3,4,5,7)"),
+  n2 = c(5, 5),
+  mu2 = c("(2,3,4,5,7)", "(2,3,4,5,7)"),
+  sigma2 = c("(2,3,4,5,7)", "(2,3,4,5,7)"),
+  p2 = c("(2,3,4,5,7)", "(2,3,4,5,7)"),
+  fx = c("(2,3,4,5,7)", "(2,3,4,5,7)")
+)
+
+kbl(df, booktabs = TRUE, longtable = TRUE,
+    caption = "Data description and parameter estimates") %>%
+  kable_styling(latex_options = c("hold_position", "repeat_header")) %>%
+  add_header_above(c(" " = 1, "Log mean count" = 4, "Log foldchange" = 5)) %>%
+  add_header_above(c(" " = 1, "Parameters" = 9)) # optional extra grouping
+
+```
+
+
+ 
 
 ## Simulating Data
 

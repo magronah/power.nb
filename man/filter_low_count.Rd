@@ -4,7 +4,14 @@
 \alias{filter_low_count}
 \title{Filter to remove low abundant taxa}
 \usage{
-filter_low_count(countdata, metadata, abund_thresh = 5, sample_thresh = 3)
+filter_low_count(
+  countdata,
+  metadata,
+  abund_thresh = 5,
+  sample_thresh = 3,
+  sample_colname,
+  group_colname
+)
 }
 \arguments{
 \item{countdata}{otu table}
@@ -14,6 +21,10 @@ filter_low_count(countdata, metadata, abund_thresh = 5, sample_thresh = 3)
 \item{abund_thresh}{minimum number of taxa abundance threshold}
 
 \item{sample_thresh}{minimum number of sample threshold}
+
+\item{sample_colname}{column names of for the samples}
+
+\item{group_colname}{column names of for the groups or conditions}
 }
 \value{
 filtered otu count data

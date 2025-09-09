@@ -65,7 +65,7 @@ filter_low_count <- function(countdata, metadata,
   }
 
   design_formula <- stats::as.formula(paste("~", group_colname))
-  dds <- DESeqDataSetFromMatrix(countData = countdata,
+  dds <- DESeq2::DESeqDataSetFromMatrix(countData = countdata,
                                 colData   = metadata,
                                 design    = design_formula)
 

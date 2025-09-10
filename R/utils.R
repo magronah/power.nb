@@ -34,45 +34,37 @@ optimal.comp <- function(logmean,sig=0.05,max.comp=4,max.boot=100){
 #' @param metadata   dataframe with 2 rows sample names and group names
 #' @param abund_thresh  minimum number of taxa abundance threshold
 #' @param sample_thresh    minimum number of sample threshold
-#' @param sample_colname  column names of for the samples
-#' @param group_colname   column names of for the groups or conditions
+#' @param sample_colname  column names of the samples
+#' @param group_colname   column names of the groups or conditions
 #' @return filtered otu count data
 #'
 #' @export
 #'
 
-filter_low_count <- function(countdata, metadata,
-                             abund_thresh   =   5,
-                             sample_thresh  =   3,
-                             sample_colname,
-                             group_colname){
-
-  stopifnot(is.data.frame(metadata)  || is.matrix(metadata))
+filter_low_count <- function (countdata, metadata, abund_thresh = 5, sample_thresh = 3,
+                              sample_colname, group_colname)
+{
+  stopifnot(is.data.frame(metadata) || is.matrix(metadata))
   stopifnot(is.data.frame(countdata) || is.matrix(countdata))
-
   if (is.null(sample_colname) || !(sample_colname %in% names(metadata))) {
-    stop("Could not find a sample ID column in metadata.
+    stop("Could not find a sample ID column in metadata.\n
          Pass `sample_colname=` explicitly.")
   }
   if (is.null(group_colname) || !(group_colname %in% names(metadata))) {
-    stop("Could not find a group/condition column in metadata.
+    stop("Could not find a group/condition column in metadata.\n
          Pass `group_colname=` explicitly.")
   }
-
-  ## sanity check
-  if(all((metadata[[sample_colname]])== colnames(countdata)) == FALSE){
+  if (!all((metadata[[sample_colname]]) == colnames(countdata))) {
     countdata = t(countdata)
-  }
+    }
 
+  metadata[[group_colname]]  = as.factor(metadata[[group_colname]])
   design_formula <- stats::as.formula(paste("~", group_colname))
   dds <- DESeq2::DESeqDataSetFromMatrix(countData = countdata,
-                                colData   = metadata,
-                                design    = design_formula)
-
-  keep <- rowSums(counts(dds) >= abund_thresh) >= sample_thresh
-
-  dds    =   dds[keep,]
-  as.data.frame(counts(dds))
+                                        colData = metadata, design = design_formula)
+  keep <- rowSums(DESeq2::counts(dds) >= abund_thresh) >= sample_thresh
+  dds = dds[keep, ]
+  as.data.frame(DESeq2::counts(dds))
 }
 
 ########################################################

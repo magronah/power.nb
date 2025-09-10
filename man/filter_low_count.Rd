@@ -22,9 +22,9 @@ filter_low_count(
 
 \item{sample_thresh}{minimum number of sample threshold}
 
-\item{sample_colname}{column names of for the samples}
+\item{sample_colname}{column names of the samples}
 
-\item{group_colname}{column names of for the groups or conditions}
+\item{group_colname}{column names of the groups or conditions}
 }
 \value{
 filtered otu count data

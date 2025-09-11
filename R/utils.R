@@ -54,7 +54,7 @@ filter_low_count <- function (countdata, metadata, abund_thresh = 5, sample_thre
     stop("Could not find a group/condition column in metadata.\n
          Pass `group_colname=` explicitly.")
   }
-  if (!all((metadata[[sample_colname]]) == colnames(countdata))) {
+  if (all((metadata[[sample_colname]]) == colnames(countdata))) {
     countdata = t(countdata)
     }
 
@@ -79,7 +79,9 @@ filter_low_count <- function (countdata, metadata, abund_thresh = 5, sample_thre
 #' @param countdata A matrix of OTU count data where rows represent taxa and columns represent samples.
 #' @param metadata A dataframe containing sample information with two rows: one for sample names and one for group names.
 #' @param alpha_level The significance level for determining differential expression. Default is 0.1.
-#' @param ref_name The reference group for calculating fold changes. Default is "NT" (Non-Treatment).
+#' @param sample_colname  column names of the samples
+#' @param group_colname   column names of the groups or conditions
+#' @param ref_name The reference group for calculating fold changes.
 #' @param minReplicatesForReplace DESeq2's parameter to control the minimum number of replicates required for replacing outliers during dispersion estimation. Default is `Inf` (no replacement).
 #' @param cooksCutoff DESeq2's parameter for removing outliers based on Cook's distance. Default is `TRUE` (outlier removal enabled).
 #' @param independentFiltering DESeq2's parameter for independent filtering. Default is `TRUE`.
@@ -87,25 +89,27 @@ filter_low_count <- function (countdata, metadata, abund_thresh = 5, sample_thre
 #' @importFrom DESeq2 counts
 #' @return A list containing the following elements:
 #' - `logfoldchange`: A vector of log fold change estimates for each taxa.
-#' - `logmean`: A vector of log mean counts for each taxa (arithmetic mean for taxa across all subjects).
 #' - `dispersion`: A vector of dispersion estimates for each taxa.
 #' - `deseq_estimate`: A dataframe containing DESeq2 results, including `baseMean`, `log2FoldChange`, `lfcSE`, `pvalue`, and `padj`.
 #' - `normalised_count`: A matrix of normalized count data.
+#' - `dds`: DESeq object
 #'
 #' @export
 #'
 #' @examples
 #' # Example usage
 #' set.seed(101)
-#' countdata <- matrix(rpois(500, 3), ncol = 10, nrow = 50)
+#' countdata <- matrix(rpois(500, 3), ncol = 50, nrow = 10)
 #' # Simulated OTU count data with 50 taxa and 10 samples
 #'
 #' metadata <- data.frame(Samples = paste("Sample", 1:10, sep = "_"),
 #'              Groups = rep(c("Control", "Treatment"), each = 5))
 #'
-#' result <- deseqfun(countdata, metadata, ref = "Control",
+#' result <- deseqfun(countdata, metadata, ref_name = "Control",
 #'                     minReplicatesForReplace = Inf,
 #'                     cooksCutoff = TRUE,
+#'                     sample_colname = "Samples",
+#'                     group_colname  = "Groups",
 #'                     independentFiltering = TRUE,
 #'                     shrinkage_method="normal")
 #'
@@ -116,51 +120,67 @@ filter_low_count <- function (countdata, metadata, abund_thresh = 5, sample_thre
 #' result$deseq_estimate  # DESeq2 results
 #' result$normalised_count  # Normalized count data
 #'
-deseqfun <- function(countdata,metadata,alpha_level=0.1,ref_name="NT",
-                     minReplicatesForReplace = Inf,
-                     cooksCutoff = TRUE,
-                     independentFiltering = TRUE,
-                     shrinkage_method="normal"){
 
-  #check otu table is in otu by samples format
-  if(all((metadata$Samples)==colnames(countdata)) == FALSE){
+deseqfun <- function (countdata, metadata, alpha_level = 0.1,
+                      ref_name,
+                      group_colname,
+                      sample_colname,
+                      minReplicatesForReplace = Inf,
+                      cooksCutoff = TRUE,
+                      independentFiltering = TRUE,
+                      shrinkage_method = "normal"){
+
+  stopifnot(is.data.frame(metadata) || is.matrix(metadata))
+  stopifnot(is.data.frame(countdata) || is.matrix(countdata))
+
+  if (is.null(sample_colname) || !(sample_colname %in% names(metadata))) {
+    stop("Could not find a sample ID column in metadata.\n
+         Pass `sample_colname=` explicitly.")
+  }
+
+  if (is.null(group_colname) || !(group_colname %in% names(metadata))) {
+    stop("Could not find a group/condition column in metadata.\n
+         Pass `group_colname=` explicitly.")
+  }
+
+  if (all((metadata[[sample_colname]]) == colnames(countdata))) {
     countdata = t(countdata)
   }
 
-  #remove samples with zeros for all taxa (if any such sample exist)
   keep <- (colSums(countdata) > 0)
-  countdata = countdata[,keep]
-  metadata= metadata[keep, ]
+  countdata = countdata[, keep]
+  metadata = metadata[keep, ]
 
-  # call deseq
-  dds <- DESeq2::DESeqDataSetFromMatrix(countdata,metadata, ~Groups)
-  dds$Groups <- relevel(dds$Groups, ref = ref_name)
+  metadata[[group_colname]]  = as.factor(metadata[[group_colname]])
+  design_formula <- stats::as.formula(paste("~", group_colname))
+  dds <- DESeq2::DESeqDataSetFromMatrix(countData = countdata,
+                                        colData = metadata,
+                                        design = design_formula)
 
-  dds <- DESeq2::DESeq(dds,sfType ="poscounts",
-               minReplicatesForReplace = minReplicatesForReplace)
+  dds[[group_colname]] <- relevel(dds[[group_colname]], ref = ref_name)
 
-  res <- DESeq2::results(dds, cooksCutoff=cooksCutoff,
-                 independentFiltering=independentFiltering,
-                 alpha = alpha_level)
+  dds <- DESeq2::DESeq(dds, sfType = "poscounts",
+                       minReplicatesForReplace = minReplicatesForReplace)
 
-  reslt <- DESeq2::lfcShrink(dds, res=res, coef=2, type=shrinkage_method)
+  res <- DESeq2::results(dds, cooksCutoff = cooksCutoff,
+                         independentFiltering = independentFiltering,
+                         alpha = alpha_level)
 
+  reslt <- DESeq2::lfcShrink(dds, res = res, coef = 2, type = shrinkage_method)
   deseq_est = data.frame(reslt)
   disp = DESeq2::dispersions(dds)
-
   logfoldchange = deseq_est$log2FoldChange
   names(logfoldchange) = rownames(deseq_est)
+  normalised_count = DESeq2::counts(dds, normalized = TRUE)
+  #logmean = log2(rowMeans(normalised_count))
 
-  normalised_count     =  counts(dds, normalized=TRUE)
-  logmean = log2(rowMeans(normalised_count))
-
-  list(logfoldchange = logfoldchange,
-       logmean = logmean,
-       dispersion = disp,
-       deseq_estimate=deseq_est,
-       normalised_count = normalised_count)
+  list(logfoldchange  =  logfoldchange,
+       #logmean      =  logmean,
+       dispersion     =  disp,
+       deseq_estimate =  deseq_est,
+       normalised_count =  normalised_count,
+       deseq_object  =  dds)
 }
-
 
 
 #' General-purpose log-likelihood function, vectorized sum(pars*x^i)

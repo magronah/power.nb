@@ -8,7 +8,9 @@ deseqfun(
   countdata,
   metadata,
   alpha_level = 0.1,
-  ref_name = "NT",
+  ref_name,
+  group_colname,
+  sample_colname,
   minReplicatesForReplace = Inf,
   cooksCutoff = TRUE,
   independentFiltering = TRUE,
@@ -22,7 +24,11 @@ deseqfun(
 
 \item{alpha_level}{The significance level for determining differential expression. Default is 0.1.}
 
-\item{ref_name}{The reference group for calculating fold changes. Default is "NT" (Non-Treatment).}
+\item{ref_name}{The reference group for calculating fold changes.}
+
+\item{group_colname}{column names of the groups or conditions}
+
+\item{sample_colname}{column names of the samples}
 
 \item{minReplicatesForReplace}{DESeq2's parameter to control the minimum number of replicates required for replacing outliers during dispersion estimation. Default is \code{Inf} (no replacement).}
 
@@ -36,10 +42,10 @@ deseqfun(
 A list containing the following elements:
 \itemize{
 \item \code{logfoldchange}: A vector of log fold change estimates for each taxa.
-\item \code{logmean}: A vector of log mean counts for each taxa (arithmetic mean for taxa across all subjects).
 \item \code{dispersion}: A vector of dispersion estimates for each taxa.
 \item \code{deseq_estimate}: A dataframe containing DESeq2 results, including \code{baseMean}, \code{log2FoldChange}, \code{lfcSE}, \code{pvalue}, and \code{padj}.
 \item \code{normalised_count}: A matrix of normalized count data.
+\item \code{dds}: DESeq object
 }
 }
 \description{
@@ -55,15 +61,17 @@ These options are particularly useful when estimating fold changes to fit the mi
 \examples{
 # Example usage
 set.seed(101)
-countdata <- matrix(rpois(500, 3), ncol = 10, nrow = 50)
+countdata <- matrix(rpois(500, 3), ncol = 50, nrow = 10)
 # Simulated OTU count data with 50 taxa and 10 samples
 
 metadata <- data.frame(Samples = paste("Sample", 1:10, sep = "_"),
              Groups = rep(c("Control", "Treatment"), each = 5))
 
-result <- deseqfun(countdata, metadata, ref = "Control",
+result <- deseqfun(countdata, metadata, ref_name = "Control",
                     minReplicatesForReplace = Inf,
                     cooksCutoff = TRUE,
+                    sample_colname = "Samples",
+                    group_colname  = "Groups",
                     independentFiltering = TRUE,
                     shrinkage_method="normal")
 

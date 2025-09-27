@@ -40,6 +40,9 @@ This package allows you to:
 - Explore sample size and effect size sensitivity.
 
 
+## Datasets 
+We used the datasets by Dr. Nearing used in the paper ... cite{}. 
+
 ### Data simulation for power estimation
 
 We would need to simulate microbiome data in order to estimate statistical power at the level of individual taxon.  The simulation framework implemented in `power.nb` is Mixture of Gaussian Mixture Model proposed in the paper by [Agronah and Bolker](https://doi.org/10.1371/journal.pone.0318820). There are one of two ways to obtain the parameters of the Mixture of Gaussian Mixture Model for data simulation. 
@@ -113,9 +116,57 @@ logfoldchangeFit
 ```
 
 
+## Simulating Data
 
- 
+- Simulate log mean count from the fitted Mixture of Gaussian (using existing dataset) or from the pre-specified parameters for the Gaussian Mixture 
 
+- Simulate log fold change using the estimated parameters or the prespecified parameters and the simulated as the input for the variance and mean of the log fold change 
+
+- Simulate dispersion parameters from the estimated nonlinear function of the dispersion function 
+
+- Simulate count data from a negative binomial model and then 
+
+- Use the simulated procedure outline above to simulate n number of count data 
+
+
+```{r, eval=FALSE}
+sim <- simulate_data(fit,
+                     n_taxa = 1000,
+                     n_per_group = c(30, 30),
+                     fold_changes = c(1.5, 2, 4),
+                     nsim = 100)
+```
+
+
+## Power estimation procedure
+
+- Fit the count data with the negative binomial model in the desert package to estimate pvalues for each fold change estimated fold change
+
+- Construct a vector of binaries with 1 for a taxa where value is less than a specified threshold and 0 otherwise. 
+
+- We fit a Generalised additive model to predict the probability of obtaining 1  (also the statistical power) for any combination of mean count and log fold change 
+
+- Figure shows a contour plot for 3  of the datasets. From the plots, there is low statistical power. 
+  a Concatenation all the 
+
+
+
+```{r, eval=FALSE}
+####
+
+```
+
+
+## Sample Size Estimation
+
+
+```{r, eval=FALSE}
+####
+
+```
+
+
+## Appendix 
 
 ```{r, echo=FALSE}
 library(knitr)
@@ -136,7 +187,7 @@ df <- data.frame(
 )
 
 kbl(df, booktabs = TRUE, longtable = TRUE,
-    caption = "Data description and parameter estimates") %>%
+    caption = "Data description and parameter estimates from actual microbiome datasets") %>%
   kable_styling(latex_options = c("hold_position", "repeat_header")) %>%
   add_header_above(c(" " = 1, "Log mean count" = 4, "Log foldchange" = 5)) %>%
   add_header_above(c(" " = 1, "Parameters" = 9)) # optional extra grouping
@@ -144,24 +195,3 @@ kbl(df, booktabs = TRUE, longtable = TRUE,
 ```
 
 
- 
-
-## Simulating Data
-
-
-```{r, eval=FALSE}
-sim <- simulate_data(fit,
-                     n_taxa = 1000,
-                     n_per_group = c(30, 30),
-                     fold_changes = c(1.5, 2, 4),
-                     nsim = 100)
-```
-
-
-
-## Estimating Power
-Calculate power for each taxon as the proportion of significant detections:
-
-
-
-## Sample Size Estimation

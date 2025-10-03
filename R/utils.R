@@ -411,7 +411,9 @@ gen_parnames <- function(np, sd_ord) {
 #' @param countdata_list : list of otu count data
 #' @param num_cores : number of cores
 #' @param ref_name reference for fold change calculation
-#'
+#' @param sample_colname  column names of the samples
+#' @param group_colname   column names of the groups or conditions
+#' @param alpha_level The significance level for determining differential expression. Default is 0.1.
 #' @return  A list
 #'  logfoldchange log fold change estimates
 #'
@@ -428,6 +430,9 @@ gen_parnames <- function(np, sd_ord) {
 #'
 #'
 deseq_fun_est <-function(metadata_list,  countdata_list,
+                         alpha_level = 0.1,
+                         group_colname,
+                         sample_colname,
                          num_cores=2, ref_name= "control"){
 
   registerDoParallel(cores = num_cores)
@@ -438,7 +443,11 @@ deseq_fun_est <-function(metadata_list,  countdata_list,
     metadata  =  metadata_list[[i]]
     stopifnot(!is.na(sum(countdata)))
     stopifnot(colnames(countdata) == metadata$Samples)
-    deseqfun(countdata,metadata, ref_name=ref_name,
+
+    deseqfun(countdata,metadata,alpha_level = alpha_level,
+             group_colname = group_colname,
+             sample_colname = sample_colname,
+             ref_name=ref_name,
              minReplicatesForReplace = Inf,
              cooksCutoff = FALSE,
              independentFiltering = FALSE)

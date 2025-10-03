@@ -7,6 +7,9 @@
 deseq_fun_est(
   metadata_list,
   countdata_list,
+  alpha_level = 0.1,
+  group_colname,
+  sample_colname,
   num_cores = 2,
   ref_name = "control"
 )
@@ -15,6 +18,12 @@ deseq_fun_est(
 \item{metadata_list}{: list of metadata}
 
 \item{countdata_list}{: list of otu count data}
+
+\item{alpha_level}{The significance level for determining differential expression. Default is 0.1.}
+
+\item{group_colname}{column names of the groups or conditions}
+
+\item{sample_colname}{column names of the samples}
 
 \item{num_cores}{: number of cores}
 

@@ -149,7 +149,7 @@ deseqfun <- function (countdata, metadata, alpha_level = 0.1,
 
   keep <- (colSums(countdata) > 0)
   countdata = countdata[, keep]
-  metadata = metadata[keep, ]
+  #metadata  = metadata[metadata[[sample_colname]] %in% rownames(countdata), ]
 
   metadata[[group_colname]]  = as.factor(metadata[[group_colname]])
   design_formula <- stats::as.formula(paste("~", group_colname))

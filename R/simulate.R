@@ -43,7 +43,6 @@ logmean_sim_fun = function(logmean_param,notu){
                                  sigma = logmean_param$sigma)
   }
   logmean
-
 }
 
 ##############################################################

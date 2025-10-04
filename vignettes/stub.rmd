@@ -15,11 +15,10 @@ vignette: >
 ---
 
 
+## Acknowledgments
 
-## Introduction 
 
-
-**Installation**
+##  Installation
 
 Install the package from GitHub using `devtools`:
 

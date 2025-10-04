@@ -99,11 +99,16 @@ filter_low_count <- function (countdata, metadata, abund_thresh = 5, sample_thre
 #' @examples
 #' # Example usage
 #' set.seed(101)
-#' countdata <- matrix(rpois(500, 3), ncol = 50, nrow = 10)
+#' nr = 10; nc =50
+#' countdata <- matrix(rpois(500, 3), ncol = nc, nrow = nr)
 #' # Simulated OTU count data with 50 taxa and 10 samples
-#'
-#' metadata <- data.frame(Samples = paste("Sample", 1:10, sep = "_"),
+#' countdata  <- as.data.frame(countdata)
+#' rownames(countdata)  <- paste("Sample", 1:nr, sep = "_")
+#' colnames(countdata) <- paste("otu", 1:nc, sep = "_")
+#' metadata <- data.frame(Samples = paste("Sample", 1:nr, sep = "_"),
 #'              Groups = rep(c("Control", "Treatment"), each = 5))
+#' sample_colname = "Samples"
+#' group_colname  = "Groups"
 #'
 #' result <- deseqfun(countdata, metadata, ref_name = "Control",
 #'                     minReplicatesForReplace = Inf,
@@ -143,13 +148,16 @@ deseqfun <- function (countdata, metadata, alpha_level = 0.1,
          Pass `group_colname=` explicitly.")
   }
 
-  if (all((metadata[[sample_colname]]) == colnames(countdata))) {
-    countdata = t(countdata)
+  if (!all(metadata[[sample_colname]] %in% colnames(countdata))) {
+    countdata <- t(countdata)
   }
 
   keep <- (colSums(countdata) > 0)
-  countdata = countdata[, keep]
-  #metadata  = metadata[metadata[[sample_colname]] %in% rownames(countdata), ]
+
+  if(sum(keep) < length(keep)){
+    countdata = countdata[, keep]
+    #metadata  = metadata[metadata[[sample_colname]] %in% rownames(countdata), ]
+  }
 
   metadata[[group_colname]]  = as.factor(metadata[[group_colname]])
   design_formula <- stats::as.formula(paste("~", group_colname))

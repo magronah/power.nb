@@ -61,11 +61,16 @@ These options are particularly useful when estimating fold changes to fit the mi
 \examples{
 # Example usage
 set.seed(101)
-countdata <- matrix(rpois(500, 3), ncol = 50, nrow = 10)
+nr = 10; nc =50
+countdata <- matrix(rpois(500, 3), ncol = nc, nrow = nr)
 # Simulated OTU count data with 50 taxa and 10 samples
-
-metadata <- data.frame(Samples = paste("Sample", 1:10, sep = "_"),
+countdata  <- as.data.frame(countdata)
+rownames(countdata)  <- paste("Sample", 1:nr, sep = "_")
+colnames(countdata) <- paste("otu", 1:nc, sep = "_")
+metadata <- data.frame(Samples = paste("Sample", 1:nr, sep = "_"),
              Groups = rep(c("Control", "Treatment"), each = 5))
+sample_colname = "Samples"
+group_colname  = "Groups"
 
 result <- deseqfun(countdata, metadata, ref_name = "Control",
                     minReplicatesForReplace = Inf,

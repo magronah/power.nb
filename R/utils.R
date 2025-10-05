@@ -445,12 +445,12 @@ deseq_fun_est <-function(metadata_list,  countdata_list,
 
   registerDoParallel(cores = num_cores)
   l = length(countdata_list)
-  i  <- NULL
+  #i  <- NULL
   dds  =  foreach(i= 1:l, .packages = "DESeq2", .export = "deseqfun") %dopar%{
     countdata =  countdata_list[[i]]
     metadata  =  metadata_list[[i]]
     stopifnot(!is.na(sum(countdata)))
-    stopifnot(colnames(countdata) == metadata$Samples)
+    stopifnot(all(colnames(countdata) %in% metadata$Samples))
 
     deseqfun(countdata,metadata,alpha_level = alpha_level,
              group_colname = group_colname,

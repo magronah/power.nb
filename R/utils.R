@@ -502,8 +502,8 @@ contour_plot_fun <- function(combined_data,
                               breaks = cont_breaks)
                + metR::geom_label_contour(data = power_estimate,
                                     aes(z= power,label = sprintf("%.3f", after_stat(level))),
-                                    breaks = cont_breaks
-               )
+                                    breaks = cont_breaks)
+               + theme_bw()
 
   )
   gg_2dimc

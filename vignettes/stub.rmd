@@ -1,10 +1,11 @@
 ---
 title: "Power and Sample Size Estimation for Microbiome Analysis"
 date: "`r Sys.Date()`"
+author: "Michael Agronah and Benjamin Bolker"
 output:
   html_document:
     toc: true
-    toc_depth: 4
+    toc_depth: 3
     number_sections: true
     df_print: paged
   pdf_document: default
@@ -50,8 +51,17 @@ references:
 
 # Acknowledgments
 
-I would like to express my sincere gratitude to Dr. Jacob T. Nearing for his generosity in granting access to the 38 microbiome datasets used in the paper “Microbiome differential abundance methods produce different results across 38 datasets.”[@Nearing2022].
-] These datasets were invaluable in developing, testing, and validating this R package for power calculation in microbiome studies.
+We would like to express our sincere gratitude to Dr. Jacob T. Nearing for his generosity in granting access to the 38 microbiome datasets used in the paper “Microbiome differential abundance methods produce different results across 38 datasets” [@Nearing2022]. These datasets were invaluable in developing, testing, and validating this R package for power and sample size calculation in microbiome studies.
+
+#  Package Description and Functionalies 
+
+`power.nb` is a package developed for estimating statistical power and sample sizes in differential abundance microbiome studies. The package presents novel methods for estimating statistical power for individual taxa (feature, otu, or species)  and for c sample size calculation accounting for effect sizes and mean abundances of taxa in a differential abundance study. 
+
+Data simulation is required in order to estimate statistical power and to estimate sample sizes required to detect a target statistical power. `power.nb` therefore presents with two novel microbiome data simulations frameworks: `MixGassSim` and `RRSim`. The method implemented in `MixGassSim` involves fitting a mixture of  Mixture of Gaussian Distributions to the distributions of mean abundance of taxa and fold changes and simulates count data from the negative binomial model implemented in the  `DESeq2` R package. Details about the method implemented in `MixGassSim` presented in the paper ["Investigating statistical power of differential abundance studies"](https://doi.org/10.1371/journal.pone.0318820).  The method implemented in `RRSim` built upon the functionality of the `glmmTMB` package and simulated microbiome data from a Mixed Effect Model with accounting for correlations between taxa and zero inflation in microbiome data. 
+
+There are 2 simulation approaches in `power.nb`; namely the `MixGaussSim` and `RRSim`.
+*MixGaussSim models the distribution of mean abundances and effect sizes of taxa as well as the relationship between mean abundance and effect size of taxa using a mixture of gaussian distributions. In contrast, RRSim jointly models all taxa and models the mean abundance of taxa with a mixed-effects model while accounting for correlations between taxa within subjects. RRSim uses the reduced-rank method to reduce the number of estimates required for the variance-covariance structure and provides flexibility in modeling zero inflation at both the taxon and group levels.*
+We would need to simulate microbiome data in order to estimate statistical power at the level of individual taxon.  The simulation framework implemented in `power.nb` is Mixture of Gaussian Mixture Model proposed in the paper by [Agronah and Bolker](https://doi.org/10.1371/journal.pone.0318820). 
 
 #  Installation
 
@@ -64,41 +74,30 @@ devtools::install_github("magronah/power.nb")
 
 # Estimating Statistical Power
 
-In other to estimate statistical power for individual power, we need to 
-There are 2 simulation approaches in `power.nb`; namely the `MixGaussSim` and `RRSim`.
-*MixGaussSim models the distribution of mean abundances and effect sizes of taxa as well as the relationship between mean abundance and effect size of taxa using a mixture of gaussian distributions. In contrast, RRSim jointly models all taxa and models the mean abundance of taxa with a mixed-effects model while accounting for correlations between taxa within subjects. RRSim uses the reduced-rank method to reduce the number of estimates required for the variance-covariance structure and provides flexibility in modeling zero inflation at both the taxon and group levels.*
-
-We will focus on `GaussMixSim` for power estimation as For power calculation
-
-## Parameters for count data simulation
-
-We would need to simulate microbiome data in order to estimate statistical power at the level of individual taxon.  The simulation framework implemented in `power.nb` is Mixture of Gaussian Mixture Model proposed in the paper by [Agronah and Bolker](https://doi.org/10.1371/journal.pone.0318820). There are one of two ways to obtain the parameters of the Mixture of Gaussian Mixture Model for data simulation. 
-
-1. Users can either pre-specify a set of parameters 
-**OR** 
-
-2. Estimating these parameters from existing datasets 
+In other to estimate statistical power for individual power, we need to simulate data that resembles actual microbiome data. Here we use the `MixGaussSim`  simulation method. 
 
 
-### Users can either pre-specify a set of parameters 
-**OR** 
+## Two ways to obtain parameters for data simulation (MixGaussSim)
+There are one of two ways to obtain the parameters of the Mixture of Gaussian Mixture Model for data simulation.  Users can:
 
-### Estimating parameters from existing datasets 
+**1. pre-specify a set of parameters:** To help users decide on plausible parameter values, we have run  `MixGaussSim` on some of the microbiome datasets used in the paper “Microbiome differential abundance methods produce different results across 38 datasets.”[@Nearing2022] and presented the parameter estimates  obtained from each of these datasets ([see Appendix](#appendix) for the parameter estimates from these datasets). 
 
-#### Dataset
+**2. estimate parameters from an existing dataset:** Secondly, users can also obtain estimates directly from fitting the model implemented in  `MixGaussSim`  to exiting datasets. The following steps outlines the process for estimating parameters if you have a dataset. To ensure that results are applicable to the study you intend conducting. 
 
-The following steps outlines the process for estimating parameters if you have a dataset. To ensure that results are applicable to the study you intend conducting. 
 
-similar to the one you intend using for your study. 
-Use your microbiome data to fit a Gaussian mixture model:
 
+## Dataset
+
+In this vignette, we are using a subset of the Artic Fire datasets; one of the datasets presented in the paper by Nearing. The data has 148 samples and 31100 taxa. We are using the subset just to illustrate how `MixGaussSim` works and for faster running. 
 
 ```{r, eval=FALSE}
+##Load libraries
 library(tidyverse)
 library(dplyr)
 library(power.nb)
 library(patchwork)
-#####################################################
+
+##Read count data and metadata
 data <- read_qza(file.path(path, "ArcticFireSoils_table.qza"))$data
 
 metadata <- read.table(
@@ -114,9 +113,11 @@ metadata <- metadata %>%
 
 head(data)
 head(metadata)
+##############Select subset###############################
+
 ```
 
-#### Pre-filtering low abundant taxa
+## Pre-filtering low abundant taxa
 
 Low abundant tax exhibit high variability, posing challenges in detecting significant differences between groups cite{m}. Pre-filtering steps, as is routinely done in differential abundance analysis, is used to filter out these low abundant taxa. In this vignette, we filter out taxa with less that 10 count in less that 5 samples. 
 
@@ -133,7 +134,7 @@ filter_data  = filter_low_count(
 head(filter_data)
 ```
 
-#### Foldchange and Dispersion Estimations
+## Foldchange and Dispersion Estimations
 
 *We used the \texttt{DESeq2} package to estimate dispersion for the negative binomial model. Dispersion typically varies based on count abundance,*
 from Deseq2 packge
@@ -150,7 +151,7 @@ logfoldchange =  foldchange_est$deseq_estimate$log2FoldChange
 ```
 
 
-#### Fit  log mean count 
+## Fit  log mean count 
 
 ```{r, eval = FALSE}
 logmean    =  log(rowMeans(filter_data))
@@ -167,14 +168,14 @@ d = c_0 + \frac{c_1}{m},
 \end{align}
 where $d$ and $m$ denote the scaled dispersion and mean abundance respectively. The term $c_0$ represents the asymptotic dispersion level for high abundance taxa, and $c_1$ captures additional dispersion variability. 
 
-#### Fit  Dispersions
+## Fit  Dispersions
 ```{r, eval = FALSE}
 
 dispersion    =  foldchange_est$dispersion
 dispersionFit =  dispersion_fit(dispersion, logmean)
 ```
 
-#### Fit log fold change
+## Fit log fold change
 
 ```{r, eval = FALSE}
 ## Fit foldchange from Deseq
@@ -190,8 +191,8 @@ logfoldchangeFit <- logfoldchange_fit(logmean,
                                        seed = 100)
 ```
 
-### Count data simulation
 
+## Simulate count data
 
 ```{r, eval = FALSE}
 
@@ -211,7 +212,6 @@ logfoldchange_sim  =  logfoldchange_sim_fun(logmean_sim = logmean_sim,
 ```
 
 
-## Simualate data
 ```{r, eval = FALSE}
 
 ntreat = sum(metadata$Groups == "Fire")
@@ -266,6 +266,10 @@ p2 = ggplot(dd, aes(x = logfoldchange, group = type, colour = type)) +
 ```
 
 
+## Estimate p-values associated to fold changes for each taxa
+
+We now run each simulated count adata to the to calculate pvalues associated to each  foldchanes for each taxa. ]
+
 
 ```{r, eval = FALSE}
 
@@ -286,7 +290,8 @@ true_lfoldchange_list = countdata_sims$logfoldchange_list
 ###############################################################
 ```
 
-## Fit GAM and Estimate Power
+## Fit Generalized Additive Model (GAM) for power estimation 
+
 ```{r, eval = FALSE}
 gamFit <- gam_fit(deseq_est_list,
                   true_lfoldchange_list,
@@ -306,9 +311,15 @@ contour_plot <- contour_plot_fun(combined_data,
 contour_plot
 ```
 
+
+## Estimate statistical power given fold change and mean abundance for taxa
+
+
+
 # Sample size calculation
 
-## Count data simulation
+## Simulate count data for various ranges of sample sizes
+
 ```{r, eval = FALSE}
 nsim = 50
 nsamp_vec = c(20, 50, 70)
@@ -332,7 +343,8 @@ names(countdata_sims_list) = paste0("sample_",nsamp_vec)
 ###############################################################
 ```
 
-## Estimating pvlaues for fold changes
+## Estimate p-values associated to fold changes for each taxa for simulated data per sample size
+
 ```{r, eval = FALSE}
 desq_est_list  =  list()
 for(i in 1:length(countdata_sims_list)){
@@ -349,6 +361,13 @@ for(i in 1:length(countdata_sims_list)){
   
 }
 ```
+
+
+## Fit Generalized Additive Model (GAM) for power estimation 
+
+
+
+## Estimate sample size for a given statistical power, fold change and mean abundance
 
 
 

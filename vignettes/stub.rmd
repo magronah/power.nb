@@ -1,10 +1,10 @@
 ---
-title: "Simulation for microbiome power analysis"
+title: "Power and Sample Size Estimation for Microbiome Analysis"
 date: "`r Sys.Date()`"
 output:
   html_document:
     toc: true
-    toc_depth: 3
+    toc_depth: 4
     number_sections: true
     df_print: paged
   pdf_document: default
@@ -12,13 +12,48 @@ vignette: >
   %\VignetteIndexEntry{Simulation for microbiome power analysis}
   %\VignettePackage{power.nb}
   %\VignetteEngine{knitr::rmarkdown}
+references:
+  - id: Nearing2022
+    type: article-journal
+    title: "Microbiome differential abundance methods produce different results across 38 datasets"
+    author:
+      - family: Nearing
+        given: Jacob T.
+      - family: Douglas
+        given: Gavin M.
+      - family: Hayes
+        given: Matilda G.
+      - family: MacDonald
+        given: Jacquelyn
+      - family: Desai
+        given: Devika K.
+      - family: Allward
+        given: Nicholas
+      - family: Jones
+        given: Caitlin
+      - family: Wright
+        given: R. Joshua
+      - family: Dhanani
+        given: Akash S.
+      - family: Comeau
+        given: André M.
+      - family: Langille
+        given: Morgan G.I.
+    issued:
+      year: 2022
+    container-title: "Nature Communications"
+    volume: "13"
+    page: "342"
+    DOI: "10.1038/s41467-022-28034-z"
 ---
 
 
-## Acknowledgments
+# Acknowledgments
 
+I would like to express my sincere gratitude to Dr. Jacob T. Nearing for his generosity in granting access to the 38 microbiome datasets used in the paper “Microbiome differential abundance methods produce different results across 38 datasets.”[@Nearing2022].
+] These datasets were invaluable in developing, testing, and validating this R package for power calculation in microbiome studies.
 
-##  Installation
+#  Installation
 
 Install the package from GitHub using `devtools`:
 
@@ -27,42 +62,295 @@ install.packages("devtools")
 devtools::install_github("magronah/power.nb")
 ```
 
-### Overview
+# Estimating Statistical Power
 
-This package allows you to:
+In other to estimate statistical power for individual power, we need to 
+There are 2 simulation approaches in `power.nb`; namely the `MixGaussSim` and `RRSim`.
+*MixGaussSim models the distribution of mean abundances and effect sizes of taxa as well as the relationship between mean abundance and effect size of taxa using a mixture of gaussian distributions. In contrast, RRSim jointly models all taxa and models the mean abundance of taxa with a mixed-effects model while accounting for correlations between taxa within subjects. RRSim uses the reduced-rank method to reduce the number of estimates required for the variance-covariance structure and provides flexibility in modeling zero inflation at both the taxon and group levels.*
 
-- Fit statistical models to microbiome count data.
+We will focus on `GaussMixSim` for power estimation as For power calculation
 
-- Simulate realistic count datasets with different effect sizes.
-
-- Test for differential abundance.
-
-- Estimate power per taxon.
-
-- Explore sample size and effect size sensitivity.
-
-
-## Datasets 
-We used the datasets by Dr. Nearing used in the paper ... cite{}. 
-
-### Data simulation for power estimation
+## Parameters for count data simulation
 
 We would need to simulate microbiome data in order to estimate statistical power at the level of individual taxon.  The simulation framework implemented in `power.nb` is Mixture of Gaussian Mixture Model proposed in the paper by [Agronah and Bolker](https://doi.org/10.1371/journal.pone.0318820). There are one of two ways to obtain the parameters of the Mixture of Gaussian Mixture Model for data simulation. 
 
-1) Users can either pre-specify a set of parameters 
+1. Users can either pre-specify a set of parameters 
 **OR** 
-2)  Estimating these parameters from existing datasets 
+
+2. Estimating these parameters from existing datasets 
 
 
-#### Prespecifing parameters for the Gaussian model
+### Users can either pre-specify a set of parameters 
+**OR** 
 
+### Estimating parameters from existing datasets 
 
-#### Estimating Gaussian parameters from existing data
+#### Dataset
 
 The following steps outlines the process for estimating parameters if you have a dataset. To ensure that results are applicable to the study you intend conducting. 
 
 similar to the one you intend using for your study. 
 Use your microbiome data to fit a Gaussian mixture model:
+
+
+```{r, eval=FALSE}
+library(tidyverse)
+library(dplyr)
+library(power.nb)
+library(patchwork)
+#####################################################
+data <- read_qza(file.path(path, "ArcticFireSoils_table.qza"))$data
+
+metadata <- read.table(
+  file.path(path, "ArcticFireSoils_meta.tsv"),
+  header = TRUE, sep = "\t",
+  check.names = FALSE, comment.char = ""
+)
+
+keep_samples = colnames(data)
+metadata <- metadata %>%
+  setNames(c("SampleID", "Groups")) %>%
+  filter(SampleID %in% keep_samples)
+
+head(data)
+head(metadata)
+```
+
+#### Pre-filtering low abundant taxa
+
+Low abundant tax exhibit high variability, posing challenges in detecting significant differences between groups cite{m}. Pre-filtering steps, as is routinely done in differential abundance analysis, is used to filter out these low abundant taxa. In this vignette, we filter out taxa with less that 10 count in less that 5 samples. 
+
+```{r, eval=FALSE}
+filter_data  = filter_low_count(
+  countdata = data,
+  metadata  = metadata,
+  abund_thresh = 10,
+  sample_thresh = 5,
+  sample_colname = "SampleID",
+  group_colname  = "Groups"
+)
+
+head(filter_data)
+```
+
+#### Foldchange and Dispersion Estimations
+
+*We used the \texttt{DESeq2} package to estimate dispersion for the negative binomial model. Dispersion typically varies based on count abundance,*
+from Deseq2 packge
+
+```{r, eval = FALSE}
+foldchange_est <- deseqfun(countdata = filter_data,
+                           metadata  = metadata,
+                          alpha_level = 0.1,
+                          ref_name  = "Control",
+                          group_colname = "Groups",
+                          sample_colname = "SampleID")
+
+logfoldchange =  foldchange_est$deseq_estimate$log2FoldChange
+```
+
+
+#### Fit  log mean count 
+
+```{r, eval = FALSE}
+logmean    =  log(rowMeans(filter_data))
+logmeanFit =  logmean_fit(logmean, sig = 0.05,
+                         max.comp = 4, max.boot = 100)
+logmeanFit
+```
+
+
+*We used the \texttt{DESeq2} package to estimate dispersion for the negative binomial model. Dispersion typically varies based on count abundance, with rarer taxa exhibiting higher dispersion \citep{love2014moderated}. To accommodate this variability and to simulate dispersion for subsequent power analyses, we used a nonlinear function of mean abundance to model the dispersion estimates, as implemented in the \texttt{DESeq2} package:*
+
+\begin{align} 
+d = c_0 + \frac{c_1}{m},
+\end{align}
+where $d$ and $m$ denote the scaled dispersion and mean abundance respectively. The term $c_0$ represents the asymptotic dispersion level for high abundance taxa, and $c_1$ captures additional dispersion variability. 
+
+#### Fit  Dispersions
+```{r, eval = FALSE}
+
+dispersion    =  foldchange_est$dispersion
+dispersionFit =  dispersion_fit(dispersion, logmean)
+```
+
+#### Fit log fold change
+
+```{r, eval = FALSE}
+## Fit foldchange from Deseq
+logfoldchangeFit <- logfoldchange_fit(logmean,
+                                       logfoldchange,
+                                       ncore = 3,
+                                       max_sd_ord = 2,
+                                       max_np = 5,
+                                       minval = -5,
+                                       maxval = 5,
+                                       itermax = 100,
+                                       NP = 800,
+                                       seed = 100)
+```
+
+### Count data simulation
+
+
+```{r, eval = FALSE}
+
+### Simulated log mean count and log foldchange using the fitted parameters
+
+logmean_param       =  logmeanFit$logmean_param
+logfoldchange_param =  logfoldchangeFit
+
+notu  = dim(filter_data)[1]
+logmean_sim  =  logmean_sim_fun(logmean_param, notu)
+
+logfoldchange_sim  =  logfoldchange_sim_fun(logmean_sim = logmean_sim,
+                                            logfoldchange_param = 
+                                            logfoldchange_param,
+                                            max_lfc  = 15,
+                                            max_iter = 30000)
+```
+
+
+## Simualate data
+```{r, eval = FALSE}
+
+ntreat = sum(metadata$Groups == "Fire")
+ncont  = sum(metadata$Groups == "Control")
+dispersion_param  =  dispersionFit$param
+
+nsim = 100
+countdata_sims = countdata_sim_fun(logmean_param,
+                                   logfoldchange_param,
+                                   dispersion_param,
+                                   nsamp_per_group = NULL,
+                                   ncont = ncont,
+                                   ntreat = ntreat,
+                                   notu,
+                                   nsim = nsim,
+                                   disp_scale = 0.3,
+                                   max_lfc = 15,
+                                   maxlfc_iter = 1000,
+                                   seed = 121)
+
+
+dim(countdata_sims$treat_countdata_list$sim_1)
+dim(countdata_sims$control_countdata_list$sim_1)
+dim(countdata_sims$countdata_list$sim_1)
+dim(countdata_sims$metadata_list$sim_1)
+
+
+length(countdata_sims$logfoldchange_list$sim_1)
+length(countdata_sims$logmean_list$sim_1)
+###############################################################
+```
+
+### Compare Simulation with the data
+
+log mean count and log fold change from simulation with data
+```{r, eval = FALSE}
+dd  = data.frame(logmean  = c(logmean,
+                              countdata_sims$logmean_list$sim_1),
+                 logfoldchange  = c(foldchange_est$logfoldchange,
+                                  countdata_sims$logfoldchange_list$sim_1),
+                 type  = rep(c("observation","simulation"), each = notu) )
+
+p1 = ggplot(dd, aes(x = logmean, group = type, colour = type)) +
+  geom_density()  +
+  theme_bw()
+
+p2 = ggplot(dd, aes(x = logfoldchange, group = type, colour = type)) +
+  geom_density()  +
+  theme_bw()
+
+(p1|p2) + plot_layout(guides = "collect")
+```
+
+
+
+```{r, eval = FALSE}
+
+###############################################################
+countdata_list  =   countdata_sims$countdata_list
+metadata_list   =   countdata_sims$metadata_list
+desq_est   =   deseq_fun_est(metadata_list =  metadata_list,
+                            countdata_list =  countdata_list,
+                            alpha_level    =  0.1,
+                            group_colname  = "Groups",
+                            sample_colname = "Samples",
+                            num_cores      =  4,
+                            ref_name       = "control")
+###############################################################
+true_lmean_list    =    countdata_sims$logmean_list
+deseq_est_list     =    lapply(desq_est, function(x){x$deseq_estimate})
+true_lfoldchange_list = countdata_sims$logfoldchange_list
+###############################################################
+```
+
+## Fit GAM and Estimate Power
+```{r, eval = FALSE}
+gamFit <- gam_fit(deseq_est_list,
+                  true_lfoldchange_list,
+                  true_lmean_list,
+                  grid_len = 50,
+                  alpha_level=0.1)
+  
+
+cont_breaks     =  seq(0,1,0.1)
+combined_data   =  gamFit$combined_data
+power_estimate  =  gamFit$power_estimate
+#plot(gamFit$fit_2d)
+
+contour_plot <- contour_plot_fun(combined_data,
+                                 power_estimate,
+                                 cont_breaks)
+contour_plot
+```
+
+# Sample size calculation
+
+## Count data simulation
+```{r, eval = FALSE}
+nsim = 50
+nsamp_vec = c(20, 50, 70)
+countdata_sims_list  =  list()
+for(j in 1:length(nsamp_vec)){
+  countdata_sims_list[[j]]  =  countdata_sim_fun(logmean_param,
+                                                 logfoldchange_param,
+                                                 dispersion_param,
+                                                 nsamp_per_group = nsamp_vec[j],
+                                                 ncont  = NULL,
+                                                 ntreat = NULL,
+                                                 notu,
+                                                 nsim = nsim,
+                                                 disp_scale = 0.3,
+                                                 max_lfc = 15,
+                                                 maxlfc_iter = 1000,
+                                                 seed = 121)
+}
+
+names(countdata_sims_list) = paste0("sample_",nsamp_vec)
+###############################################################
+```
+
+## Estimating pvlaues for fold changes
+```{r, eval = FALSE}
+desq_est_list  =  list()
+for(i in 1:length(countdata_sims_list)){
+  
+  countdata_list       =   countdata_sims_list[[i]]$countdata_list
+  metadata_list        =   countdata_sims_list[[i]]$metadata_list
+  desq_est_list[[i]]   =   deseq_fun_est(metadata_list =  metadata_list,
+                               countdata_list =  countdata_list,
+                               alpha_level    =  0.1,
+                               group_colname  = "Groups",
+                               sample_colname = "Samples",
+                               num_cores      =  4,
+                               ref_name       = "control")
+  
+}
+```
+
+
 
 
 ##### Data preprocessing 
@@ -153,22 +441,11 @@ sim <- simulate_data(fit,
 
 
 
-```{r, eval=FALSE}
-####
-
-```
 
 
-## Sample Size Estimation
 
 
-```{r, eval=FALSE}
-####
-
-```
-
-
-## Appendix 
+# Appendix 
 
 ```{r, echo=FALSE}
 library(knitr)

@@ -163,53 +163,54 @@
 #' #'
 #' #' @examples
 #'
-#' power_fun_ss <- function(deseq_est_list,
-#'                          true_logfoldchange,
-#'                          true_logmean,
-#'                          sample_vec,
-#'                          alpha_level=0.1,notu){
-#'
-#'   # concatenate all p-values from all the sample size
-#'   # est_list <- do.call("c", deseq_est_list)
-#'   # p_val <- do.call("c", lapply(est_list, function(est) est$deseq_estimate$padj))
-#'
-#'   # concatenate all log foldchange, logmean from all the sample size
-#'   #true_logfoldchange <- do.call("c", do.call("c", sim_logfoldchange_list))
-#'   #true_logmean  <-  do.call("c", do.call("c", sim_logmean_list))
-#'
-#'   #deseq_est_list = deseq_sample_size[[1]]
-#'   # find p-values that were rejected
-#'   p_val =  deseq_est_list$padj
-#'
-#'   pval_reject   =   (!is.na(p_val) & p_val < 0.1)
-#'   #length(p_val)
-#'   # create a table with all the information
-#'   comb   =   tibble(lmean_abund  =   true_logmean,
-#'                     abs_lfc      =   abs(true_logfoldchange),
-#'                     pval_reject  =   as.numeric(pval_reject))
-#'
-#'   comb$sample_size = deseq_est_list$sample_size #rep(sample_vec, each = nsim*notu)
-#'   #' fit GAM with covariates as tensor product (ie,interaction between
-#'   #' log mean abundance and absolute log fold changes
-#'   #' and then a spline for the sample sizes
-#'   #' log mean abundance and log fold changes are related directly,hence the
-#'   #' interaction but sample size is not quite related to log mean abundance
-#'   #' and log fold changes directly
-#'
-#'   df =  length(sample_vec) -1 # degrees of freedom
-#'   comb$lss = log2(comb$sample_size)
-#'
-#'   # fit_3d <- scam(pval_reject ~ s(lmean_abund, abs_lfc,bs="tedmi") + s(lss, k = df),
-#'   #                data = comb, family = binomial)
-#'   # fit_3d <- scam(pval_reject ~ s(lmean_abund, abs_lfc,bs="tedmi") + s(sample_size,bs="mpi"),
-#'   #                data = comb, family = binomial)
-#'
-#'   fit_3d <- scam(pval_reject ~ s(lmean_abund, abs_lfc,bs="tedmi") +
-#'                    s(sample_size,lmean_abund,bs="tedmi") +
-#'                    s(sample_size,abs_lfc,bs="tedmi"),
-#'                  data = comb, family = binomial)
-#'
-#'   list(combined_data=comb, gam_mod = fit_3d)
-#' }
+power_fun_ss <- function(deseq_est_list,
+                         true_logfoldchange,
+                         true_logmean,
+                         sample_vec,
+                         alpha_level=0.1,notu){
+
+  # concatenate all p-values from all the sample size
+  est_list <- do.call("c", deseq_est_list)
+  p_val <- do.call("c", lapply(est_list, function(est) est$deseq_estimate$padj))
+
+  # concatenate all log foldchange, logmean from all the sample size
+  #true_logfoldchange <- do.call("c", do.call("c", sim_logfoldchange_list))
+  #true_logmean  <-  do.call("c", do.call("c", sim_logmean_list))
+
+  #deseq_est_list = deseq_sample_size[[1]]
+  # find p-values that were rejected
+  p_val =  deseq_est_list$padj
+
+  pval_reject   =   (!is.na(p_val) & p_val < 0.1)
+  #length(p_val)
+  # create a table with all the information
+  comb   =   tibble(lmean_abund  =   true_logmean,
+                    abs_lfc      =   abs(true_logfoldchange),
+                    pval_reject  =   as.numeric(pval_reject))
+
+  comb$sample_size = deseq_est_list$sample_size #rep(sample_vec, each = nsim*notu)
+  #' fit GAM with covariates as tensor product (ie,interaction between
+  #' log mean abundance and absolute log fold changes
+  #' and then a spline for the sample sizes
+  #' log mean abundance and log fold changes are related directly,hence the
+  #' interaction but sample size is not quite related to log mean abundance
+  #' and log fold changes directly
+
+  df =  length(sample_vec) -1 # degrees of freedom
+  comb$lss = log2(comb$sample_size)
+
+  # fit_3d <- scam(pval_reject ~ s(lmean_abund, abs_lfc,bs="tedmi") + s(lss, k = df),
+  #                data = comb, family = binomial)
+  # fit_3d <- scam(pval_reject ~ s(lmean_abund, abs_lfc,bs="tedmi") + s(sample_size,bs="mpi"),
+  #                data = comb, family = binomial)
+
+  fit_3d <- scam(pval_reject ~ s(lmean_abund, abs_lfc,bs="tedmi") +
+                   s(sample_size,lmean_abund,bs="tedmi") +
+                   s(sample_size,abs_lfc,bs="tedmi"),
+                 data = comb, family = binomial)
+
+  list(combined_data=comb, gam_mod = fit_3d)
+}
+
 #'
 #'

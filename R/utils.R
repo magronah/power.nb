@@ -54,7 +54,7 @@ filter_low_count <- function (countdata, metadata, abund_thresh = 5, sample_thre
     stop("Could not find a group/condition column in metadata.\n
          Pass `group_colname=` explicitly.")
   }
-  if (all((metadata[[sample_colname]]) == colnames(countdata))) {
+  if (!all(metadata[[sample_colname]] %in% colnames(countdata))) {
     countdata = t(countdata)
     }
 
@@ -482,7 +482,8 @@ deseq_fun_est <-function(metadata_list,  countdata_list,
 #'
 contour_plot_fun <- function(combined_data,
                              power_estimate,
-                             cont_breaks){
+                             cont_breaks,
+                             multiple_samples = FALSE){
 
     ## utils::globalVariables(c("lmean_abund", "abs_lfc"))
     ## deal with code checking: not sure why 'globalVariables' not working
@@ -506,6 +507,23 @@ contour_plot_fun <- function(combined_data,
                + theme_bw()
 
   )
+  if(!is.null(multiple_samples)){
+    gg_2dimc <- (ggplot(combined_data)
+                 + aes(lmean_abund, abs_lfc, color = sample_size_vec)
+                 + ggrastr::rasterise(geom_point(aes(color = pvalue_reject), alpha = 0.5))
+                 + xlab(TeX("$\\log_2$(mean counts)"))
+                 + ylab(TeX("|$\\log_2$(fold change)|"))
+                 + scale_colour_manual(values = c("black", "red"))
+                 + geom_contour(data = power_estimate,
+                                aes(z=power),lwd=1,
+                                breaks = cont_breaks)
+                 + metR::geom_label_contour(data = power_estimate,
+                                            aes(z= power,label = sprintf("%.3f", after_stat(level))),
+                                            breaks = cont_breaks)
+                 + theme_bw()
+
+    )
+  }
   gg_2dimc
 
 }

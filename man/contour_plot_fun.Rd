@@ -4,7 +4,12 @@
 \alias{contour_plot_fun}
 \title{Contour plot for showing predicted power}
 \usage{
-contour_plot_fun(combined_data, power_estimate, cont_breaks)
+contour_plot_fun(
+  combined_data,
+  power_estimate,
+  cont_breaks,
+  multiple_samples = FALSE
+)
 }
 \arguments{
 \item{combined_data}{data used for fitting gam}

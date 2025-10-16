@@ -81,7 +81,9 @@ filter_low_count <- function (countdata, metadata, abund_thresh = 5, sample_thre
 #' @param alpha_level The significance level for determining differential expression. Default is 0.1.
 #' @param sample_colname  column names of the samples
 #' @param group_colname   column names of the groups or conditions
-#' @param ref_name The reference group for calculating fold changes.
+#' @param ref_name reference level for fold change calculation.
+#'                 If NULL, the reference level is determined automatically — by default,
+#'                 the factor level that comes first is used as the reference.
 #' @param minReplicatesForReplace DESeq2's parameter to control the minimum number of replicates required for replacing outliers during dispersion estimation. Default is `Inf` (no replacement).
 #' @param cooksCutoff DESeq2's parameter for removing outliers based on Cook's distance. Default is `TRUE` (outlier removal enabled).
 #' @param independentFiltering DESeq2's parameter for independent filtering. Default is `TRUE`.
@@ -127,7 +129,7 @@ filter_low_count <- function (countdata, metadata, abund_thresh = 5, sample_thre
 #'
 
 deseqfun <- function (countdata, metadata, alpha_level = 0.1,
-                      ref_name,
+                      ref_name = NULL,
                       group_colname,
                       sample_colname,
                       minReplicatesForReplace = Inf,
@@ -165,7 +167,9 @@ deseqfun <- function (countdata, metadata, alpha_level = 0.1,
                                         colData = metadata,
                                         design = design_formula)
 
-  dds[[group_colname]] <- relevel(dds[[group_colname]], ref = ref_name)
+  if(!is.null(ref_name)){
+    dds[[group_colname]] <- relevel(dds[[group_colname]], ref = ref_name)
+  }
 
   dds <- DESeq2::DESeq(dds, sfType = "poscounts",
                        minReplicatesForReplace = minReplicatesForReplace)
@@ -418,7 +422,9 @@ gen_parnames <- function(np, sd_ord) {
 #' @param metadata_list : list of metadata
 #' @param countdata_list : list of otu count data
 #' @param num_cores : number of cores
-#' @param ref_name reference for fold change calculation
+#' @param ref_name reference level for fold change calculation.
+#'                 If NULL, the reference level is determined automatically — by default,
+#'                 the factor level that comes first is used as the reference.
 #' @param sample_colname  column names of the samples
 #' @param group_colname   column names of the groups or conditions
 #' @param alpha_level The significance level for determining differential expression. Default is 0.1.
@@ -441,11 +447,11 @@ deseq_fun_est <-function(metadata_list,  countdata_list,
                          alpha_level = 0.1,
                          group_colname,
                          sample_colname,
-                         num_cores=2, ref_name= "control"){
+                         num_cores=2, ref_name= NULL){
 
   registerDoParallel(cores = num_cores)
   l = length(countdata_list)
-  #i  <- NULL
+  i  <- NULL
   dds  =  foreach(i= 1:l, .packages = "DESeq2", .export = "deseqfun") %dopar%{
     countdata =  countdata_list[[i]]
     metadata  =  metadata_list[[i]]
@@ -487,8 +493,8 @@ contour_plot_fun <- function(combined_data,
 
     ## utils::globalVariables(c("lmean_abund", "abs_lfc"))
     ## deal with code checking: not sure why 'globalVariables' not working
-    ##lmean_abund <- abs_lfc <- power <- power_estimate <-
-    ##    pvalue_reject <- level <- NULL
+    lmean_abund <- abs_lfc <- power <- power_estimate <-
+        pvalue_reject <- level <- NULL
 
   combined_data$pvalue_reject <- factor(combined_data$pval_reject)
 

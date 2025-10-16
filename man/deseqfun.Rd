@@ -8,7 +8,7 @@ deseqfun(
   countdata,
   metadata,
   alpha_level = 0.1,
-  ref_name,
+  ref_name = NULL,
   group_colname,
   sample_colname,
   minReplicatesForReplace = Inf,
@@ -24,7 +24,9 @@ deseqfun(
 
 \item{alpha_level}{The significance level for determining differential expression. Default is 0.1.}
 
-\item{ref_name}{The reference group for calculating fold changes.}
+\item{ref_name}{reference level for fold change calculation.
+If NULL, the reference level is determined automatically — by default,
+the factor level that comes first is used as the reference.}
 
 \item{group_colname}{column names of the groups or conditions}
 

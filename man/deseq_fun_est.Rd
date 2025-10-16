@@ -11,7 +11,7 @@ deseq_fun_est(
   group_colname,
   sample_colname,
   num_cores = 2,
-  ref_name = "control"
+  ref_name = NULL
 )
 }
 \arguments{
@@ -27,7 +27,9 @@ deseq_fun_est(
 
 \item{num_cores}{: number of cores}
 
-\item{ref_name}{reference for fold change calculation}
+\item{ref_name}{reference level for fold change calculation.
+If NULL, the reference level is determined automatically — by default,
+the factor level that comes first is used as the reference.}
 }
 \value{
 A list

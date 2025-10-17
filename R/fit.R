@@ -124,16 +124,21 @@ logfoldchange_fit = function(logmean,logfoldchange,ncore = 2,
 
   res  =  list(); cnt = 0
 
+  cl <- parallel::makeCluster(ncore)
+  on.exit(parallel::stopCluster(cl), add = TRUE)
+
+  fun_names <- c("nllfun","polyfun", "dnormmix", "dnormmix0", "genmixpars")
+  parallel::clusterExport(cl, varlist = fun_names, envir = environment())
+
+  #clusterExport(cl, c("logmean", "logfoldchange", fun_names))
+
+  set.seed(seed)
+
   for(sd_ord in 1:max_sd_ord){
 
     for(np in 2:max_np){
 
       l   =  (np-1)+2*np+(sd_ord+1)*np
-      set.seed(seed)
-
-      cl <- makeCluster(ncore)
-      fun_names <- c("polyfun", "dnormmix", "dnormmix0", "genmixpars")
-      clusterExport(cl, c("logmean", "logfoldchange", fun_names))
 
       opt  <- DEoptim(fn = nllfun, lower = rep(minval, l), upper = rep(maxval, l),
                       vals = logfoldchange, logmean = logmean, np = np, sd_ord = sd_ord,

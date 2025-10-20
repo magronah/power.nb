@@ -85,8 +85,9 @@ logmean_sim_fun = function(logmean_param,notu){
 #'   max_iter = 5000
 #' )
 logfoldchange_sim_fun <- function(logmean_sim, logfoldchange_param,
-                                  max_lfc = 15, max_iter = 10000) {
+                                  max_lfc = 15, max_iter = 10000, seed = 121) {
 
+  set.seed(seed)
   par   =   logfoldchange_param$par
   np    =   logfoldchange_param$np
   sd_ord  =   logfoldchange_param$sd_ord

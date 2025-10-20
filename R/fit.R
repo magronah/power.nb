@@ -43,7 +43,7 @@ logmean_fit <- function(logmean,sig=0.05,max.comp=4,max.boot=100){
                                 sigma=mixmdl$sigma)
   }
 
-  list(logmean_param=param,components=ncomp_opt)
+  list(param=param,components=ncomp_opt)
 }
 
 
@@ -65,19 +65,46 @@ logmean_fit <- function(logmean,sig=0.05,max.comp=4,max.boot=100){
 #' dispersion =  abs(rnorm(100))
 #' dispersion_fit(dispersion,logmean)
 
-dispersion_fit <- function(dispersion,logmean){
+dispersion_fit <- function(dispersion, logmean) {
 
-  dat = data.frame(dispersion=dispersion,mean_abund = 2^logmean)
+  mean_abund <- 2^logmean
+  x <- 1/mean_abund; y <- dispersion
 
-  param= nls(dispersion~ asymptDisp + extraPois/mean_abund, data = dat,
-             start = list(asymptDisp = 0.1, extraPois = 0.1))
+  a0 <- max(coef(stats::lm(y ~ x))[1], 1e-6)
+  b0 <- max(coef(stats::lm(y ~ x))[2], 1e-6)
 
-  dd=list(param=data.frame(asymptDisp= coef(param)[[1]],
-                           extraPois = coef(param)[[2]]),
-          confint=confint(param))
-  dd
+  # Try plain nls with log-params
+  ctrl <- stats::nls.control(maxiter = 200, warnOnly = TRUE, minFactor = 1e-10)
+  fit <- try(stats::nls(
+    y ~ exp(log_asymptDisp) + exp(log_extraPois) /mean_abund,
+    start = list(log_asymptDisp = log(a0), log_extraPois = log(b0)),
+    control = ctrl
+  ), silent = TRUE)
+
+
+  # Fallback: nlsLM with bounds, same model
+  if (inherits(fit, "try-error")) {
+    fit <- minpack.lm::nlsLM(
+      y ~ exp(log_asymptDisp) + exp(log_extraPois) / (1/x),
+      start = list(log_asymptDisp = log(a0), log_extraPois = log(b0)),
+      control = minpack.lm::nls.lm.control(maxiter = 1000),
+      lower = c(log_asymptDisp = log(1e-8), log_extraPois = log(1e-8)),
+      upper = c(log_asymptDisp = log(1e6),  log_extraPois = log(1e12))
+    )
+  }
+
+  cv  <- exp(coef(fit))
+  ci  <- try(exp(confint(fit)), silent = TRUE)
+  if (inherits(ci, "try-error")) {
+    ci <- matrix(NA_real_, 2, 2, dimnames = list(c("asymptDisp","extraPois"),
+                                                 c("2.5 %","97.5 %")))
+  }
+
+  list(param   = data.frame(asymptDisp = unname(cv["log_asymptDisp"]),
+                            extraPois  = unname(cv["log_extraPois"])),
+       confint = ci)
+
 }
-
 ##################################################################
 #' Fit a mixture of Gaussian distributions to log fold change
 #'

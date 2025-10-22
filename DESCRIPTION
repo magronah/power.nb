@@ -11,7 +11,7 @@ Authors@R:
    )
 Description: Calculates power and sample size for differential abundance microbiome studies based on the negative binomial model.
 License: MIT + file LICENSE
-Encoding: UTF-8
+Encoding: UTF-8 
 VignetteBuilder: knitr
 Roxygen: list(markdown = TRUE)
 Depends: R (>= 4.1.0)

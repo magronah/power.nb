@@ -510,7 +510,7 @@ contour_plot_fun <- function(combined_data,
                + metR::geom_label_contour(data = power_estimate,
                                     aes(z= power,label = sprintf("%.3f", after_stat(level))),
                                     breaks = cont_breaks)
-               + theme_bw()
+               + ggplot2::theme_bw()
 
   )
   if(!is.null(multiple_samples)){
@@ -526,7 +526,7 @@ contour_plot_fun <- function(combined_data,
                  + metR::geom_label_contour(data = power_estimate,
                                             aes(z= power,label = sprintf("%.3f", after_stat(level))),
                                             breaks = cont_breaks)
-                 + theme_bw()
+                 + ggplot2::theme_bw()
 
     )
   }

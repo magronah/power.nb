@@ -182,11 +182,10 @@ power_fun_ss <- function(deseq_est_list,
   p_val =  deseq_est_list$padj
 
   pval_reject   =   (!is.na(p_val) & p_val < 0.1)
-  #length(p_val)
   # create a table with all the information
-  comb   =   tibble(lmean_abund  =   true_logmean,
-                    abs_lfc      =   abs(true_logfoldchange),
-                    pval_reject  =   as.numeric(pval_reject))
+  comb   = tibble::tibble(lmean_abund  =   true_logmean,
+                          abs_lfc      =   abs(true_logfoldchange),
+                          pval_reject  =   as.numeric(pval_reject))
 
   comb$sample_size = deseq_est_list$sample_size #rep(sample_vec, each = nsim*notu)
   #' fit GAM with covariates as tensor product (ie,interaction between
@@ -204,13 +203,12 @@ power_fun_ss <- function(deseq_est_list,
   # fit_3d <- scam(pval_reject ~ s(lmean_abund, abs_lfc,bs="tedmi") + s(sample_size,bs="mpi"),
   #                data = comb, family = binomial)
 
-  fit_3d <- scam(pval_reject ~ s(lmean_abund, abs_lfc,bs="tedmi") +
+  fit_3d <- scam::scam(pval_reject ~ s(lmean_abund, abs_lfc,bs="tedmi") +
                    s(sample_size,lmean_abund,bs="tedmi") +
                    s(sample_size,abs_lfc,bs="tedmi"),
-                 data = comb, family = binomial)
+                   data = comb, family = binomial)
 
   list(combined_data=comb, gam_mod = fit_3d)
 }
 
-#'
-#'
+

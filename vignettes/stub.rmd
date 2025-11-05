@@ -26,7 +26,9 @@ We would like to express our sincere gratitude to Dr. Jacob T. Nearing for his g
 `power.nb` is a package developed for estimating statistical power and sample sizes in differential abundance microbiome studies. The package presents novel methods for estimating statistical power for individual taxa (feature, otu, or species) and for sample size calculation accounting for effect sizes and mean abundance of taxa.
 
 
-`power.nb` also presents two novel microbiome data simulations frameworks: `MixGassSim` and `RRSim`. The method implemented in `MixGassSim` models the distribution of mean abundance of taxa and the distribution of fold change (as a function of mean abundance of taxa) by finite Mixture of Gaussian distributions.  Microbiome count data is then simulated from a negative binomial distribution. Detailed description of the `MixGassSim` method is presented in the paper ["Investigating statistical power of differential abundance studies"](https://doi.org/10.1371/journal.pone.0318820) [@agronahnbolker].  `RRSim`, on the other hand models the mean abundance of all taxa jointly with a mixed-effects model while accounting for correlations among taxa within subjects and zero inflation in microbiome data. Given the high dimensionality of microbiome data (usually having hundreds or thousands of taxa), modelling correlations between taxa requires estimating thousands or even millions of parameters for the correlation matrix. `RRSim` uses the reduced rank functionality implemented in the `glmmTMB` [@magnusson2017package] packages to reduce the number of parameter estimates required of the variance-correlation matrix. Details of this method is presented in the thesis ["A Novel Approach for Simulation-Based Power Estimation and Joint Modeling of Microbiome Counts"](https://macsphere.mcmaster.ca/handle/11375/31784) [@agronah2025novel]
+`power.nb` also presents two novel microbiome data simulations frameworks: `MixGassSim` and `RRSim`. The method implemented in `MixGassSim` models the distribution of mean abundance of taxa and the distribution of fold change (as a function of mean abundance of taxa) by finite Mixture of Gaussian distributions.  Microbiome count data is then simulated from a negative binomial distribution. Detailed description of the `MixGassSim` method is presented in the paper ["Investigating statistical power of differential abundance studies"](https://doi.org/10.1371/journal.pone.0318820) [@agronahnbolker].  
+
+`RRSim` (this simulation method is still under development and some functions in `RRSim` are yet to tested), on the other hand models the mean abundance of all taxa jointly with a mixed-effects model while accounting for correlations among taxa within subjects and zero inflation in microbiome data. Given the high dimensionality of microbiome data (usually having hundreds or thousands of taxa), modelling correlations between taxa requires estimating thousands or even millions of parameters for the correlation matrix. `RRSim` uses the reduced rank functionality implemented in the `glmmTMB` [@magnusson2017package] packages to reduce the number of parameter estimates required of the variance-correlation matrix. Details of this method is presented in the thesis ["A Novel Approach for Simulation-Based Power Estimation and Joint Modeling of Microbiome Counts"](https://macsphere.mcmaster.ca/handle/11375/31784) [@agronah2025novel]
 
 #  Installation
 
@@ -41,7 +43,7 @@ devtools::install_github("magronah/power.nb")
 
 Since the goal of differential abundance studies is to identify taxa that differ significantly between groups, statistical power must be estimated at the level of individual taxa. Because of the complexity of microbiome data, analytical approaches based on theoretical distributions of test statistics (e.g., non-central t or chi-squared distributions) are not feasible [@arnold2011simulation]. Therefore, power estimation typically relies on simulation-based methods that can mimic the characteristics of real microbiome data.
 
-Statistical power for a given taxon depends on both its mean abundance and effect size (defined in this package as fold changes) [@agronahnbolker]. Thus, estimating the distributions of mean abundance and fold change of taxa explicitly will offer great benefit for estimation of statistical power for individual taxon. We use the `MixGaussSim` simulation approach to simulate microbiome data for power calculation due to its flexibly in modelling the distributions of taxa mean abundances and effect sizes explicitly as as well as their relationship. 
+Statistical power for a given taxon depends on both its mean abundance and effect size (defined in this package as fold changes) [@agronahnbolker]. Thus, estimating the distributions of mean abundance and fold change of taxa explicitly will offer great benefit for estimation of statistical power for individual taxon. We use the `MixGaussSim` simulation approach to simulate microbiome data for power calculation due to its flexibility in modelling the distributions of taxa mean abundances and effect sizes explicitly as as well as their relationship. 
 
 
 ## Two ways to obtain parameters for data simulation using MixGaussSim
@@ -49,11 +51,11 @@ There are one of two ways to obtain the parameters of the `MixGaussSim` method f
 
 **1. pre-specify a set of parameters:** To help users decide on plausible parameter values, we have run  `MixGaussSim` on some of the microbiome datasets used in the paper ["Microbiome differential abundance methods produce different results across 38 datasets"](10.1038/s41467-022-28034-z) [@Nearing2022] and presented the parameter estimates  obtained from each of these datasets ([see Appendix for the parameter estimates from these datasets](#appendix) ). 
 
-**2. estimate parameters from an existing dataset:** Secondly, users can also obtain estimates directly from fitting the model implemented in  `MixGaussSim`  to exiting datasets. The following steps outlines the process for estimating parameters from an existing dataset. 
+**2. estimate parameters from an existing dataset:** Secondly, users can also obtain estimates directly from fitting the model implemented in  `MixGaussSim`  to existing datasets. The following steps outlines the process for estimating parameters from an existing dataset. 
 
 ## Dataset
 
-We use a subset of the Arctic Fire dataset, one of the datasets analyzed in [@Nearing2022]. The full dataset contains 148 samples and 31,100 taxa; however, for illustration and faster computation, only a subset is used to demonstrate how `MixGaussSim` works
+We use a subset of the Obsesity dataset, one of the datasets analyzed in [@Nearing2022]. The full dataset contains 52 samples and 1203 taxa.
 
 ```{r, eval=FALSE}
 ##Load libraries
@@ -63,22 +65,23 @@ library(power.nb)
 library(patchwork)
 
 ##Read count data and metadata
-data <- read_qza(file.path(path, "ArcticFireSoils_table.qza"))$data
-
-metadata <- read.table(
-  file.path(path, "ArcticFireSoils_meta.tsv"),
+data <- read.table(
+  file.path(path, "ob_ross_ASVs_table.tsv"),
   header = TRUE, sep = "\t",
   check.names = FALSE, comment.char = ""
 )
 
-keep_samples = colnames(data)
+metadata <- read.table(
+  file.path(path, "ob_ross_metadata.tsv"),
+  header = TRUE, sep = "\t",
+  check.names = FALSE, comment.char = ""
+)
+
 metadata <- metadata %>%
-  setNames(c("SampleID", "Groups")) %>%
-  filter(SampleID %in% keep_samples)
+  setNames(c("SampleID", "Groups")) 
 
 head(data); dim(data)
 head(metadata);dim(metadata)
-##############Select subset###############################
 
 ```
 
@@ -87,45 +90,43 @@ head(metadata);dim(metadata)
 Low abundant tax exhibit high variability, posing challenges in detecting significant differences between groups [@love2014moderated]. Pre-filtering steps, as is routinely done in differential abundance analysis, is used to filter out these low abundant taxa. We filter out taxa with less that 10 count in less that 5 samples. 
 
 ```{r, eval=FALSE}
-filter_data  = filter_low_count(
-  countdata = data,
-  metadata  = metadata,
-  abund_thresh = 10,
-  sample_thresh = 5,
-  sample_colname = "SampleID",
-  group_colname  = "Groups"
-)
+filter_data  = filter_low_count(countdata      =  data,
+                                metadata       =  metadata,
+                                abund_thresh   =  10,
+                                sample_thresh  =  5,
+                                sample_colname =  "SampleID",
+                                group_colname  =  "Groups")
 
 dim(filter_data)
 ```
 
 ## Foldchange and Dispersion Estimations
 
-We estimate fold changes of each taxa and dispersions estimates from the negative binomial model implemented in the `DESeq2` package [@love2014moderated]. The model is .... 
+We estimate fold change of each taxa and dispersion estimates for samples from the negative binomial model implemented in the `DESeq2` package [@love2014moderated]. The negative binomial model is implemented in the `DESeq2` package is described as follows:
 
-*The negative binomial model, a standard approach for analyzing microbiome count data, is implemented in the \texttt{DEseq2}  {love2014moderated} and \texttt{edgeR} {robinson2010edger} R packages which are both widely used in microbiome analysis.  The model is described as follows: Let $K_{ij}$ denote the count data for the $i^{th}$ taxon in the $j^{th}$ sample. Then $K_{ij}$  follows a negative binomial distribution:* \begin{align} 
+*The negative binomial model, a standard approach for analyzing microbiome count data, is implemented in the \texttt{DEseq2}  {love2014moderated} and \texttt{edgeR} {robinson2010edger} R packages which are both widely used in microbiome analysis.  The model is described as follows:*
+
+Let $K_{ij}$ denote the count data for the $i^{th}$ taxon in the $j^{th}$ sample. Then $K_{ij}$  follows a negative binomial distribution:* \begin{align} 
 K_{ij} \sim \text{NB}(\text{mean} &= \mu_{ij}, \text{dispersion} = \alpha_{ij}), \nonumber \\
 \mu_{ij} &= s_{j} q_{ij}   \\ 
 \log q_{ij} &= \sum_r x_{jr}\beta_{ir} , \nonumber
 \end{align} *where $\mu_{ij}$ and $s_{j}$ are the mean abundances and normalization constants respectively. $q_{ij}$ is the expected mean abundance of a given taxon in a sample prior to normalization. We assume  the dispersion parameter is constant for a given taxon. Thus, $\alpha_{ij}=\alpha_{i}$. The estimated coefficients $\hat \beta_{ir}$ are estimates of the effect sizes and $x_{jr}$ are the covariates. The relationship between the variance of counts and the dispersion is defined by $\text{var} (K_{ij}) = \mu_i + \alpha_i\mu_i^2$. In this study, the estimating procedure implemented in the \texttt{DESeq2} package ~\cite{love2014moderated,anders2010differential} in \texttt{R} is used for estimating $\hat \beta_{ir}$ and $\hat \alpha_i$.*
 
 
-
-
-
-
 *We used the \texttt{DESeq2} package to estimate dispersion for the negative binomial model. Dispersion typically varies based on count abundance,*
 from Deseq2 packge
 
 ```{r, eval = FALSE}
-foldchange_est <- deseqfun(countdata = filter_data,
-                           metadata  = metadata,
-                          alpha_level = 0.1,
-                          ref_name  = "Control",
-                          group_colname = "Groups",
-                          sample_colname = "SampleID")
+foldchange_est <- deseqfun(countdata      =   filter_data,
+                           metadata       =   metadata,
+                           alpha_level    =   0.1,
+                           ref_name       =  "Control",
+                           group_colname  =  "Groups",
+                           sample_colname =  "SampleID")
 
 logfoldchange =  foldchange_est$deseq_estimate$log2FoldChange
+
+head(logfoldchange)
 ```
 
 
@@ -134,8 +135,9 @@ logfoldchange =  foldchange_est$deseq_estimate$log2FoldChange
 ```{r, eval = FALSE}
 logmean    =  log(rowMeans(filter_data))
 logmeanFit =  logmean_fit(logmean, sig = 0.05,
-                         max.comp = 4, max.boot = 100)
-logmeanFit
+                          max.comp = 4, max.boot = 100)
+
+head(logmeanFit)
 ```
 
 

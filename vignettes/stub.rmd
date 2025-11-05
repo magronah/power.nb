@@ -57,31 +57,33 @@ There are one of two ways to obtain the parameters of the `MixGaussSim` method f
 
 We use a subset of the Obsesity dataset, one of the datasets analyzed in [@Nearing2022]. The full dataset contains 52 samples and 1203 taxa.
 
-```{r, eval=FALSE}
+```{r,message=FALSE}
 ##Load libraries
 library(tidyverse)
 library(dplyr)
 library(power.nb)
 library(patchwork)
 
+data_path =  "~/Documents/power.nb/data"
 ##Read count data and metadata
 data <- read.table(
-  file.path(path, "ob_ross_ASVs_table.tsv"),
+  file.path(data_path, "ob_ross_ASVs_table.tsv"),
   header = TRUE, sep = "\t",
-  check.names = FALSE, comment.char = ""
+  check.names = FALSE, comment.char = "", 
+  row.names = 1
 )
 
 metadata <- read.table(
-  file.path(path, "ob_ross_metadata.tsv"),
+  file.path(data_path, "ob_ross_metadata.tsv"),
   header = TRUE, sep = "\t",
   check.names = FALSE, comment.char = ""
 )
 
 metadata <- metadata %>%
-  setNames(c("SampleID", "Groups")) 
+  setNames(c("SampleID", "Groups"))
 
-head(data); dim(data)
-head(metadata);dim(metadata)
+dim(data); dim(metadata)
+head(data); head(metadata)
 
 ```
 
@@ -89,8 +91,8 @@ head(metadata);dim(metadata)
 
 Low abundant tax exhibit high variability, posing challenges in detecting significant differences between groups [@love2014moderated]. Pre-filtering steps, as is routinely done in differential abundance analysis, is used to filter out these low abundant taxa. We filter out taxa with less that 10 count in less that 5 samples. 
 
-```{r, eval=FALSE}
-filter_data  = filter_low_count(countdata      =  data,
+```{r}
+filter_data  =  filter_low_count(countdata     =  data,
                                 metadata       =  metadata,
                                 abund_thresh   =  10,
                                 sample_thresh  =  5,
@@ -116,11 +118,14 @@ K_{ij} \sim \text{NB}(\text{mean} &= \mu_{ij}, \text{dispersion} = \alpha_{ij}),
 *We used the \texttt{DESeq2} package to estimate dispersion for the negative binomial model. Dispersion typically varies based on count abundance,*
 from Deseq2 packge
 
-```{r, eval = FALSE}
+```{r,message=FALSE}
+
+unique(metadata$Groups)
+
 foldchange_est <- deseqfun(countdata      =   filter_data,
                            metadata       =   metadata,
                            alpha_level    =   0.1,
-                           ref_name       =  "Control",
+                           ref_name       =  "OB",
                            group_colname  =  "Groups",
                            sample_colname =  "SampleID")
 
@@ -132,12 +137,12 @@ head(logfoldchange)
 
 ## Fit  log mean count 
 
-```{r, eval = FALSE}
+```{r}
 logmean    =  log(rowMeans(filter_data))
 logmeanFit =  logmean_fit(logmean, sig = 0.05,
                           max.comp = 4, max.boot = 100)
 
-head(logmeanFit)
+logmeanFit
 ```
 
 
@@ -152,10 +157,10 @@ d = c_0 + \frac{c_1}{m},
 where $d$ and $m$ denote the scaled dispersion and mean abundance respectively. The term $c_0$ represents the asymptotic dispersion level for high abundance taxa, and $c_1$ captures additional dispersion variability. 
 
 
-```{r, eval = FALSE}
-
+```{r,message=FALSE, warning=FALSE}
 dispersion    =  foldchange_est$dispersion
 dispersionFit =  dispersion_fit(dispersion, logmean)
+dispersionFit$param
 ```
 
 ## Fit log fold change

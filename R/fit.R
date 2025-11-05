@@ -7,6 +7,7 @@
 #'             parametric bootstrap calculation
 #' @param max.comp maximum number of Gaussian components to compare sequentially
 #' @param max.boot maximum number of bootstraps simulations
+#' @param verb If TRUE, it prints out updates of iterations of the algorithm
 #' @return A list containing the optimal number of Gaussian components fitted; and mean and
 #'          variance parameter estimates from the fit
 
@@ -17,7 +18,7 @@
 #' logmean  = rnorm(100)
 #' logmean_fit(logmean,sig=0.05,max.comp=4,max.boot=100)
 #'
-logmean_fit <- function(logmean,sig=0.05,max.comp=4,max.boot=100){
+logmean_fit <- function(logmean,sig=0.05,max.comp=4,max.boot=100,verb=FALSE){
 
   ncomp_opt = optimal.comp(logmean,sig,max.comp,max.boot)
   if(length(ncomp_opt) == 0){stop("zero number of component")}
@@ -32,7 +33,8 @@ logmean_fit <- function(logmean,sig=0.05,max.comp=4,max.boot=100){
                      mean = param$mu,
                      sd   = param$sigma)
   }else{
-    mixmdl = mixtools::normalmixEM(logmean, k=ncomp_opt, maxrestarts=1e3)
+    mixmdl = mixtools::normalmixEM(logmean, k=ncomp_opt, maxrestarts=1e3,
+                                   verb = verb)
 
     param  = data.frame(lambda =  mixmdl$lambda,
                         sigma =  mixmdl$sigma,

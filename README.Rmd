@@ -15,4 +15,8 @@ power.nb is an R package with the following features
 ## Microbiome data simulation 
 
 
+## Developer notes
+
+* to rebuild the pkgdown site, add "[rebuild site]" to your commit messages ... (unfortunately manually starting the workflow from the 'Actions' page doesn't work at the moment)
+
 

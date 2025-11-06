@@ -135,7 +135,7 @@ head(logfoldchange)
 
 ## Fit  log mean count 
 
-We modelled the log mean abundance---defined as the logarithm of the arithmetic mean abundance across both control and treatment groups---as a finite mixture of Gaussian distributions. To determine the optimal number of mixture components, denoted by $k$, we employed a parametric bootstrap approach to sequentially compare models with $k$ and $k+1$ components. 
+We modelled the log mean abundance (defined as the logarithm of the arithmetic mean abundance across both control and treatment groups) as a finite mixture of Gaussian distributions. To determine the optimal number of mixture components, denoted by $k$, we employed a parametric bootstrap approach to sequentially compare models with $k$ and $k+1$ components. 
 
 Let the observed data be denoted by $\mathbf{y} = (y_1, y_2, \dots, y_n)$, where each $y_i$ represents the log mean abundance for the $i^{\text{th}}$ taxon. The mixture model with $k$ components is given by
 
@@ -197,7 +197,7 @@ dispersionFit$param
 
 ## Fit log fold change
 
-We also modelled the log fold change as a finite mixture of Gaussian distributions. Fold change is typically related to mean abundance~\cite{love2014moderated}; therefore, we expressed the mean and standard deviation parameters of the individual Gaussian components as functions of log mean abundance. Detailed description model fitted to log fold changes is presented in the paper ["Investigating statistical power of differential abundance studies"](https://doi.org/10.1371/journal.pone.0318820) [@agronahnbolker].  
+We also modelled the log fold change as a finite mixture of Gaussian distributions. Fold change is typically related to mean abundance [@love2014moderated]; therefore, we expressed the mean and standard deviation parameters of the individual Gaussian components as functions of log mean abundance. Detailed description model fitted to log fold changes is presented in the paper ["Investigating statistical power of differential abundance studies"](https://doi.org/10.1371/journal.pone.0318820) [@agronahnbolker].  
 
 
 ```{r, eval = FALSE}
@@ -241,7 +241,7 @@ logfoldchange_sim  =  logfoldchange_sim_fun(logmean_sim = logmean_sim,
                                             max_iter = 30000)
 ```
 
-### Simulate counts form the negative binomial distribution 
+### Simulate counts from the negative binomial distribution 
 
 The dispersion values estimated internally with the `countdata_sim_fun` function. 
 

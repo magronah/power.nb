@@ -84,29 +84,45 @@ logmean_sim_fun = function(logmean_param,notu){
 #'   max_lfc = 10,
 #'   max_iter = 5000
 #' )
+
 logfoldchange_sim_fun <- function(logmean_sim, logfoldchange_param,
                                   max_lfc = 15, max_iter = 10000, seed = 121) {
-
   set.seed(seed)
-  par   =   logfoldchange_param$par
-  np    =   logfoldchange_param$np
-  sd_ord  =   logfoldchange_param$sd_ord
 
+  par   <- logfoldchange_param$par
+  np    <- logfoldchange_param$np
+  sd_ord <- logfoldchange_param$sd_ord
+
+  # Initial simulation
   lfc <- myrnormmix(par, logmean_sim, np = np, sd_ord = sd_ord)
-  r <- range(lfc);   iteration_count <- 0
 
-  while (max(abs(r)) > max_lfc && iteration_count < max_iter) {
-    lfc <- myrnormmix(par, logmean_sim, np = np, sd_ord = sd_ord)
-    r <- range(lfc)
+  iteration_count <- 0
+  extreme_idx <- which(abs(lfc) > max_lfc)
+
+  # Re-simulate only extreme entries until they are within bounds or max_iter reached
+  while (length(extreme_idx) > 0 && iteration_count < max_iter) {
+    # Re-simulate only for the extreme indices
+    lfc[extreme_idx] <- myrnormmix(par, logmean_sim[extreme_idx],
+                                   np = np, sd_ord = sd_ord)
+
+    extreme_idx <- which(abs(lfc) > max_lfc)
     iteration_count <- iteration_count + 1
   }
 
-  if (iteration_count == max_iter) {
-    warning("Maximum number of iterations reached without convergence.")
+  if (length(extreme_idx) > 0) {
+    lfc[lfc > max_lfc] <- max_lfc
+    lfc[lfc < -max_lfc] <- -max_lfc
+    warning(sprintf(
+      "Maximum number of iterations reached;
+      log fold change values greater than %.2f were set to %.2f and
+      those less than %.2f were set to %.2f.",
+      max_lfc, max_lfc, -max_lfc, -max_lfc
+    ))
   }
 
   return(lfc)
 }
+
 
 ##############################################################
 #' Simulate Count Data for Microbiome Studies

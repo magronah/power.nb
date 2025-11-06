@@ -39,7 +39,7 @@ install.packages("devtools")
 devtools::install_github("magronah/power.nb")
 ```
 
-# Estimating Statistical Power
+# Simulating microbiome data
 
 Since the goal of differential abundance studies is to identify taxa that differ significantly between groups, statistical power must be estimated at the level of individual taxa. Because of the complexity of microbiome data, analytical approaches based on theoretical distributions of test statistics (e.g., non-central t or chi-squared distributions) are not feasible [@arnold2011simulation]. Therefore, power estimation typically relies on simulation-based methods that can mimic the characteristics of real microbiome data.
 
@@ -102,21 +102,19 @@ filter_data  =  filter_low_count(countdata     =  data,
 dim(filter_data)
 ```
 
-## Foldchange and Dispersion Estimations
+## Foldchange and Dispersion Estimation
 
-We estimate fold change of each taxa and dispersion estimates for samples from the negative binomial model implemented in the `DESeq2` package [@love2014moderated]. The negative binomial model is implemented in the `DESeq2` package is described as follows:
+We estimate fold change for each taxon and dispersion parameters using the negative binomial model implemented in the `DESeq2` package [@love2014moderated]. The negative binomial model is widely used in both microbiome and RNA-seq analyses and is implemented in the `NBZIMM` [@yi2020nbzimm] and `edgeR` R packages [@robinson2010edger].  The model implemented in the `DESeq2` package is described as follows:
 
-*The negative binomial model, a standard approach for analyzing microbiome count data, is implemented in the \texttt{DEseq2}  {love2014moderated} and \texttt{edgeR} {robinson2010edger} R packages which are both widely used in microbiome analysis.  The model is described as follows:*
+Let $K_{ij}$ represent the observed count for the $i^{\text{th}}$ taxon in the $j^{\text{th}}$ sample. The model assumes that  
+$$K_{ij} \sim \text{NB}(\mu_{ij}, \alpha_{ij}),$$
+where the mean is defined as $\mu_{ij} = s_j q_{ij}$, and $s_j$ is the normalization factor for sample $j$. The expected abundance prior to normalization, $q_{ij}$, is modeled as  
+$$\log q_{ij} = \sum_r x_{jr} \beta_{ir},$$
+with $x_{jr}$ denoting the covariates and $\beta_{ir}$ the associated coefficients. The dispersion parameter is assumed constant across samples for each taxon, such that $\alpha_{ij} = \alpha_i$. This formulation links the variance and mean through  
+$$\mathrm{Var}(K_{ij}) = \mu_i + \alpha_i \mu_i^2.$$
 
-Let $K_{ij}$ denote the count data for the $i^{th}$ taxon in the $j^{th}$ sample. Then $K_{ij}$  follows a negative binomial distribution:* \begin{align} 
-K_{ij} \sim \text{NB}(\text{mean} &= \mu_{ij}, \text{dispersion} = \alpha_{ij}), \nonumber \\
-\mu_{ij} &= s_{j} q_{ij}   \\ 
-\log q_{ij} &= \sum_r x_{jr}\beta_{ir} , \nonumber
-\end{align} *where $\mu_{ij}$ and $s_{j}$ are the mean abundances and normalization constants respectively. $q_{ij}$ is the expected mean abundance of a given taxon in a sample prior to normalization. We assume  the dispersion parameter is constant for a given taxon. Thus, $\alpha_{ij}=\alpha_{i}$. The estimated coefficients $\hat \beta_{ir}$ are estimates of the effect sizes and $x_{jr}$ are the covariates. The relationship between the variance of counts and the dispersion is defined by $\text{var} (K_{ij}) = \mu_i + \alpha_i\mu_i^2$. In this study, the estimating procedure implemented in the \texttt{DESeq2} package ~\cite{love2014moderated,anders2010differential} in \texttt{R} is used for estimating $\hat \beta_{ir}$ and $\hat \alpha_i$.*
+Estimation of the regression coefficients $\hat{\beta}_{ir}$ and dispersion parameters $\hat{\alpha}_i$ was carried out using the empirical Bayes shrinkage procedures implemented in the `DESeq2` package [@love2014moderated,@anders2010differential]. 
 
-
-*We used the \texttt{DESeq2} package to estimate dispersion for the negative binomial model. Dispersion typically varies based on count abundance,*
-from Deseq2 packge
 
 ```{r,message=FALSE}
 
@@ -125,7 +123,7 @@ unique(metadata$Groups)
 foldchange_est <- deseqfun(countdata      =   filter_data,
                            metadata       =   metadata,
                            alpha_level    =   0.1,
-                           ref_name       =  "OB",
+                           ref_name       =  "H",
                            group_colname  =  "Groups",
                            sample_colname =  "SampleID")
 
@@ -137,24 +135,58 @@ head(logfoldchange)
 
 ## Fit  log mean count 
 
-```{r}
+We modelled the log mean abundance---defined as the logarithm of the arithmetic mean abundance across both control and treatment groups---as a finite mixture of Gaussian distributions. To determine the optimal number of mixture components, denoted by $k$, we employed a parametric bootstrap approach to sequentially compare models with $k$ and $k+1$ components. 
+
+Let the observed data be denoted by $\mathbf{y} = (y_1, y_2, \dots, y_n)$, where each $y_i$ represents the log mean abundance for the $i^{\text{th}}$ taxon. The mixture model with $k$ components is given by
+
+$$f_k(y_i \mid \boldsymbol{\theta}_k) = \sum_{j=1}^{k} \pi_{j,k} \, \phi(y_i \mid \mu_{j,k}, \sigma_{j,k}^2),$$
+
+where $\pi_{j,k}$ are the mixing proportions satisfying $\sum_{j=1}^{k} \pi_{j,k} = 1$, and $\phi(\cdot \mid \mu, \sigma^2)$ denotes the normal density with mean $\mu$ and variance $\sigma^2$.
+
+To test whether adding an additional component improves model fit, we formulated the hypotheses as:
+
+$$\begin{cases} H_0: \mathbf{y} \sim f_k(y_i \mid \boldsymbol{\theta}_k) & \text{(the data follow a $k$-component mixture model)} \\[4pt]
+H_a: \mathbf{y} \sim f_{k+1}(y_i \mid \boldsymbol{\theta}_{k+1}) & \text{(the data follow a $(k+1)$-component mixture model)} \end{cases}$$
+
+The test statistic is the likelihood ratio statistic:
+
+$$\Lambda = 2 \left[ \ell_{k+1}(\widehat{\boldsymbol{\theta}}_{k+1}) - \ell_{k}(\widehat{\boldsymbol{\theta}}_{k}) \right],$$
+where $\ell_{k}(\widehat{\boldsymbol{\theta}}_{k})$ and $\ell_{k+1}(\widehat{\boldsymbol{\theta}}_{k+1})$ are the maximized log-likelihoods under the $k$- and $(k+1)$-component models, respectively.
+
+To approximate the null distribution of $\Lambda$, we performed a parametric bootstrap using $B = 100$ bootstrap samples generated under $H_0$. For each bootstrap replicate $b = 1, \dots, B$, data were simulated from the fitted $k$-component model, and both the null and alternative models were re-fitted to obtain $\Lambda^{(b)}$. The empirical $p$-value is computed as
+
+$$p = \frac{1}{B} \sum_{b=1}^{B} I\left( \Lambda^{(b)} \ge \Lambda_{\text{obs}} \right),$$
+where $\Lambda_{\text{obs}}$ is the observed likelihood ratio statistic. 
+
+If $p < 0.05$, the null hypothesis $H_0$ is rejected in favor of the $(k+1)$-component model. Testing proceeds sequentially for $k = 1, 2, \dots, 5$ until the $p$-value exceeds the $5\%$ significance threshold, at which point the $k$-component model from the last accepted test is selected as the optimal mixture size [@benaglia2010mixtools].
+
+```{r, message=FALSE, warning=FALSE}
 logmean    =  log(rowMeans(filter_data))
-logmeanFit =  logmean_fit(logmean, sig = 0.05,
-                          max.comp = 4, max.boot = 100)
+
+quiet <- function(expr) {
+  out <- suppressWarnings(suppressMessages(
+    capture.output(res <- eval.parent(substitute(expr)))
+  ))
+  res}
+
+logmeanFit =   quiet(logmean_fit(logmean, sig = 0.05,
+                                 max.comp = 4, max.boot = 100))
 
 logmeanFit
 ```
 
 
 
-## Fit  Dispersions
+## Fit  Dispersion estimates
 
-*We used the \texttt{DESeq2} package to estimate dispersion for the negative binomial model. Dispersion typically varies based on count abundance, with rarer taxa exhibiting higher dispersion \citep{love2014moderated}. To accommodate this variability and to simulate dispersion for subsequent power analyses, we used a nonlinear function of mean abundance to model the dispersion estimates, as implemented in the \texttt{DESeq2} package:*
+Because dispersion tends to depend on mean count abundance with rarer taxa showing greater variability we modeled the dispersion as a nonlinear function of the mean, following the approach implemented in `DESeq2`. The nonlinear function is defined by
 
-\begin{align} 
-d = c_0 + \frac{c_1}{m},
-\end{align}
-where $d$ and $m$ denote the scaled dispersion and mean abundance respectively. The term $c_0$ represents the asymptotic dispersion level for high abundance taxa, and $c_1$ captures additional dispersion variability. 
+<span id="disp-eq"></span>
+$$
+d = c_0 + \frac{c_1}{m}
+$$
+
+where $d$ and $m$ denote the scaled dispersion and mean abundance respectively. The term $c_0$ represents the asymptotic dispersion level for high abundance taxa, and $c_1$ captures additional dispersion variability. This procedure enables estimation of dispersion values corresponding to given mean counts, facilitating their use in downstream simulations and power analyses.
 
 
 ```{r,message=FALSE, warning=FALSE}
@@ -164,6 +196,9 @@ dispersionFit$param
 ```
 
 ## Fit log fold change
+
+We also modelled the log fold change as a finite mixture of Gaussian distributions. Fold change is typically related to mean abundance~\cite{love2014moderated}; therefore, we expressed the mean and standard deviation parameters of the individual Gaussian components as functions of log mean abundance. Detailed description model fitted to log fold changes is presented in the paper ["Investigating statistical power of differential abundance studies"](https://doi.org/10.1371/journal.pone.0318820) [@agronahnbolker].  
+
 
 ```{r, eval = FALSE}
 ## Fit foldchange from Deseq
@@ -177,10 +212,17 @@ logfoldchangeFit <- logfoldchange_fit(logmean,
                                        itermax = 100,
                                        NP = 800,
                                        seed = 100)
+
+head(logfoldchangeFit)
 ```
 
 
-## Simulate count data
+## Simulate count microbiome data
+
+To simulate microbiome data, we simulate log mean count and corresponding log fold change. Using the simulated mean count and fold change, we compute the mean count of taxa for each group (control and treatment groups) and estimate dispersion values for each sample using the fitted nonlinear function in the equation [here](#disp-eq).
+
+
+### Simulate log mean count and log fold change
 
 ```{r, eval = FALSE}
 
@@ -199,11 +241,14 @@ logfoldchange_sim  =  logfoldchange_sim_fun(logmean_sim = logmean_sim,
                                             max_iter = 30000)
 ```
 
+### Simulate counts form the negative binomial distribution 
+
+The dispersion values estimated internally with the `countdata_sim_fun` function. 
 
 ```{r, eval = FALSE}
 
-ntreat = sum(metadata$Groups == "Fire")
-ncont  = sum(metadata$Groups == "Control")
+ntreat = sum(metadata$Groups == "OB")
+ncont  = sum(metadata$Groups == "H")
 dispersion_param  =  dispersionFit$param
 
 nsim = 100
@@ -232,9 +277,14 @@ length(countdata_sims$logmean_list$sim_1)
 ###############################################################
 ```
 
-### Compare Simulation with the data
+### Comparing the distributions of mean count and fold change from simulation with actual data
 
-log mean count and log fold change from simulation with data
+We compare the following comparisions bettween our simulation and the actual dataset 
+
+- we come distribution of variances of counts of taxa and 
+
+- the means of taxa from out simulation with those of the actual dataset
+
 ```{r, eval = FALSE}
 dd  = data.frame(logmean  = c(logmean,
                               countdata_sims$logmean_list$sim_1),
@@ -254,9 +304,13 @@ p2 = ggplot(dd, aes(x = logfoldchange, group = type, colour = type)) +
 ```
 
 
-## Estimate p-values associated to fold changes for each taxa
+# Power estimation fir individual taxa proceed
 
-We now run each simulated count adata to the to calculate pvalues associated to each  foldchanes for each taxa. ]
+## Simulating microbiome datasets
+
+## Estimate p-values associated with the simulated fold changes for each taxa
+
+We now run each simulated count adata to the to calculate pvalues associated to each  foldchanes for each taxa. 
 
 
 ```{r, eval = FALSE}
@@ -300,7 +354,7 @@ contour_plot
 ```
 
 
-## Estimate statistical power given fold change and mean abundance for taxa
+## Predict statistical power given fold change and mean abundance for taxa
 
 
 

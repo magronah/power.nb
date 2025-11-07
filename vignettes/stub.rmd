@@ -14,6 +14,7 @@ vignette: >
   %\VignettePackage{power.nb}
   %\VignetteEngine{knitr::rmarkdown}
 bibliography: references.bib
+biblio-title: "References"
 ---
 
 
@@ -94,8 +95,8 @@ Low abundant tax exhibit high variability, posing challenges in detecting signif
 ```{r}
 filter_data  =  filter_low_count(countdata     =  data,
                                 metadata       =  metadata,
-                                abund_thresh   =  10,
-                                sample_thresh  =  5,
+                                abund_thresh   =  2,
+                                sample_thresh  =  2,
                                 sample_colname =  "SampleID",
                                 group_colname  =  "Groups")
 
@@ -133,7 +134,7 @@ head(logfoldchange)
 ```
 
 
-## Fit  log mean count 
+## Modeling the distribution of log mean counts
 
 We modelled the log mean abundance (defined as the logarithm of the arithmetic mean abundance across both control and treatment groups) as a finite mixture of Gaussian distributions. To determine the optimal number of mixture components, denoted by $k$, we employed a parametric bootstrap approach to sequentially compare models with $k$ and $k+1$ components. 
 
@@ -163,6 +164,8 @@ If $p < 0.05$, the null hypothesis $H_0$ is rejected in favor of the $(k+1)$-com
 ```{r, message=FALSE, warning=FALSE}
 logmean    =  log(rowMeans(filter_data))
 
+### function to mute printing out messages about
+### update on the number of iterations 
 quiet <- function(expr) {
   out <- suppressWarnings(suppressMessages(
     capture.output(res <- eval.parent(substitute(expr)))
@@ -177,7 +180,28 @@ logmeanFit
 
 
 
-## Fit  Dispersion estimates
+
+## Modelling the distribution of log fold change estimates
+
+We also modelled log fold change of taxa as a finite mixture of Gaussian distributions. Fold change is typically related to mean abundance [@love2014moderated]; therefore, we expressed the mean and standard deviation parameters of the individual Gaussian components as functions of log mean abundance. Detailed description of the model fitted to log fold changes is presented in the paper ["Investigating statistical power of differential abundance studies"](https://doi.org/10.1371/journal.pone.0318820) [@agronahnbolker].  
+
+
+```{r}
+logfoldchangeFit <- quiet(logfoldchange_fit(logmean,
+                                            logfoldchange,
+                                            ncore = 3,
+                                            max_sd_ord = 2,
+                                            max_np = 5,
+                                            minval = -5,
+                                            maxval = 5,
+                                            itermax = 100,
+                                            NP = 800,
+                                            seed = 100))
+
+logfoldchangeFit
+```
+
+## Modelling the dispersion estimates
 
 Because dispersion tends to depend on mean count abundance with rarer taxa showing greater variability we modeled the dispersion as a nonlinear function of the mean, following the approach implemented in `DESeq2`. The nonlinear function is defined by
 
@@ -195,43 +219,23 @@ dispersionFit =  dispersion_fit(dispersion, logmean)
 dispersionFit$param
 ```
 
-## Fit log fold change
-
-We also modelled the log fold change as a finite mixture of Gaussian distributions. Fold change is typically related to mean abundance [@love2014moderated]; therefore, we expressed the mean and standard deviation parameters of the individual Gaussian components as functions of log mean abundance. Detailed description model fitted to log fold changes is presented in the paper ["Investigating statistical power of differential abundance studies"](https://doi.org/10.1371/journal.pone.0318820) [@agronahnbolker].  
-
-
-```{r, eval = FALSE}
-## Fit foldchange from Deseq
-logfoldchangeFit <- logfoldchange_fit(logmean,
-                                       logfoldchange,
-                                       ncore = 3,
-                                       max_sd_ord = 2,
-                                       max_np = 5,
-                                       minval = -5,
-                                       maxval = 5,
-                                       itermax = 100,
-                                       NP = 800,
-                                       seed = 100)
-
-head(logfoldchangeFit)
-```
-
-
 ## Simulate count microbiome data
 
-To simulate microbiome data, we simulate log mean count and corresponding log fold change. Using the simulated mean count and fold change, we compute the mean count of taxa for each group (control and treatment groups) and estimate dispersion values for each sample using the fitted nonlinear function in the equation [here](#disp-eq).
+To simulate microbiome data, we first simulate log mean counts and corresponding log fold changes. The simulated log mean counts represent overall log mean counts (ie, log of the arithmetic mean of the counts in all of treatment and control  groups). We then use the simulated log mean count to estimate corresponding dispersion values for each sample through the fitted nonlinear function described in the equation [here](#disp-eq) ([see section on Modelling the Distribution of Log Fold Changes](#modelling-the-distribution-of-log-fold-changes)). Using the simulated log mean counts and fold changes, we now compute the group specific mean counts (ie, mean counts of taxa for control group and mean count of taxa for treatment group). We then simulate microbiome count data from the negative binomial distribution using the group specific mean counts and the estimated dispersion values. 
 
 
 ### Simulate log mean count and log fold change
 
-```{r, eval = FALSE}
+```{r}
 
-### Simulated log mean count and log foldchange using the fitted parameters
+### Simulated log mean count and log foldchange from the fitted 
+### log mean count and log foldchange models
 
-logmean_param       =  logmeanFit$logmean_param
+logmean_param       =  logmeanFit$param
 logfoldchange_param =  logfoldchangeFit
 
 notu  = dim(filter_data)[1]
+notu
 logmean_sim  =  logmean_sim_fun(logmean_param, notu)
 
 logfoldchange_sim  =  logfoldchange_sim_fun(logmean_sim = logmean_sim,
@@ -239,19 +243,21 @@ logfoldchange_sim  =  logfoldchange_sim_fun(logmean_sim = logmean_sim,
                                             logfoldchange_param,
                                             max_lfc  = 15,
                                             max_iter = 30000)
+
+head(logfoldchange_sim)
 ```
 
 ### Simulate counts from the negative binomial distribution 
 
-The dispersion values estimated internally with the `countdata_sim_fun` function. 
+Estimating the dispersion values is done internally within the `countdata_sim_fun` function. 
 
-```{r, eval = FALSE}
+```{r}
 
+nsim = 4
 ntreat = sum(metadata$Groups == "OB")
 ncont  = sum(metadata$Groups == "H")
 dispersion_param  =  dispersionFit$param
 
-nsim = 100
 countdata_sims = countdata_sim_fun(logmean_param,
                                    logfoldchange_param,
                                    dispersion_param,
@@ -260,12 +266,12 @@ countdata_sims = countdata_sim_fun(logmean_param,
                                    ntreat = ntreat,
                                    notu,
                                    nsim = nsim,
-                                   disp_scale = 0.3,
+                                   disp_scale = 0.7,
                                    max_lfc = 15,
                                    maxlfc_iter = 1000,
                                    seed = 121)
 
-
+names(countdata_sim_fun)
 dim(countdata_sims$treat_countdata_list$sim_1)
 dim(countdata_sims$control_countdata_list$sim_1)
 dim(countdata_sims$countdata_list$sim_1)
@@ -274,10 +280,9 @@ dim(countdata_sims$metadata_list$sim_1)
 
 length(countdata_sims$logfoldchange_list$sim_1)
 length(countdata_sims$logmean_list$sim_1)
-###############################################################
 ```
 
-### Comparing the distributions of mean count and fold change from simulation with actual data
+### Comparing the distributions between simulated count d of mean count and fold change from simulation with actual data
 
 We compare the following comparisions bettween our simulation and the actual dataset 
 
@@ -285,67 +290,182 @@ We compare the following comparisions bettween our simulation and the actual dat
 
 - the means of taxa from out simulation with those of the actual dataset
 
-```{r, eval = FALSE}
-dd  = data.frame(logmean  = c(logmean,
-                              countdata_sims$logmean_list$sim_1),
-                 logfoldchange  = c(foldchange_est$logfoldchange,
-                                  countdata_sims$logfoldchange_list$sim_1),
-                 type  = rep(c("observation","simulation"), each = notu) )
+```{r}
+library(rlist)
+library(latex2exp)
 
-p1 = ggplot(dd, aes(x = logmean, group = type, colour = type)) +
-  geom_density()  +
+
+# means
+dd_mean <- rbind(
+  data.frame(value = apply(countdata_sims$countdata_list$sim_1, 1, mean),
+             type = "simulation"),
+  data.frame(value = apply(filter_data, 1, mean),
+             type = "observation")
+)
+
+p1_ <- ggplot(dd_mean, aes(x = log(value + 1e-8))) +
+  geom_density(aes(colour = type), linewidth = 1.2,
+               data = subset(dd_mean, type == "simulation")) +
+  geom_density(linetype = "dashed", colour = "black", linewidth = 1.2,
+               data = subset(dd_mean, type == "observation")) +
   theme_bw()
 
-p2 = ggplot(dd, aes(x = logfoldchange, group = type, colour = type)) +
-  geom_density()  +
+# variances
+dd_var <- rbind(
+  data.frame(value = apply(countdata_sims$countdata_list$sim_1, 1, var),
+             type = "simulation"),
+  data.frame(value = apply(filter_data, 1, var),
+             type = "observation")
+)
+
+p2_ <- ggplot(dd_var, aes(x = log(value + 1e-8))) +
+  geom_density(aes(colour = type), linewidth = 1.2,
+               data = subset(dd_var, type == "simulation")) +
+  geom_density(linetype = "dashed", colour = "black", linewidth = 1.2,
+               data = subset(dd_var, type == "observation")) +
   theme_bw()
 
-(p1|p2) + plot_layout(guides = "collect")
+(p1_ | p2_) + patchwork::plot_layout(guides = "collect")
+
+
+pp1= apply(countdata_sims$countdata_list$sim_1, 1, function(x){mean(x)})
+pp2= apply(filter_data, 1, function(x){mean(x)})
+
+pp11= apply(countdata_sims$countdata_list$sim_1, 1, function(x){var(x)})
+pp21= apply(filter_data, 1, function(x){var(x)})
+
+dd_ = data.frame(mean = c( as.numeric(pp2),as.numeric(pp1)),
+                 var = c( as.numeric(pp21),as.numeric(pp11)),
+                type = rep(c("observation","simulation"), each = notu))
+
+
+p1_ = ggplot(dd_, aes(x = log(mean), group = type, colour = type)) +
+geom_density() +
+theme_bw()
+
+p2_ = ggplot(dd_, aes(x = log(var), group = type, colour = type)) +
+geom_density() +
+theme_bw()
+                 
+(p1_|p2_) + plot_layout(guides = "collect")
+
+compare_dataset <- function(countdata_sim_list,countdata_obs,method = c("var", "mean")){
+  
+  # Check if method is either "var" or "mean"
+  if (!(method %in% c("var", "mean"))) {
+    stop("Invalid method. Please choose either 'var' or 'mean'.")
+  }
+  
+  # Calculate variance or mean based on the chosen method
+  if (method == "var") {
+    calc_func <- stats::var
+    xlab_text <- "$\\log$(variance of taxa)"
+  } else {
+    calc_func <- mean
+    xlab_text <- "$\\log$(mean of taxa)"
+  }
+  
+  # Create a list combining simulation data and observed data
+  dlist <- list.append(countdata_sim_list, obs_filt = countdata_obs)
+  
+  # Calculate variance or mean for each dataset in the list
+  vars <- dlist |> purrr::map(~ apply(., 1, calc_func)) |>
+    purrr::map_dfr(~ tibble(var = .), .id = "type")
+  
+  # Separate observed and simulated data
+  vars_obs <- vars[vars$type == "obs_filt", ]
+  vars_sim <- vars[vars$type != "obs_filt", ]
+  
+  # Create ggplot for visualization
+  p <- ggplot(vars_sim, aes(x = log(var), colour = type)) + 
+    geom_density(lwd = 1.5) +
+    geom_density(data = vars_obs, aes(x = log(var)), 
+                 colour = "black", linetype = "dashed", lwd = 1.5) +
+    xlab(TeX(xlab_text)) + theme_bw()
+  
+  return(p)
+}
+                                   
+countdata_sim_list =  countdata_sims$countdata_list[1]
+countdata_obs      =  filter_data
+p11 = compare_dataset(countdata_sim_list,countdata_obs,method = "mean")
+p12 = compare_dataset(countdata_sim_list,countdata_obs,method = "var")
+(p11|p12) + plot_layout(guides = "collect")
+
+dim(countdata_obs)
+
 ```
 
 
-# Power estimation fir individual taxa proceed
 
-## Simulating microbiome datasets
+# Estimating Statistical Power for Individual Taxa
 
-## Estimate p-values associated with the simulated fold changes for each taxa
+We estimate statistical power for a given taxon as the probability of rejecting the null hypothesis that the mean abundance in the control and treatment groups are the same for  that given taxon. To estimate statistical power for various combinations of log mean abundance and log fold change, we fitted a shape-constrained generalized additive model (GAM) [@pya2015shape]. The event that a given taxon is significantly different between groups is treated as a Bernoulli trial. The model predicting statistical power as a function of log fold change and log mean abundance is given by:
 
-We now run each simulated count adata to the to calculate pvalues associated to each  foldchanes for each taxa. 
+$$\begin{align}
+y &\sim \text{Bernoulli}(p_i) \\
+p_i &= \frac{1}{1 + e^{-\eta}} \\
+\eta &= \beta_0 + f_1(x_1, x_2) + \epsilon,
+\end{align}$$
+
+where:
+
+- $y$ is a binary value (1 if the p-value was below the critical threshold, and 0 otherwise);
+- $p_i$ is the estimated statistical power for taxon $i$;
+- $\beta_0$ and $\epsilon$ are the intercept and error terms, respectively;
+- The predictors $x_1$ and $x_2$ represent log mean abundance and log fold change, respectively;
+- $f_1(\cdot)$ is a two-dimensional smoothing surface, generated using a tensor product smooth of log mean abundance and log fold change. 
+
+Power and fold change are positively correlated. Additionally, effect sizes of highly abundant taxa are more likely to be detected—hence having higher power—than those of rare taxa. To account for these relationships, the function $f_1$ was constrained to be a monotonically increasing function of both log mean abundance and log fold change.
+
+We used the `DESeq2` package to compute p-values for each taxon, applying the Benjamini and Hochberg method for false discovery rate (FDR) correction. We used the default critical p-value threshold of 0.1 in the `DESeq2` package.
 
 
-```{r, eval = FALSE}
+The follow steps outlines the power estimation procedure:
 
-###############################################################
+## Estimate p-values associated with simulated fold changes 
+
+To train the GAM on a sufficiently large sample size, we generate multiple microbiome count datasets following the procedure described in the section [Simulate count microbiome data](#simulate-count-microbiome-data). We then estimate p-values associated with the simulated fold changes using the `DESeq2` package. 
+
+```{r}
+
 countdata_list  =   countdata_sims$countdata_list
 metadata_list   =   countdata_sims$metadata_list
-desq_est   =   deseq_fun_est(metadata_list =  metadata_list,
+desq_est   =   quiet(deseq_fun_est(metadata_list =  metadata_list,
                             countdata_list =  countdata_list,
                             alpha_level    =  0.1,
                             group_colname  = "Groups",
                             sample_colname = "Samples",
                             num_cores      =  4,
-                            ref_name       = "control")
-###############################################################
-true_lmean_list    =    countdata_sims$logmean_list
+                            ref_name       = "control"))
+
+names(desq_est$sim_1)
 deseq_est_list     =    lapply(desq_est, function(x){x$deseq_estimate})
-true_lfoldchange_list = countdata_sims$logfoldchange_list
-###############################################################
 ```
 
-## Fit Generalized Additive Model (GAM) for power estimation 
+## Fitting the Generalized Additive Model (GAM) 
 
-```{r, eval = FALSE}
+We now fit the GAM for predicting statistical power for individual taxon.
+```{r}
+true_lmean_list       =    countdata_sims$logmean_list
+true_lfoldchange_list =    countdata_sims$logfoldchange_list
+
 gamFit <- gam_fit(deseq_est_list,
                   true_lfoldchange_list,
                   true_lmean_list,
                   grid_len = 50,
                   alpha_level=0.1)
-  
 
+#plot(gamFit$fit_2d)
+```
+
+
+## Contour plot showing power for various combinations of mean abundance and fold change
+
+```{r}
 cont_breaks     =  seq(0,1,0.1)
 combined_data   =  gamFit$combined_data
 power_estimate  =  gamFit$power_estimate
-#plot(gamFit$fit_2d)
 
 contour_plot <- contour_plot_fun(combined_data,
                                  power_estimate,
@@ -354,7 +474,6 @@ contour_plot
 ```
 
 
-## Predict statistical power given fold change and mean abundance for taxa
 
 
 
@@ -382,7 +501,6 @@ for(j in 1:length(nsamp_vec)){
 }
 
 names(countdata_sims_list) = paste0("sample_",nsamp_vec)
-###############################################################
 ```
 
 ## Estimate p-values associated to fold changes for each taxa for simulated data per sample size
@@ -413,92 +531,6 @@ for(i in 1:length(countdata_sims_list)){
 
 
 
-
-##### Data preprocessing 
-Low abundant tax exhibit high variability, posing challenges in detecting significant differences between groups cite{m}. Pre-filtering steps, as is routinely done in differential abundance analysis, is used to filter out these low abundant taxa. In this vignette, we filter out taxa with less that 10 count in less that 5 samples. 
-
-```{r, eval=FALSE}
-# load library
-library(power.nb) 
-
-#filter out low abundant taxa
-filter_data  = filter_low_count(countdata = data,
-                                metadata  = metadata,
-                                abund_thresh = 10,
-                                sample_thresh = 5,
-                                sample_colname = "SampleID",
-                                group_colname  = "Groups")
-
-head(filter_data)
-```
-
-##### Model Fitting
-
-```{r, eval=FALSE}
-#Fit log mean count
-logmean    =  log(rowMeans(filter_data))
-logmeanFit =  logmean_fit(logmean, sig = 0.05, 
-                         max.comp = 4, max.boot = 100)
-names(logmeanFit)
-
-#Estimate foldchange from Deseq
-foldchange_est <- deseqfun(countdata = data,
-                           metadata  = metadata,
-                          alpha_level = 0.1,
-                          ref_name  = "Control",
-                          group_colname = "Groups",
-                          sample_colname = "SampleID")
-
-logfoldchange =  foldchange_est$log2FoldChange
-
-## Fit foldchange from Deseq
-logfoldchangeFit <- logfoldchange_fit(logmean,
-                                       logfoldchange,
-                                       ncore = 2,
-                                       max_sd_ord = 2,
-                                       max_np = 5,
-                                       minval = -5,
-                                       maxval = 5,
-                                       itermax = 100,
-                                       NP = 800,
-                                       seed = 100)
-
-logfoldchangeFit
-```
-
-
-## Simulating Data
-
-- Simulate log mean count from the fitted Mixture of Gaussian (using existing dataset) or from the pre-specified parameters for the Gaussian Mixture 
-
-- Simulate log fold change using the estimated parameters or the prespecified parameters and the simulated as the input for the variance and mean of the log fold change 
-
-- Simulate dispersion parameters from the estimated nonlinear function of the dispersion function 
-
-- Simulate count data from a negative binomial model and then 
-
-- Use the simulated procedure outline above to simulate n number of count data 
-
-
-```{r, eval=FALSE}
-sim <- simulate_data(fit,
-                     n_taxa = 1000,
-                     n_per_group = c(30, 30),
-                     fold_changes = c(1.5, 2, 4),
-                     nsim = 100)
-```
-
-
-## Power estimation procedure
-
-- Fit the count data with the negative binomial model in the desert package to estimate pvalues for each fold change estimated fold change
-
-- Construct a vector of binaries with 1 for a taxa where value is less than a specified threshold and 0 otherwise. 
-
-- We fit a Generalised additive model to predict the probability of obtaining 1  (also the statistical power) for any combination of mean count and log fold change 
-
-- Figure shows a contour plot for 3  of the datasets. From the plots, there is low statistical power. 
-  a Concatenation all the 
 
 
 

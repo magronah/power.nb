@@ -462,7 +462,7 @@ gamFit <- gam_fit(deseq_est_list,
 
 ## Contour plot showing power for various combinations of mean abundance and fold change
 
-```{r}
+```{r, eval=FALSE}
 cont_breaks     =  seq(0,1,0.1)
 combined_data   =  gamFit$combined_data
 power_estimate  =  gamFit$power_estimate

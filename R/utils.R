@@ -158,7 +158,7 @@ deseqfun <- function (countdata, metadata, alpha_level = 0.1,
 
   if(sum(keep) < length(keep)){
     countdata = countdata[, keep]
-    #metadata  = metadata[metadata[[sample_colname]] %in% rownames(countdata), ]
+    metadata  = metadata[metadata[[sample_colname]] %in% rownames(countdata), ]
   }
 
   metadata[[group_colname]]  = as.factor(metadata[[group_colname]])
@@ -183,15 +183,15 @@ deseqfun <- function (countdata, metadata, alpha_level = 0.1,
   disp = DESeq2::dispersions(dds)
   logfoldchange = deseq_est$log2FoldChange
   names(logfoldchange) = rownames(deseq_est)
-  normalised_count = DESeq2::counts(dds, normalized = TRUE)
-  #logmean = log2(rowMeans(normalised_count))
+  # normalised_count = DESeq2::counts(dds, normalized = TRUE)
 
   list(logfoldchange  =  logfoldchange,
-       #logmean      =  logmean,
        dispersion     =  disp,
        deseq_estimate =  deseq_est,
-       normalised_count =  normalised_count,
-       deseq_object  =  dds)
+       # normalised_count =  normalised_count,
+       deseq_object   =  dds,
+       metadata       =  metadata,
+       countdata      =  countdata)
 }
 
 

@@ -158,7 +158,7 @@ deseqfun <- function (countdata, metadata, alpha_level = 0.1,
 
   if(sum(keep) < length(keep)){
     countdata = countdata[, keep]
-    metadata  = metadata[metadata[[sample_colname]] %in% rownames(countdata), ]
+    metadata  = metadata[metadata[[sample_colname]] %in% colnames(countdata), ]
   }
 
   metadata[[group_colname]]  = as.factor(metadata[[group_colname]])

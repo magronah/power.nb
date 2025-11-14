@@ -58,14 +58,14 @@ There are one of two ways to obtain the parameters of the `MixGaussSim` method f
 
 We use a subset of the Obsesity dataset, one of the datasets analyzed in [@Nearing2022]. The full dataset contains 52 samples and 1203 taxa.
 
-```{r,message=FALSE}
+```{r pkgs, message=FALSE}
 ##Load libraries
 library(tidyverse)
 library(dplyr)
 library(power.nb)
 library(patchwork)
 
-data_path =  "~/Documents/power.nb/data"
+data_path =  system.file("data", package = "power.nb")
 ##Read count data and metadata
 data <- read.table(
   file.path(data_path, "ob_ross_ASVs_table.tsv"),
@@ -92,7 +92,7 @@ head(data); head(metadata)
 
 Low abundant tax exhibit high variability, posing challenges in detecting significant differences between groups [@love2014moderated]. Pre-filtering steps, as is routinely done in differential abundance analysis, is used to filter out these low abundant taxa. We filter out taxa with less that 10 count in less that 5 samples. 
 
-```{r}
+```{r filter-data}
 filter_data  =  filter_low_count(countdata     =  data,
                                 metadata       =  metadata,
                                 abund_thresh   =  2,

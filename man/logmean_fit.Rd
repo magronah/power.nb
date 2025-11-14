@@ -4,7 +4,7 @@
 \alias{logmean_fit}
 \title{Fit a mixture of Gaussian Distributions to log mean count of taxa.}
 \usage{
-logmean_fit(logmean, sig = 0.05, max.comp = 4, max.boot = 100)
+logmean_fit(logmean, sig = 0.05, max.comp = 4, max.boot = 100, verb = FALSE)
 }
 \arguments{
 \item{logmean}{vector of log mean count of taxa}
@@ -15,6 +15,8 @@ parametric bootstrap calculation}
 \item{max.comp}{maximum number of Gaussian components to compare sequentially}
 
 \item{max.boot}{maximum number of bootstraps simulations}
+
+\item{verb}{If TRUE, it prints out updates of iterations of the algorithm}
 }
 \value{
 A list containing the optimal number of Gaussian components fitted; and mean and

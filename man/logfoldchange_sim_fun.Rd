@@ -8,7 +8,8 @@ logfoldchange_sim_fun(
   logmean_sim,
   logfoldchange_param,
   max_lfc = 15,
-  max_iter = 10000
+  max_iter = 10000,
+  seed = 121
 )
 }
 \arguments{

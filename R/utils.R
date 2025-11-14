@@ -479,6 +479,7 @@ deseq_fun_est <-function(metadata_list,  countdata_list,
 #' @param combined_data data used for fitting gam
 #' @param power_estimate predicted power
 #' @param cont_breaks breaks for contour plot
+#' @param multiple_samples not currently used
 #' @importFrom ggplot2 ggplot aes geom_contour geom_point xlab ylab scale_colour_manual
 #' @importFrom ggplot2 after_stat
 #' @return ggplot2 object

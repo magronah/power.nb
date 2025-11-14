@@ -17,6 +17,8 @@ contour_plot_fun(
 \item{power_estimate}{predicted power}
 
 \item{cont_breaks}{breaks for contour plot}
+
+\item{multiple_samples}{not currently used}
 }
 \value{
 ggplot2 object

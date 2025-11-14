@@ -25,6 +25,8 @@ logfoldchange_sim_fun(
 \item{max_lfc}{A numeric value specifying the maximum allowable absolute log fold change value. Default is 15.}
 
 \item{max_iter}{An integer specifying the maximum number of iterations allowed to ensure all simulated LFC values are within the \code{max_lfc} range. Default is 10,000.}
+
+\item{seed}{random-number seed}
 }
 \value{
 A numeric vector of simulated log fold change values (\code{lfc}).

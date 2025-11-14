@@ -61,7 +61,7 @@ logmean_sim_fun = function(logmean_param,notu){
 #'
 #' @param max_lfc A numeric value specifying the maximum allowable absolute log fold change value. Default is 15.
 #' @param max_iter An integer specifying the maximum number of iterations allowed to ensure all simulated LFC values are within the \code{max_lfc} range. Default is 10,000.
-#'
+#' @param seed random-number seed
 #' @return A numeric vector of simulated log fold change values (\code{lfc}).
 #'
 #' @export

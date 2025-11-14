@@ -566,4 +566,5 @@ kbl(df, booktabs = TRUE, longtable = TRUE,
 
 ```
 
+# References
 

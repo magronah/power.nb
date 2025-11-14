@@ -65,7 +65,7 @@ library(dplyr)
 library(power.nb)
 library(patchwork)
 
-data_path =  system.file("data", package = "power.nb")
+data_path =  system.file("pkgdata", package = "power.nb")
 ##Read count data and metadata
 data <- read.table(
   file.path(data_path, "ob_ross_ASVs_table.tsv"),

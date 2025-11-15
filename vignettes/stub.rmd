@@ -18,10 +18,6 @@ biblio-title: "References"
 ---
 
 
-# Acknowledgments
-
-We would like to express our sincere gratitude to Dr. Jacob T. Nearing for his generosity in granting us access to the 38 microbiome datasets used in the paper “Microbiome differential abundance methods produce different results across 38 datasets” [@Nearing2022]. These datasets were invaluable in developing, testing, and validating this R package for power and sample size calculation in microbiome studies.
-
 #  Package Description and Functionalities 
 
 `power.nb` is a package developed for estimating statistical power and sample sizes in differential abundance microbiome studies. The package presents novel methods for estimating statistical power for individual taxa (feature, OTU/ASV, or species) and for sample size calculation accounting for effect sizes and mean abundance of taxa.
@@ -567,6 +563,11 @@ kbl(df, booktabs = TRUE, longtable = TRUE,
   add_header_above(c(" " = 1, "Parameters" = 9)) # optional extra grouping
 
 ```
+
+# Acknowledgments
+
+We would like to express our sincere gratitude to Dr. Jacob T. Nearing for his generosity in granting us access to the 38 microbiome datasets used in the paper “Microbiome differential abundance methods produce different results across 38 datasets” [@Nearing2022]. These datasets were invaluable in developing, testing, and validating this R package for power and sample size calculation in microbiome studies.
+
 
 # References
 

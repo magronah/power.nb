@@ -148,7 +148,7 @@ To test whether adding an additional component improves model fit, we formulated
 
 $$
 \begin{cases} 
-H_0: \mathbf{y} \sim f_k(y_i \mid \boldsymbol{\theta}_k) & \textrm{(the data follow a $k$-component mixture model)} \\[4pt]
+H_0: \mathbf{y} \sim f_k(y_i \mid \boldsymbol{\theta}_k) & \textrm{(the data follow a $k$-component mixture model)} \\
 H_a: \mathbf{y} \sim f_{k+1}(y_i \mid \boldsymbol{\theta}_{k+1}) & \textrm{(the data follow a $(k+1)$-component mixture model)} \end{cases}$$
 
 The test statistic is the likelihood ratio statistic:

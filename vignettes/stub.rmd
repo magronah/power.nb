@@ -24,10 +24,10 @@ We would like to express our sincere gratitude to Dr. Jacob T. Nearing for his g
 
 #  Package Description and Functionalities 
 
-`power.nb` is a package developed for estimating statistical power and sample sizes in differential abundance microbiome studies. The package presents novel methods for estimating statistical power for individual taxa (feature, otu, or species) and for sample size calculation accounting for effect sizes and mean abundance of taxa.
+`power.nb` is a package developed for estimating statistical power and sample sizes in differential abundance microbiome studies. The package presents novel methods for estimating statistical power for individual taxa (feature, OTU/ASV, or species) and for sample size calculation accounting for effect sizes and mean abundance of taxa.
 
 
-`power.nb` also presents two novel microbiome data simulations frameworks: `MixGassSim` and `RRSim`. The method implemented in `MixGassSim` models the distribution of mean abundance of taxa and the distribution of fold change (as a function of mean abundance of taxa) by finite Mixture of Gaussian distributions.  Microbiome count data is then simulated from a negative binomial distribution. Detailed description of the `MixGassSim` method is presented in the paper ["Investigating statistical power of differential abundance studies"](https://doi.org/10.1371/journal.pone.0318820) [@agronahnbolker].  
+`power.nb` also presents two novel microbiome data simulations frameworks: `Cask's` and `RRSim`. The method implemented in `MixGaussSim` models the distribution of mean abundance of taxa and the distribution of fold change (as a function of mean abundance of taxa) by finite Mixture of Gaussian distributions.  Microbiome count data is then simulated from a negative binomial distribution. Detailed description of the `MixGaussSim` method is presented in the paper ["Investigating statistical power of differential abundance studies"](https://doi.org/10.1371/journal.pone.0318820) [@agronahnbolker].  
 
 `RRSim` (this simulation method is still under development and some functions in `RRSim` are yet to tested), on the other hand models the mean abundance of all taxa jointly with a mixed-effects model while accounting for correlations among taxa within subjects and zero inflation in microbiome data. Given the high dimensionality of microbiome data (usually having hundreds or thousands of taxa), modelling correlations between taxa requires estimating thousands or even millions of parameters for the correlation matrix. `RRSim` uses the reduced rank functionality implemented in the `glmmTMB` [@magnusson2017package] packages to reduce the number of parameter estimates required of the variance-correlation matrix. Details of this method is presented in the thesis ["A Novel Approach for Simulation-Based Power Estimation and Joint Modeling of Microbiome Counts"](https://macsphere.mcmaster.ca/handle/11375/31784) [@agronah2025novel]
 
@@ -56,7 +56,7 @@ There are one of two ways to obtain the parameters of the `MixGaussSim` method f
 
 ## Dataset
 
-We use a subset of the Obsesity dataset, one of the datasets analyzed in [@Nearing2022]. The full dataset contains 52 samples and 1203 taxa.
+We use a subset of the Obesity dataset, one of the datasets analyzed in [@Nearing2022]. The full dataset contains 52 samples and 1203 taxa.
 
 ```{r pkgs, message=FALSE}
 ##Load libraries
@@ -103,7 +103,7 @@ filter_data  =  filter_low_count(countdata     =  data,
 dim(filter_data)
 ```
 
-## Foldchange and Dispersion Estimation
+## Fold change and Dispersion Estimation
 
 We estimate fold change for each taxon and dispersion parameters using the negative binomial model implemented in the `DESeq2` package [@love2014moderated]. The negative binomial model is widely used in both microbiome and RNA-seq analyses and is implemented in the `NBZIMM` [@yi2020nbzimm] and `edgeR` R packages [@robinson2010edger].  The model implemented in the `DESeq2` package is described as follows:
 
@@ -223,7 +223,7 @@ dispersionFit$param
 
 ## Simulate count microbiome data
 
-To simulate microbiome data, we first simulate log mean counts and corresponding log fold changes. The simulated log mean counts represent overall log mean counts (ie, log of the arithmetic mean of the counts in all of treatment and control  groups). We then use the simulated log mean count to estimate corresponding dispersion values for each sample through the fitted nonlinear function described in the equation [here](#disp-eq) ([see section on Modelling the Distribution of Log Fold Changes](#modelling-the-distribution-of-log-fold-changes)). Using the simulated log mean counts and fold changes, we now compute the group specific mean counts (ie, mean counts of taxa for control group and mean count of taxa for treatment group). We then simulate microbiome count data from the negative binomial distribution using the group specific mean counts and the estimated dispersion values. 
+To simulate microbiome data, we first simulate log mean counts and corresponding log fold changes. The simulated log mean counts represent overall log mean counts (i.e., log of the arithmetic mean of the counts in all of treatment and control  groups). We then use the simulated log mean count to estimate corresponding dispersion values for each sample through the fitted nonlinear function described in the equation [here](#disp-eq) ([see section on Modelling the Distribution of Log Fold Changes](#modelling-the-distribution-of-log-fold-changes)). Using the simulated log mean counts and fold changes, we now compute the group specific mean counts (i.e., mean counts of taxa for control group and mean count of taxa for treatment group). We then simulate microbiome count data from the negative binomial distribution using the group specific mean counts and the estimated dispersion values. 
 
 
 ### Simulate log mean count and log fold change
@@ -286,7 +286,7 @@ length(countdata_sims$logmean_list$sim_1)
 
 ### Comparing the distributions between simulated count d of mean count and fold change from simulation with actual data
 
-We compare the following comparisions bettween our simulation and the actual dataset 
+We compare the following comparisons between our simulation and the actual dataset 
 
 - we come distribution of variances of counts of taxa and 
 

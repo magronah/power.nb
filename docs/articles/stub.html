@@ -59,7 +59,7 @@
                         <h4 data-toc-skip class="author">Michael Agronah
 and Benjamin Bolker</h4>
             
-            <h4 data-toc-skip class="date">2025-10-22</h4>
+            <h4 data-toc-skip class="date">2025-11-14</h4>
       
 
       <div class="d-none name"><code>stub.rmd</code></div>
@@ -71,14 +71,14 @@ and Benjamin Bolker</h4>
 <h2 id="acknowledgments">Acknowledgments<a class="anchor" aria-label="anchor" href="#acknowledgments"></a>
 </h2>
 <p>We would like to express our sincere gratitude to Dr. Jacob T.
-Nearing for his generosity in granting access to the 38 microbiome
+Nearing for his generosity in granting us access to the 38 microbiome
 datasets used in the paper “Microbiome differential abundance methods
 produce different results across 38 datasets” <span class="citation">(Nearing et al. 2022)</span>. These datasets were
 invaluable in developing, testing, and validating this R package for
 power and sample size calculation in microbiome studies.</p>
 </div>
 <div class="section level2">
-<h2 id="package-description-and-functionalies">Package Description and Functionalies<a class="anchor" aria-label="anchor" href="#package-description-and-functionalies"></a>
+<h2 id="package-description-and-functionalities">Package Description and Functionalities<a class="anchor" aria-label="anchor" href="#package-description-and-functionalities"></a>
 </h2>
 <p><code>power.nb</code> is a package developed for estimating
 statistical power and sample sizes in differential abundance microbiome
@@ -93,8 +93,10 @@ change (as a function of mean abundance of taxa) by finite Mixture of
 Gaussian distributions. Microbiome count data is then simulated from a
 negative binomial distribution. Detailed description of the
 <code>MixGassSim</code> method is presented in the paper <a href="https://doi.org/10.1371/journal.pone.0318820" class="external-link">“Investigating
-statistical power of differential abundance studies”</a> <span class="citation">(Agronah and Bolker 2025)</span>. <code>RRSim</code>,
-on the other hand models the mean abundance of all taxa jointly with a
+statistical power of differential abundance studies”</a> <span class="citation">(Agronah and Bolker 2025)</span>.</p>
+<p><code>RRSim</code> (this simulation method is still under development
+and some functions in <code>RRSim</code> are yet to tested), on the
+other hand models the mean abundance of all taxa jointly with a
 mixed-effects model while accounting for correlations among taxa within
 subjects and zero inflation in microbiome data. Given the high
 dimensionality of microbiome data (usually having hundreds or thousands
@@ -117,7 +119,7 @@ Microbiome Counts”</a> <span class="citation">(Agronah 2025)</span></p>
 <span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"magronah/power.nb"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="estimating-statistical-power">Estimating Statistical Power<a class="anchor" aria-label="anchor" href="#estimating-statistical-power"></a>
+<h2 id="simulating-microbiome-data">Simulating microbiome data<a class="anchor" aria-label="anchor" href="#simulating-microbiome-data"></a>
 </h2>
 <p>Since the goal of differential abundance studies is to identify taxa
 that differ significantly between groups, statistical power must be
@@ -135,7 +137,7 @@ estimating the distributions of mean abundance and fold change of taxa
 explicitly will offer great benefit for estimation of statistical power
 for individual taxon. We use the <code>MixGaussSim</code> simulation
 approach to simulate microbiome data for power calculation due to its
-flexibly in modelling the distributions of taxa mean abundances and
+flexibility in modelling the distributions of taxa mean abundances and
 effect sizes explicitly as as well as their relationship.</p>
 <div class="section level3">
 <h3 id="two-ways-to-obtain-parameters-for-data-simulation-using-mixgausssim">Two ways to obtain parameters for data simulation using
@@ -153,18 +155,16 @@ parameter estimates obtained from each of these datasets (<a href="#appendix">se
 datasets</a> ).</p>
 <p><strong>2. estimate parameters from an existing dataset:</strong>
 Secondly, users can also obtain estimates directly from fitting the
-model implemented in <code>MixGaussSim</code> to exiting datasets. The
+model implemented in <code>MixGaussSim</code> to existing datasets. The
 following steps outlines the process for estimating parameters from an
 existing dataset.</p>
 </div>
 <div class="section level3">
 <h3 id="dataset">Dataset<a class="anchor" aria-label="anchor" href="#dataset"></a>
 </h3>
-<p>We use a subset of the Arctic Fire dataset, one of the datasets
-analyzed in <span class="citation">(Nearing et al. 2022)</span>. The
-full dataset contains 148 samples and 31,100 taxa; however, for
-illustration and faster computation, only a subset is used to
-demonstrate how <code>MixGaussSim</code> works</p>
+<p>We use a subset of the Obsesity dataset, one of the datasets analyzed
+in <span class="citation">(Nearing et al. 2022)</span>. The full dataset
+contains 52 samples and 1203 taxa.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">##Load libraries</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyverse.tidyverse.org" class="external-link">tidyverse</a></span><span class="op">)</span></span>
@@ -172,23 +172,92 @@ demonstrate how <code>MixGaussSim</code> works</p>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">power.nb</span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://patchwork.data-imaginist.com" class="external-link">patchwork</a></span><span class="op">)</span></span>
 <span></span>
+<span><span class="va">data_path</span> <span class="op">=</span>  <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"pkgdata"</span>, package <span class="op">=</span> <span class="st">"power.nb"</span><span class="op">)</span></span>
 <span><span class="co">##Read count data and metadata</span></span>
-<span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu">read_qza</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">path</span>, <span class="st">"ArcticFireSoils_table.qza"</span><span class="op">)</span><span class="op">)</span><span class="op">$</span><span class="va">data</span></span>
+<span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.table</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">data_path</span>, <span class="st">"ob_ross_ASVs_table.tsv"</span><span class="op">)</span>,</span>
+<span>  header <span class="op">=</span> <span class="cn">TRUE</span>, sep <span class="op">=</span> <span class="st">"\t"</span>,</span>
+<span>  check.names <span class="op">=</span> <span class="cn">FALSE</span>, comment.char <span class="op">=</span> <span class="st">""</span>, </span>
+<span>  row.names <span class="op">=</span> <span class="fl">1</span></span>
+<span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">metadata</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.table</a></span><span class="op">(</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">path</span>, <span class="st">"ArcticFireSoils_meta.tsv"</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">data_path</span>, <span class="st">"ob_ross_metadata.tsv"</span><span class="op">)</span>,</span>
 <span>  header <span class="op">=</span> <span class="cn">TRUE</span>, sep <span class="op">=</span> <span class="st">"\t"</span>,</span>
 <span>  check.names <span class="op">=</span> <span class="cn">FALSE</span>, comment.char <span class="op">=</span> <span class="st">""</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">keep_samples</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span></span>
 <span><span class="va">metadata</span> <span class="op">&lt;-</span> <span class="va">metadata</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/stats/setNames.html" class="external-link">setNames</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"SampleID"</span>, <span class="st">"Groups"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">SampleID</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="va">keep_samples</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/stats/setNames.html" class="external-link">setNames</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"SampleID"</span>, <span class="st">"Groups"</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span>; <span class="fu"><a href="https://rdrr.io/r/base/dim.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">metadata</span><span class="op">)</span>;<span class="fu"><a href="https://rdrr.io/r/base/dim.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">metadata</span><span class="op">)</span></span>
-<span><span class="co">##############Select subset###############################</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/base/dim.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span>; <span class="fu"><a href="https://rdrr.io/r/base/dim.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">metadata</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## [1] 1203   52</span></span></code></pre>
+<pre><code><span><span class="co">## [1] 52  2</span></span></code></pre>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span>; <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">metadata</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">##           BD0017v13 BD0027v13 BD0022v13 BD0040v13 BD0044v13 BD0057v13 BD0115v13</span></span>
+<span><span class="co">## denovo619         0         0         0         0         0         0         0</span></span>
+<span><span class="co">## denovo618         0         0         0         0         0         0         0</span></span>
+<span><span class="co">## denovo617         0         0         0         0         9         0         0</span></span>
+<span><span class="co">## denovo616         0         0         0         0         0         0         0</span></span>
+<span><span class="co">## denovo615         0         0         0         0         0         0         0</span></span>
+<span><span class="co">## denovo614         0         0         0         0         0         0         0</span></span>
+<span><span class="co">##           BD0190v13 BD0072v13 BD0112v13 BD0246v13 BD0247v13 BD0266v13 BD0235v13</span></span>
+<span><span class="co">## denovo619         8         0         0         0         0         0         0</span></span>
+<span><span class="co">## denovo618         0         0         0         0         0         0         0</span></span>
+<span><span class="co">## denovo617         0         0         0         1         3         0         0</span></span>
+<span><span class="co">## denovo616         0         0         0         0         0         0         0</span></span>
+<span><span class="co">## denovo615         0         0         0         0         0         0         0</span></span>
+<span><span class="co">## denovo614         0         0         0         1         1         8         0</span></span>
+<span><span class="co">##           BD0295v13 BD0255v13 BD0300v13 BD0331v13 BD0321v13 BD0351v13 BD0409v13</span></span>
+<span><span class="co">## denovo619         1         0         0         0         0         0         8</span></span>
+<span><span class="co">## denovo618         0         0         0         0         0         0         0</span></span>
+<span><span class="co">## denovo617         0         0         0         0         0         2         0</span></span>
+<span><span class="co">## denovo616         0         0         0         0        27         0         0</span></span>
+<span><span class="co">## denovo615         0         0         0         0         0         0         0</span></span>
+<span><span class="co">## denovo614         0         0         1         0         3         1         1</span></span>
+<span><span class="co">##           BD0410v13 BD0375v13 BD0414v13 BD0422v13 BD0464v13 BD0571v13 BD0578v13</span></span>
+<span><span class="co">## denovo619         0         0         0         0         0         0         0</span></span>
+<span><span class="co">## denovo618         0         0         0         0         0         0         1</span></span>
+<span><span class="co">## denovo617         0         0         1         0         0         0         0</span></span>
+<span><span class="co">## denovo616         0         0         0         0         0         0         0</span></span>
+<span><span class="co">## denovo615         0         0         0         0         3         0         0</span></span>
+<span><span class="co">## denovo614         1         0         1         0         0         0         0</span></span>
+<span><span class="co">##           BD0587v13 BD0592v13 BD0594v13 BD0610v13 BD0611v13 BD0613v13 BD0636v13</span></span>
+<span><span class="co">## denovo619         0         0         0         1         0         0         0</span></span>
+<span><span class="co">## denovo618         2         0         0         0         0        18         0</span></span>
+<span><span class="co">## denovo617         1         0         1         0         0         0         0</span></span>
+<span><span class="co">## denovo616         0         0         0         0         0         0         0</span></span>
+<span><span class="co">## denovo615         0         0         0         0         0         0         4</span></span>
+<span><span class="co">## denovo614         1         0         0         0         0         2         0</span></span>
+<span><span class="co">##           BD0616v13 BD0653v13 BD0643v13 BD0654v13 BD0673v13 BD0735v13 BD0760v13</span></span>
+<span><span class="co">## denovo619         0         0         0         1         0         0         0</span></span>
+<span><span class="co">## denovo618         0         0         0         0         0         0         0</span></span>
+<span><span class="co">## denovo617         0         4         0         0         0         5         0</span></span>
+<span><span class="co">## denovo616         0         0         0         0         0         0         0</span></span>
+<span><span class="co">## denovo615         0         0         0         0         0         0         0</span></span>
+<span><span class="co">## denovo614         0         2         0         1         0         0         0</span></span>
+<span><span class="co">##           BD0777v13 BD0758v13 BD0789v13 BD0791v13 BD0821v13 BD0786v13 BD0790v13</span></span>
+<span><span class="co">## denovo619         0         0         0         0         7         0         0</span></span>
+<span><span class="co">## denovo618         0         0         0         0         6         0         0</span></span>
+<span><span class="co">## denovo617         0         0         0         0         0         0         0</span></span>
+<span><span class="co">## denovo616         0         0         0         0         0         0         0</span></span>
+<span><span class="co">## denovo615         0        20         0         0         0         0         0</span></span>
+<span><span class="co">## denovo614         0         0         0         0         0         0         0</span></span>
+<span><span class="co">##           BD0913v13 BD0954v13 BD0981v13</span></span>
+<span><span class="co">## denovo619         0         0         0</span></span>
+<span><span class="co">## denovo618         0         0         0</span></span>
+<span><span class="co">## denovo617         0         0         0</span></span>
+<span><span class="co">## denovo616         0         0         0</span></span>
+<span><span class="co">## denovo615         0         0         0</span></span>
+<span><span class="co">## denovo614         0         1         0</span></span></code></pre>
+<pre><code><span><span class="co">##    SampleID Groups</span></span>
+<span><span class="co">## 1 BD0017v13     OB</span></span>
+<span><span class="co">## 2 BD0027v13      H</span></span>
+<span><span class="co">## 3 BD0022v13      H</span></span>
+<span><span class="co">## 4 BD0040v13     OB</span></span>
+<span><span class="co">## 5 BD0044v13     OB</span></span>
+<span><span class="co">## 6 BD0057v13      H</span></span></code></pre>
 </div>
 <div class="section level3">
 <h3 id="pre-filtering-low-abundant-taxa">Pre-filtering low abundant taxa<a class="anchor" aria-label="anchor" href="#pre-filtering-low-abundant-taxa"></a>
@@ -198,97 +267,234 @@ detecting significant differences between groups <span class="citation">(Love, H
 steps, as is routinely done in differential abundance analysis, is used
 to filter out these low abundant taxa. We filter out taxa with less that
 10 count in less that 5 samples.</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">filter_data</span>  <span class="op">=</span> <span class="fu"><a href="../reference/filter_low_count.html">filter_low_count</a></span><span class="op">(</span></span>
-<span>  countdata <span class="op">=</span> <span class="va">data</span>,</span>
-<span>  metadata  <span class="op">=</span> <span class="va">metadata</span>,</span>
-<span>  abund_thresh <span class="op">=</span> <span class="fl">10</span>,</span>
-<span>  sample_thresh <span class="op">=</span> <span class="fl">5</span>,</span>
-<span>  sample_colname <span class="op">=</span> <span class="st">"SampleID"</span>,</span>
-<span>  group_colname  <span class="op">=</span> <span class="st">"Groups"</span></span>
-<span><span class="op">)</span></span>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">filter_data</span>  <span class="op">=</span>  <span class="fu"><a href="../reference/filter_low_count.html">filter_low_count</a></span><span class="op">(</span>countdata     <span class="op">=</span>  <span class="va">data</span>,</span>
+<span>                                metadata       <span class="op">=</span>  <span class="va">metadata</span>,</span>
+<span>                                abund_thresh   <span class="op">=</span>  <span class="fl">2</span>,</span>
+<span>                                sample_thresh  <span class="op">=</span>  <span class="fl">2</span>,</span>
+<span>                                sample_colname <span class="op">=</span>  <span class="st">"SampleID"</span>,</span>
+<span>                                group_colname  <span class="op">=</span>  <span class="st">"Groups"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/dim.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">filter_data</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## [1] 903  52</span></span></code></pre>
 </div>
 <div class="section level3">
-<h3 id="foldchange-and-dispersion-estimations">Foldchange and Dispersion Estimations<a class="anchor" aria-label="anchor" href="#foldchange-and-dispersion-estimations"></a>
+<h3 id="foldchange-and-dispersion-estimation">Foldchange and Dispersion Estimation<a class="anchor" aria-label="anchor" href="#foldchange-and-dispersion-estimation"></a>
 </h3>
-<p>We estimate fold changes of each taxa and dispersions estimates from
-the negative binomial model implemented in the <code>DESeq2</code>
+<p>We estimate fold change for each taxon and dispersion parameters
+using the negative binomial model implemented in the <code>DESeq2</code>
 package <span class="citation">(Love, Huber, and Anders 2014)</span>.
-The model is ….</p>
-<p><em>The negative binomial model, a standard approach for analyzing
-microbiome count data, is implemented in the {love2014moderated} and
-{robinson2010edger} R packages which are both widely used in microbiome
-analysis. The model is described as follows: Let
+The negative binomial model is widely used in both microbiome and
+RNA-seq analyses and is implemented in the <code>NBZIMM</code> <span class="citation">(Yi 2020)</span> and <code>edgeR</code> R packages
+<span class="citation">(Robinson, McCarthy, and Smyth 2010)</span>. The
+model implemented in the <code>DESeq2</code> package is described as
+follows:</p>
+<p>Let
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>K</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><annotation encoding="application/x-tex">K_{ij}</annotation></semantics></math>
-denote the count data for the
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>i</mi><mrow><mi>t</mi><mi>h</mi></mrow></msup><annotation encoding="application/x-tex">i^{th}</annotation></semantics></math>
+represent the observed count for the
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>i</mi><mtext mathvariant="normal">th</mtext></msup><annotation encoding="application/x-tex">i^{\text{th}}</annotation></semantics></math>
 taxon in the
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>j</mi><mrow><mi>t</mi><mi>h</mi></mrow></msup><annotation encoding="application/x-tex">j^{th}</annotation></semantics></math>
-sample. Then
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>K</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><annotation encoding="application/x-tex">K_{ij}</annotation></semantics></math>
-follows a negative binomial distribution:</em>
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable><mtr><mtd columnalign="right" style="text-align: right"><msub><mi>K</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><mo>∼</mo><mtext mathvariant="normal">NB</mtext><mo stretchy="false" form="prefix">(</mo><mtext mathvariant="normal">mean</mtext></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><msub><mi>μ</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><mo>,</mo><mtext mathvariant="normal">dispersion</mtext><mo>=</mo><msub><mi>α</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><mo stretchy="false" form="postfix">)</mo><mo>,</mo></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right"><msub><mi>μ</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><msub><mi>s</mi><mi>j</mi></msub><msub><mi>q</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right"><mo>log</mo><msub><mi>q</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><munder><mo>∑</mo><mi>r</mi></munder><msub><mi>x</mi><mrow><mi>j</mi><mi>r</mi></mrow></msub><msub><mi>β</mi><mrow><mi>i</mi><mi>r</mi></mrow></msub><mo>,</mo></mtd></mtr></mtable><annotation encoding="application/x-tex">\begin{align} 
-K_{ij} \sim \text{NB}(\text{mean} &amp;= \mu_{ij}, \text{dispersion} = \alpha_{ij}), \nonumber \\
-\mu_{ij} &amp;= s_{j} q_{ij}   \\ 
-\log q_{ij} &amp;= \sum_r x_{jr}\beta_{ir} , \nonumber
-\end{align}</annotation></semantics></math><em>where
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>μ</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><annotation encoding="application/x-tex">\mu_{ij}</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>j</mi><mtext mathvariant="normal">th</mtext></msup><annotation encoding="application/x-tex">j^{\text{th}}</annotation></semantics></math>
+sample. The model assumes that<br><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>K</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><mo>∼</mo><mtext mathvariant="normal">NB</mtext><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>μ</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><mo>,</mo><msub><mi>α</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo></mrow><annotation encoding="application/x-tex">K_{ij} \sim \text{NB}(\mu_{ij}, \alpha_{ij}),</annotation></semantics></math>
+where the mean is defined as
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>μ</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><mo>=</mo><msub><mi>s</mi><mi>j</mi></msub><msub><mi>q</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub></mrow><annotation encoding="application/x-tex">\mu_{ij} = s_j q_{ij}</annotation></semantics></math>,
 and
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>s</mi><mi>j</mi></msub><annotation encoding="application/x-tex">s_{j}</annotation></semantics></math>
-are the mean abundances and normalization constants respectively.
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>q</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><annotation encoding="application/x-tex">q_{ij}</annotation></semantics></math>
-is the expected mean abundance of a given taxon in a sample prior to
-normalization. We assume the dispersion parameter is constant for a
-given taxon. Thus,
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>α</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><mo>=</mo><msub><mi>α</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">\alpha_{ij}=\alpha_{i}</annotation></semantics></math>.
-The estimated coefficients
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mover><mi>β</mi><mo accent="true">̂</mo></mover><mrow><mi>i</mi><mi>r</mi></mrow></msub><annotation encoding="application/x-tex">\hat \beta_{ir}</annotation></semantics></math>
-are estimates of the effect sizes and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>s</mi><mi>j</mi></msub><annotation encoding="application/x-tex">s_j</annotation></semantics></math>
+is the normalization factor for sample
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>j</mi><annotation encoding="application/x-tex">j</annotation></semantics></math>.
+The expected abundance prior to normalization,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>q</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><annotation encoding="application/x-tex">q_{ij}</annotation></semantics></math>,
+is modeled as<br><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>log</mo><msub><mi>q</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><mo>=</mo><munder><mo>∑</mo><mi>r</mi></munder><msub><mi>x</mi><mrow><mi>j</mi><mi>r</mi></mrow></msub><msub><mi>β</mi><mrow><mi>i</mi><mi>r</mi></mrow></msub><mo>,</mo></mrow><annotation encoding="application/x-tex">\log q_{ij} = \sum_r x_{jr} \beta_{ir},</annotation></semantics></math>
+with
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>x</mi><mrow><mi>j</mi><mi>r</mi></mrow></msub><annotation encoding="application/x-tex">x_{jr}</annotation></semantics></math>
-are the covariates. The relationship between the variance of counts and
-the dispersion is defined by
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">var</mtext><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>K</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><msub><mi>μ</mi><mi>i</mi></msub><mo>+</mo><msub><mi>α</mi><mi>i</mi></msub><msubsup><mi>μ</mi><mi>i</mi><mn>2</mn></msubsup></mrow><annotation encoding="application/x-tex">\text{var} (K_{ij}) = \mu_i + \alpha_i\mu_i^2</annotation></semantics></math>.
-In this study, the estimating procedure implemented in the package ~ in
-is used for estimating
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mover><mi>β</mi><mo accent="true">̂</mo></mover><mrow><mi>i</mi><mi>r</mi></mrow></msub><annotation encoding="application/x-tex">\hat \beta_{ir}</annotation></semantics></math>
-and
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mover><mi>α</mi><mo accent="true">̂</mo></mover><mi>i</mi></msub><annotation encoding="application/x-tex">\hat \alpha_i</annotation></semantics></math>.</em></p>
-<p><em>We used the package to estimate dispersion for the negative
-binomial model. Dispersion typically varies based on count
-abundance,</em> from Deseq2 packge</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">foldchange_est</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/deseqfun.html">deseqfun</a></span><span class="op">(</span>countdata <span class="op">=</span> <span class="va">filter_data</span>,</span>
-<span>                           metadata  <span class="op">=</span> <span class="va">metadata</span>,</span>
-<span>                          alpha_level <span class="op">=</span> <span class="fl">0.1</span>,</span>
-<span>                          ref_name  <span class="op">=</span> <span class="st">"Control"</span>,</span>
-<span>                          group_colname <span class="op">=</span> <span class="st">"Groups"</span>,</span>
-<span>                          sample_colname <span class="op">=</span> <span class="st">"SampleID"</span><span class="op">)</span></span>
+denoting the covariates and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>β</mi><mrow><mi>i</mi><mi>r</mi></mrow></msub><annotation encoding="application/x-tex">\beta_{ir}</annotation></semantics></math>
+the associated coefficients. The dispersion parameter is assumed
+constant across samples for each taxon, such that
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>α</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><mo>=</mo><msub><mi>α</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">\alpha_{ij} = \alpha_i</annotation></semantics></math>.
+This formulation links the variance and mean through<br><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">V</mi><mi mathvariant="normal">a</mi><mi mathvariant="normal">r</mi></mrow><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>K</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><msub><mi>μ</mi><mi>i</mi></msub><mo>+</mo><msub><mi>α</mi><mi>i</mi></msub><msubsup><mi>μ</mi><mi>i</mi><mn>2</mn></msubsup><mi>.</mi></mrow><annotation encoding="application/x-tex">\mathrm{Var}(K_{ij}) = \mu_i + \alpha_i \mu_i^2.</annotation></semantics></math></p>
+<p>Estimation of the regression coefficients
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mover><mi>β</mi><mo accent="true">̂</mo></mover><mrow><mi>i</mi><mi>r</mi></mrow></msub><annotation encoding="application/x-tex">\hat{\beta}_{ir}</annotation></semantics></math>
+and dispersion parameters
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mover><mi>α</mi><mo accent="true">̂</mo></mover><mi>i</mi></msub><annotation encoding="application/x-tex">\hat{\alpha}_i</annotation></semantics></math>
+was carried out using the empirical Bayes shrinkage procedures
+implemented in the <code>DESeq2</code> package <span class="citation">Anders and Huber (2010)</span>.</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">metadata</span><span class="op">$</span><span class="va">Groups</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## [1] "OB" "H"</span></span></code></pre>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">foldchange_est</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/deseqfun.html">deseqfun</a></span><span class="op">(</span>countdata      <span class="op">=</span>   <span class="va">filter_data</span>,</span>
+<span>                           metadata       <span class="op">=</span>   <span class="va">metadata</span>,</span>
+<span>                           alpha_level    <span class="op">=</span>   <span class="fl">0.1</span>,</span>
+<span>                           ref_name       <span class="op">=</span>  <span class="st">"H"</span>,</span>
+<span>                           group_colname  <span class="op">=</span>  <span class="st">"Groups"</span>,</span>
+<span>                           sample_colname <span class="op">=</span>  <span class="st">"SampleID"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">logfoldchange</span> <span class="op">=</span>  <span class="va">foldchange_est</span><span class="op">$</span><span class="va">deseq_estimate</span><span class="op">$</span><span class="va">log2FoldChange</span></span></code></pre></div>
+<span><span class="va">logfoldchange</span> <span class="op">=</span>  <span class="va">foldchange_est</span><span class="op">$</span><span class="va">deseq_estimate</span><span class="op">$</span><span class="va">log2FoldChange</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">logfoldchange</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## [1]  0.32958211 -0.90669149  0.23052500 -0.51398232 -0.02770075 -0.82149821</span></span></code></pre>
 </div>
 <div class="section level3">
-<h3 id="fit-log-mean-count">Fit log mean count<a class="anchor" aria-label="anchor" href="#fit-log-mean-count"></a>
+<h3 id="modeling-the-distribution-of-log-mean-counts">Modeling the distribution of log mean counts<a class="anchor" aria-label="anchor" href="#modeling-the-distribution-of-log-mean-counts"></a>
 </h3>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<p>We modelled the log mean abundance (defined as the logarithm of the
+arithmetic mean abundance across both control and treatment groups) as a
+finite mixture of Gaussian distributions. To determine the optimal
+number of mixture components, denoted by
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>k</mi><annotation encoding="application/x-tex">k</annotation></semantics></math>,
+we employed a parametric bootstrap approach to sequentially compare
+models with
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>k</mi><annotation encoding="application/x-tex">k</annotation></semantics></math>
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>k</mi><mo>+</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">k+1</annotation></semantics></math>
+components.</p>
+<p>Let the observed data be denoted by
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>𝐲</mi><mo>=</mo><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>y</mi><mn>1</mn></msub><mo>,</mo><msub><mi>y</mi><mn>2</mn></msub><mo>,</mo><mi>…</mi><mo>,</mo><msub><mi>y</mi><mi>n</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\mathbf{y} = (y_1, y_2, \dots, y_n)</annotation></semantics></math>,
+where each
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>y</mi><mi>i</mi></msub><annotation encoding="application/x-tex">y_i</annotation></semantics></math>
+represents the log mean abundance for the
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>i</mi><mtext mathvariant="normal">th</mtext></msup><annotation encoding="application/x-tex">i^{\text{th}}</annotation></semantics></math>
+taxon. The mixture model with
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>k</mi><annotation encoding="application/x-tex">k</annotation></semantics></math>
+components is given by</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>f</mi><mi>k</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>y</mi><mi>i</mi></msub><mo>∣</mo><msub><mi>𝛉</mi><mi>k</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><munderover><mo>∑</mo><mrow><mi>j</mi><mo>=</mo><mn>1</mn></mrow><mi>k</mi></munderover><msub><mi>π</mi><mrow><mi>j</mi><mo>,</mo><mi>k</mi></mrow></msub><mspace width="0.167em"></mspace><mi>ϕ</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>y</mi><mi>i</mi></msub><mo>∣</mo><msub><mi>μ</mi><mrow><mi>j</mi><mo>,</mo><mi>k</mi></mrow></msub><mo>,</mo><msubsup><mi>σ</mi><mrow><mi>j</mi><mo>,</mo><mi>k</mi></mrow><mn>2</mn></msubsup><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo></mrow><annotation encoding="application/x-tex">f_k(y_i \mid \boldsymbol{\theta}_k) = \sum_{j=1}^{k} \pi_{j,k} \, \phi(y_i \mid \mu_{j,k}, \sigma_{j,k}^2),</annotation></semantics></math></p>
+<p>where
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>π</mi><mrow><mi>j</mi><mo>,</mo><mi>k</mi></mrow></msub><annotation encoding="application/x-tex">\pi_{j,k}</annotation></semantics></math>
+are the mixing proportions satisfying
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mo>∑</mo><mrow><mi>j</mi><mo>=</mo><mn>1</mn></mrow><mi>k</mi></msubsup><msub><mi>π</mi><mrow><mi>j</mi><mo>,</mo><mi>k</mi></mrow></msub><mo>=</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">\sum_{j=1}^{k} \pi_{j,k} = 1</annotation></semantics></math>,
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>ϕ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mo>⋅</mo><mo>∣</mo><mi>μ</mi><mo>,</mo><msup><mi>σ</mi><mn>2</mn></msup><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\phi(\cdot \mid \mu, \sigma^2)</annotation></semantics></math>
+denotes the normal density with mean
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>μ</mi><annotation encoding="application/x-tex">\mu</annotation></semantics></math>
+and variance
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>σ</mi><mn>2</mn></msup><annotation encoding="application/x-tex">\sigma^2</annotation></semantics></math>.</p>
+<p>To test whether adding an additional component improves model fit, we
+formulated the hypotheses as:</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="true" form="prefix">{</mo><mtable><mtr><mtd columnalign="left" style="text-align: left"><msub><mi>H</mi><mn>0</mn></msub><mo>:</mo><mi>𝐲</mi><mo>∼</mo><msub><mi>f</mi><mi>k</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>y</mi><mi>i</mi></msub><mo>∣</mo><msub><mi>𝛉</mi><mi>k</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow></mtd><mtd columnalign="left" style="text-align: left"><mrow><mtext mathvariant="normal">(the data follow a </mtext><mspace width="0.333em"></mspace></mrow><mi>k</mi><mtext mathvariant="normal">-component mixture model)</mtext></mtd></mtr><mtr><mtd columnalign="left" style="text-align: left"><msub><mi>H</mi><mi>a</mi></msub><mo>:</mo><mi>𝐲</mi><mo>∼</mo><msub><mi>f</mi><mrow><mi>k</mi><mo>+</mo><mn>1</mn></mrow></msub><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>y</mi><mi>i</mi></msub><mo>∣</mo><msub><mi>𝛉</mi><mrow><mi>k</mi><mo>+</mo><mn>1</mn></mrow></msub><mo stretchy="true" form="postfix">)</mo></mrow></mtd><mtd columnalign="left" style="text-align: left"><mrow><mtext mathvariant="normal">(the data follow a </mtext><mspace width="0.333em"></mspace></mrow><mrow><mo stretchy="true" form="prefix">(</mo><mi>k</mi><mo>+</mo><mn>1</mn><mo stretchy="true" form="postfix">)</mo></mrow><mtext mathvariant="normal">-component mixture model)</mtext></mtd></mtr></mtable></mrow><annotation encoding="application/x-tex">\begin{cases} H_0: \mathbf{y} \sim f_k(y_i \mid \boldsymbol{\theta}_k) &amp; \text{(the data follow a $k$-component mixture model)} \\[4pt]
+H_a: \mathbf{y} \sim f_{k+1}(y_i \mid \boldsymbol{\theta}_{k+1}) &amp; \text{(the data follow a $(k+1)$-component mixture model)} \end{cases}</annotation></semantics></math></p>
+<p>The test statistic is the likelihood ratio statistic:</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Λ</mi><mo>=</mo><mn>2</mn><mrow><mo stretchy="true" form="prefix">[</mo><msub><mo>ℓ</mo><mrow><mi>k</mi><mo>+</mo><mn>1</mn></mrow></msub><mrow><mo stretchy="true" form="prefix">(</mo><msub><mover><mi>𝛉</mi><mo accent="true">̂</mo></mover><mrow><mi>k</mi><mo>+</mo><mn>1</mn></mrow></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>−</mo><msub><mo>ℓ</mo><mi>k</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><msub><mover><mi>𝛉</mi><mo accent="true">̂</mo></mover><mi>k</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">]</mo></mrow><mo>,</mo></mrow><annotation encoding="application/x-tex">\Lambda = 2 \left[ \ell_{k+1}(\widehat{\boldsymbol{\theta}}_{k+1}) - \ell_{k}(\widehat{\boldsymbol{\theta}}_{k}) \right],</annotation></semantics></math>
+where
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mo>ℓ</mo><mi>k</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><msub><mover><mi>𝛉</mi><mo accent="true">̂</mo></mover><mi>k</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\ell_{k}(\widehat{\boldsymbol{\theta}}_{k})</annotation></semantics></math>
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mo>ℓ</mo><mrow><mi>k</mi><mo>+</mo><mn>1</mn></mrow></msub><mrow><mo stretchy="true" form="prefix">(</mo><msub><mover><mi>𝛉</mi><mo accent="true">̂</mo></mover><mrow><mi>k</mi><mo>+</mo><mn>1</mn></mrow></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\ell_{k+1}(\widehat{\boldsymbol{\theta}}_{k+1})</annotation></semantics></math>
+are the maximized log-likelihoods under the
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>k</mi><annotation encoding="application/x-tex">k</annotation></semantics></math>-
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="true" form="prefix">(</mo><mi>k</mi><mo>+</mo><mn>1</mn><mo stretchy="true" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">(k+1)</annotation></semantics></math>-component
+models, respectively.</p>
+<p>To approximate the null distribution of
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>Λ</mi><annotation encoding="application/x-tex">\Lambda</annotation></semantics></math>,
+we performed a parametric bootstrap using
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>B</mi><mo>=</mo><mn>100</mn></mrow><annotation encoding="application/x-tex">B = 100</annotation></semantics></math>
+bootstrap samples generated under
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>H</mi><mn>0</mn></msub><annotation encoding="application/x-tex">H_0</annotation></semantics></math>.
+For each bootstrap replicate
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>b</mi><mo>=</mo><mn>1</mn><mo>,</mo><mi>…</mi><mo>,</mo><mi>B</mi></mrow><annotation encoding="application/x-tex">b = 1, \dots, B</annotation></semantics></math>,
+data were simulated from the fitted
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>k</mi><annotation encoding="application/x-tex">k</annotation></semantics></math>-component
+model, and both the null and alternative models were re-fitted to obtain
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>Λ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>b</mi><mo stretchy="true" form="postfix">)</mo></mrow></msup><annotation encoding="application/x-tex">\Lambda^{(b)}</annotation></semantics></math>.
+The empirical
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>p</mi><annotation encoding="application/x-tex">p</annotation></semantics></math>-value
+is computed as</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mo>=</mo><mfrac><mn>1</mn><mi>B</mi></mfrac><munderover><mo>∑</mo><mrow><mi>b</mi><mo>=</mo><mn>1</mn></mrow><mi>B</mi></munderover><mi>I</mi><mrow><mo stretchy="true" form="prefix">(</mo><msup><mi>Λ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>b</mi><mo stretchy="true" form="postfix">)</mo></mrow></msup><mo>≥</mo><msub><mi>Λ</mi><mtext mathvariant="normal">obs</mtext></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo></mrow><annotation encoding="application/x-tex">p = \frac{1}{B} \sum_{b=1}^{B} I\left( \Lambda^{(b)} \ge \Lambda_{\text{obs}} \right),</annotation></semantics></math>
+where
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>Λ</mi><mtext mathvariant="normal">obs</mtext></msub><annotation encoding="application/x-tex">\Lambda_{\text{obs}}</annotation></semantics></math>
+is the observed likelihood ratio statistic.</p>
+<p>If
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mo>&lt;</mo><mn>0.05</mn></mrow><annotation encoding="application/x-tex">p &lt; 0.05</annotation></semantics></math>,
+the null hypothesis
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>H</mi><mn>0</mn></msub><annotation encoding="application/x-tex">H_0</annotation></semantics></math>
+is rejected in favor of the
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="true" form="prefix">(</mo><mi>k</mi><mo>+</mo><mn>1</mn><mo stretchy="true" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">(k+1)</annotation></semantics></math>-component
+model. Testing proceeds sequentially for
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>k</mi><mo>=</mo><mn>1</mn><mo>,</mo><mn>2</mn><mo>,</mo><mi>…</mi><mo>,</mo><mn>5</mn></mrow><annotation encoding="application/x-tex">k = 1, 2, \dots, 5</annotation></semantics></math>
+until the
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>p</mi><annotation encoding="application/x-tex">p</annotation></semantics></math>-value
+exceeds the
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>5</mn><mi>%</mi></mrow><annotation encoding="application/x-tex">5\%</annotation></semantics></math>
+significance threshold, at which point the
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>k</mi><annotation encoding="application/x-tex">k</annotation></semantics></math>-component
+model from the last accepted test is selected as the optimal mixture
+size <span class="citation">(Benaglia et al. 2010)</span>.</p>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">logmean</span>    <span class="op">=</span>  <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">rowMeans</a></span><span class="op">(</span><span class="va">filter_data</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">logmeanFit</span> <span class="op">=</span>  <span class="fu"><a href="../reference/logmean_fit.html">logmean_fit</a></span><span class="op">(</span><span class="va">logmean</span>, sig <span class="op">=</span> <span class="fl">0.05</span>,</span>
-<span>                         max.comp <span class="op">=</span> <span class="fl">4</span>, max.boot <span class="op">=</span> <span class="fl">100</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">### function to mute printing out messages about</span></span>
+<span><span class="co">### update on the number of iterations </span></span>
+<span><span class="va">quiet</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">expr</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">out</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/warning.html" class="external-link">suppressWarnings</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressMessages</a></span><span class="op">(</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/utils/capture.output.html" class="external-link">capture.output</a></span><span class="op">(</span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/eval.html" class="external-link">eval.parent</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/substitute.html" class="external-link">substitute</a></span><span class="op">(</span><span class="va">expr</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="va">res</span><span class="op">}</span></span>
+<span></span>
+<span><span class="va">logmeanFit</span> <span class="op">=</span>   <span class="fu">quiet</span><span class="op">(</span><span class="fu"><a href="../reference/logmean_fit.html">logmean_fit</a></span><span class="op">(</span><span class="va">logmean</span>, sig <span class="op">=</span> <span class="fl">0.05</span>,</span>
+<span>                                 max.comp <span class="op">=</span> <span class="fl">4</span>, max.boot <span class="op">=</span> <span class="fl">100</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
 <span><span class="va">logmeanFit</span></span></code></pre></div>
+<pre><code><span><span class="co">## $param</span></span>
+<span><span class="co">##      lambda     sigma         mu</span></span>
+<span><span class="co">## 1 0.1982037 0.1841083 -1.4702824</span></span>
+<span><span class="co">## 2 0.3594970 0.4703611 -0.7892082</span></span>
+<span><span class="co">## 3 0.4422992 1.4529581  1.3381490</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## $components</span></span>
+<span><span class="co">## [1] 3</span></span></code></pre>
+<p><img src="stub_files/figure-html/unnamed-chunk-3-1.png" class="r-plt" width="700"></p>
 </div>
 <div class="section level3">
-<h3 id="fit-dispersions">Fit Dispersions<a class="anchor" aria-label="anchor" href="#fit-dispersions"></a>
+<h3 id="modelling-the-distribution-of-log-fold-change-estimates">Modelling the distribution of log fold change estimates<a class="anchor" aria-label="anchor" href="#modelling-the-distribution-of-log-fold-change-estimates"></a>
 </h3>
-<p><em>We used the package to estimate dispersion for the negative
-binomial model. Dispersion typically varies based on count abundance,
-with rarer taxa exhibiting higher dispersion . To accommodate this
-variability and to simulate dispersion for subsequent power analyses, we
-used a nonlinear function of mean abundance to model the dispersion
-estimates, as implemented in the package:</em></p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable><mtr><mtd columnalign="right" style="text-align: right"><mi>d</mi><mo>=</mo><msub><mi>c</mi><mn>0</mn></msub><mo>+</mo><mfrac><msub><mi>c</mi><mn>1</mn></msub><mi>m</mi></mfrac><mo>,</mo></mtd></mtr></mtable><annotation encoding="application/x-tex">\begin{align} 
-d = c_0 + \frac{c_1}{m},
-\end{align}</annotation></semantics></math> where
+<p>We also modelled log fold change of taxa as a finite mixture of
+Gaussian distributions. Fold change is typically related to mean
+abundance <span class="citation">(Love, Huber, and Anders 2014)</span>;
+therefore, we expressed the mean and standard deviation parameters of
+the individual Gaussian components as functions of log mean abundance.
+Detailed description of the model fitted to log fold changes is
+presented in the paper <a href="https://doi.org/10.1371/journal.pone.0318820" class="external-link">“Investigating
+statistical power of differential abundance studies”</a> <span class="citation">(Agronah and Bolker 2025)</span>.</p>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">logfoldchangeFit</span> <span class="op">&lt;-</span> <span class="fu">quiet</span><span class="op">(</span><span class="fu"><a href="../reference/logfoldchange_fit.html">logfoldchange_fit</a></span><span class="op">(</span><span class="va">logmean</span>,</span>
+<span>                                            <span class="va">logfoldchange</span>,</span>
+<span>                                            ncore <span class="op">=</span> <span class="fl">3</span>,</span>
+<span>                                            max_sd_ord <span class="op">=</span> <span class="fl">2</span>,</span>
+<span>                                            max_np <span class="op">=</span> <span class="fl">5</span>,</span>
+<span>                                            minval <span class="op">=</span> <span class="op">-</span><span class="fl">5</span>,</span>
+<span>                                            maxval <span class="op">=</span> <span class="fl">5</span>,</span>
+<span>                                            itermax <span class="op">=</span> <span class="fl">100</span>,</span>
+<span>                                            NP <span class="op">=</span> <span class="fl">800</span>,</span>
+<span>                                            seed <span class="op">=</span> <span class="fl">100</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">logfoldchangeFit</span></span></code></pre></div>
+<pre><code><span><span class="co">## $par</span></span>
+<span><span class="co">## logitprob_1    mu_int_1    mu_int_2  mu_slope_1  mu_slope_2  logsd_.1_1 </span></span>
+<span><span class="co">## -4.55703267  0.03677531 -1.42836719  0.06345551 -0.81207193 -0.33404343 </span></span>
+<span><span class="co">##  logsd_.1_2  logsd_.L_1  logsd_.L_2  logsd_.Q_1  logsd_.Q_2 </span></span>
+<span><span class="co">##  1.45264954  0.38750859  2.81470432 -0.11822723  0.45802656 </span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## $np</span></span>
+<span><span class="co">## [1] 2</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## $sd_ord</span></span>
+<span><span class="co">## [1] 2</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## $aic</span></span>
+<span><span class="co">## [1] 1779.056</span></span></code></pre>
+</div>
+<div class="section level3">
+<h3 id="modelling-the-dispersion-estimates">Modelling the dispersion estimates<a class="anchor" aria-label="anchor" href="#modelling-the-dispersion-estimates"></a>
+</h3>
+<p>Because dispersion tends to depend on mean count abundance with rarer
+taxa showing greater variability we modeled the dispersion as a
+nonlinear function of the mean, following the approach implemented in
+<code>DESeq2</code>. The nonlinear function is defined by</p>
+<p><span id="disp-eq"></span>
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>d</mi><mo>=</mo><msub><mi>c</mi><mn>0</mn></msub><mo>+</mo><mfrac><msub><mi>c</mi><mn>1</mn></msub><mi>m</mi></mfrac></mrow><annotation encoding="application/x-tex">
+d = c_0 + \frac{c_1}{m}
+</annotation></semantics></math></p>
+<p>where
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>d</mi><annotation encoding="application/x-tex">d</annotation></semantics></math>
 and
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>m</mi><annotation encoding="application/x-tex">m</annotation></semantics></math>
@@ -296,50 +502,67 @@ denote the scaled dispersion and mean abundance respectively. The term
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>c</mi><mn>0</mn></msub><annotation encoding="application/x-tex">c_0</annotation></semantics></math>
 represents the asymptotic dispersion level for high abundance taxa, and
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>c</mi><mn>1</mn></msub><annotation encoding="application/x-tex">c_1</annotation></semantics></math>
-captures additional dispersion variability.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+captures additional dispersion variability. This procedure enables
+estimation of dispersion values corresponding to given mean counts,
+facilitating their use in downstream simulations and power analyses.</p>
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">dispersion</span>    <span class="op">=</span>  <span class="va">foldchange_est</span><span class="op">$</span><span class="va">dispersion</span></span>
-<span><span class="va">dispersionFit</span> <span class="op">=</span>  <span class="fu"><a href="../reference/dispersion_fit.html">dispersion_fit</a></span><span class="op">(</span><span class="va">dispersion</span>, <span class="va">logmean</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">dispersionFit</span> <span class="op">=</span>  <span class="fu"><a href="../reference/dispersion_fit.html">dispersion_fit</a></span><span class="op">(</span><span class="va">dispersion</span>, <span class="va">logmean</span><span class="op">)</span></span>
+<span><span class="va">dispersionFit</span><span class="op">$</span><span class="va">param</span></span></code></pre></div>
+<pre><code><span><span class="co">##   asymptDisp extraPois</span></span>
+<span><span class="co">## 1   18.12243  2.597064</span></span></code></pre>
 </div>
 <div class="section level3">
-<h3 id="fit-log-fold-change">Fit log fold change<a class="anchor" aria-label="anchor" href="#fit-log-fold-change"></a>
+<h3 id="simulate-count-microbiome-data">Simulate count microbiome data<a class="anchor" aria-label="anchor" href="#simulate-count-microbiome-data"></a>
 </h3>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co">## Fit foldchange from Deseq</span></span>
-<span><span class="va">logfoldchangeFit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/logfoldchange_fit.html">logfoldchange_fit</a></span><span class="op">(</span><span class="va">logmean</span>,</span>
-<span>                                       <span class="va">logfoldchange</span>,</span>
-<span>                                       ncore <span class="op">=</span> <span class="fl">3</span>,</span>
-<span>                                       max_sd_ord <span class="op">=</span> <span class="fl">2</span>,</span>
-<span>                                       max_np <span class="op">=</span> <span class="fl">5</span>,</span>
-<span>                                       minval <span class="op">=</span> <span class="op">-</span><span class="fl">5</span>,</span>
-<span>                                       maxval <span class="op">=</span> <span class="fl">5</span>,</span>
-<span>                                       itermax <span class="op">=</span> <span class="fl">100</span>,</span>
-<span>                                       NP <span class="op">=</span> <span class="fl">800</span>,</span>
-<span>                                       seed <span class="op">=</span> <span class="fl">100</span><span class="op">)</span></span></code></pre></div>
-</div>
-<div class="section level3">
-<h3 id="simulate-count-data">Simulate count data<a class="anchor" aria-label="anchor" href="#simulate-count-data"></a>
-</h3>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co">### Simulated log mean count and log foldchange using the fitted parameters</span></span>
+<p>To simulate microbiome data, we first simulate log mean counts and
+corresponding log fold changes. The simulated log mean counts represent
+overall log mean counts (ie, log of the arithmetic mean of the counts in
+all of treatment and control groups). We then use the simulated log mean
+count to estimate corresponding dispersion values for each sample
+through the fitted nonlinear function described in the equation <a href="#disp-eq">here</a> (<a href="#modelling-the-distribution-of-log-fold-changes">see section on
+Modelling the Distribution of Log Fold Changes</a>). Using the simulated
+log mean counts and fold changes, we now compute the group specific mean
+counts (ie, mean counts of taxa for control group and mean count of taxa
+for treatment group). We then simulate microbiome count data from the
+negative binomial distribution using the group specific mean counts and
+the estimated dispersion values.</p>
+<div class="section level4">
+<h4 id="simulate-log-mean-count-and-log-fold-change">Simulate log mean count and log fold change<a class="anchor" aria-label="anchor" href="#simulate-log-mean-count-and-log-fold-change"></a>
+</h4>
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co">### Simulated log mean count and log foldchange from the fitted </span></span>
+<span><span class="co">### log mean count and log foldchange models</span></span>
 <span></span>
-<span><span class="va">logmean_param</span>       <span class="op">=</span>  <span class="va">logmeanFit</span><span class="op">$</span><span class="va">logmean_param</span></span>
+<span><span class="va">logmean_param</span>       <span class="op">=</span>  <span class="va">logmeanFit</span><span class="op">$</span><span class="va">param</span></span>
 <span><span class="va">logfoldchange_param</span> <span class="op">=</span>  <span class="va">logfoldchangeFit</span></span>
 <span></span>
 <span><span class="va">notu</span>  <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/dim.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">filter_data</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span></span>
-<span><span class="va">logmean_sim</span>  <span class="op">=</span>  <span class="fu"><a href="../reference/logmean_sim_fun.html">logmean_sim_fun</a></span><span class="op">(</span><span class="va">logmean_param</span>, <span class="va">notu</span><span class="op">)</span></span>
+<span><span class="va">notu</span></span></code></pre></div>
+<pre><code><span><span class="co">## [1] 903</span></span></code></pre>
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">logmean_sim</span>  <span class="op">=</span>  <span class="fu"><a href="../reference/logmean_sim_fun.html">logmean_sim_fun</a></span><span class="op">(</span><span class="va">logmean_param</span>, <span class="va">notu</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">logfoldchange_sim</span>  <span class="op">=</span>  <span class="fu"><a href="../reference/logfoldchange_sim_fun.html">logfoldchange_sim_fun</a></span><span class="op">(</span>logmean_sim <span class="op">=</span> <span class="va">logmean_sim</span>,</span>
 <span>                                            logfoldchange_param <span class="op">=</span> </span>
 <span>                                            <span class="va">logfoldchange_param</span>,</span>
 <span>                                            max_lfc  <span class="op">=</span> <span class="fl">15</span>,</span>
-<span>                                            max_iter <span class="op">=</span> <span class="fl">30000</span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">ntreat</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">metadata</span><span class="op">$</span><span class="va">Groups</span> <span class="op">==</span> <span class="st">"Fire"</span><span class="op">)</span></span>
-<span><span class="va">ncont</span>  <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">metadata</span><span class="op">$</span><span class="va">Groups</span> <span class="op">==</span> <span class="st">"Control"</span><span class="op">)</span></span>
+<span>                                            max_iter <span class="op">=</span> <span class="fl">30000</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">logfoldchange_sim</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## [1]  1.67394732 -0.72483152  0.09834296  0.73556137 -0.13028789 -0.51072261</span></span></code></pre>
+</div>
+<div class="section level4">
+<h4 id="simulate-counts-from-the-negative-binomial-distribution">Simulate counts from the negative binomial distribution<a class="anchor" aria-label="anchor" href="#simulate-counts-from-the-negative-binomial-distribution"></a>
+</h4>
+<p>Estimating the dispersion values is done internally within the
+<code>countdata_sim_fun</code> function.</p>
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">nsim</span> <span class="op">=</span> <span class="fl">4</span></span>
+<span><span class="va">ntreat</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">metadata</span><span class="op">$</span><span class="va">Groups</span> <span class="op">==</span> <span class="st">"OB"</span><span class="op">)</span></span>
+<span><span class="va">ncont</span>  <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">metadata</span><span class="op">$</span><span class="va">Groups</span> <span class="op">==</span> <span class="st">"H"</span><span class="op">)</span></span>
 <span><span class="va">dispersion_param</span>  <span class="op">=</span>  <span class="va">dispersionFit</span><span class="op">$</span><span class="va">param</span></span>
 <span></span>
-<span><span class="va">nsim</span> <span class="op">=</span> <span class="fl">100</span></span>
 <span><span class="va">countdata_sims</span> <span class="op">=</span> <span class="fu"><a href="../reference/countdata_sim_fun.html">countdata_sim_fun</a></span><span class="op">(</span><span class="va">logmean_param</span>,</span>
 <span>                                   <span class="va">logfoldchange_param</span>,</span>
 <span>                                   <span class="va">dispersion_param</span>,</span>
@@ -348,90 +571,267 @@ captures additional dispersion variability.</p>
 <span>                                   ntreat <span class="op">=</span> <span class="va">ntreat</span>,</span>
 <span>                                   <span class="va">notu</span>,</span>
 <span>                                   nsim <span class="op">=</span> <span class="va">nsim</span>,</span>
-<span>                                   disp_scale <span class="op">=</span> <span class="fl">0.3</span>,</span>
+<span>                                   disp_scale <span class="op">=</span> <span class="fl">0.7</span>,</span>
 <span>                                   max_lfc <span class="op">=</span> <span class="fl">15</span>,</span>
 <span>                                   maxlfc_iter <span class="op">=</span> <span class="fl">1000</span>,</span>
-<span>                                   seed <span class="op">=</span> <span class="fl">121</span><span class="op">)</span></span>
-<span></span>
-<span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/dim.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">countdata_sims</span><span class="op">$</span><span class="va">treat_countdata_list</span><span class="op">$</span><span class="va">sim_1</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/dim.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">countdata_sims</span><span class="op">$</span><span class="va">control_countdata_list</span><span class="op">$</span><span class="va">sim_1</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/dim.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">countdata_sims</span><span class="op">$</span><span class="va">countdata_list</span><span class="op">$</span><span class="va">sim_1</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/dim.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">countdata_sims</span><span class="op">$</span><span class="va">metadata_list</span><span class="op">$</span><span class="va">sim_1</span><span class="op">)</span></span>
-<span></span>
-<span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">countdata_sims</span><span class="op">$</span><span class="va">logfoldchange_list</span><span class="op">$</span><span class="va">sim_1</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">countdata_sims</span><span class="op">$</span><span class="va">logmean_list</span><span class="op">$</span><span class="va">sim_1</span><span class="op">)</span></span>
-<span><span class="co">###############################################################</span></span></code></pre></div>
+<span>                                   seed <span class="op">=</span> <span class="fl">121</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## mixtools package, version 2.0.0.1, Released 2022-12-04</span></span>
+<span><span class="co">## This package is based upon work supported by the National Science Foundation under Grant No. SES-0518772 and the Chan Zuckerberg Initiative: Essential Open Source Software for Science (Grant No. 2020-255193).</span></span></code></pre>
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">countdata_sim_fun</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## NULL</span></span></code></pre>
+<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/dim.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">countdata_sims</span><span class="op">$</span><span class="va">treat_countdata_list</span><span class="op">$</span><span class="va">sim_1</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## [1] 903  31</span></span></code></pre>
+<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/dim.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">countdata_sims</span><span class="op">$</span><span class="va">control_countdata_list</span><span class="op">$</span><span class="va">sim_1</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## [1] 903  21</span></span></code></pre>
+<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/dim.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">countdata_sims</span><span class="op">$</span><span class="va">countdata_list</span><span class="op">$</span><span class="va">sim_1</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## [1] 903  52</span></span></code></pre>
+<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/dim.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">countdata_sims</span><span class="op">$</span><span class="va">metadata_list</span><span class="op">$</span><span class="va">sim_1</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## [1] 52  2</span></span></code></pre>
+<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">countdata_sims</span><span class="op">$</span><span class="va">logfoldchange_list</span><span class="op">$</span><span class="va">sim_1</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## [1] 903</span></span></code></pre>
+<div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">countdata_sims</span><span class="op">$</span><span class="va">logmean_list</span><span class="op">$</span><span class="va">sim_1</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## [1] 903</span></span></code></pre>
+</div>
 <div class="section level4">
-<h4 id="compare-simulation-with-the-data">Compare Simulation with the data<a class="anchor" aria-label="anchor" href="#compare-simulation-with-the-data"></a>
+<h4 id="comparing-the-distributions-between-simulated-count-d-of-mean-count-and-fold-change-from-simulation-with-actual-data">Comparing the distributions between simulated count d of mean count
+and fold change from simulation with actual data<a class="anchor" aria-label="anchor" href="#comparing-the-distributions-between-simulated-count-d-of-mean-count-and-fold-change-from-simulation-with-actual-data"></a>
 </h4>
-<p>log mean count and log fold change from simulation with data</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">dd</span>  <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>logmean  <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">logmean</span>,</span>
-<span>                              <span class="va">countdata_sims</span><span class="op">$</span><span class="va">logmean_list</span><span class="op">$</span><span class="va">sim_1</span><span class="op">)</span>,</span>
-<span>                 logfoldchange  <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">foldchange_est</span><span class="op">$</span><span class="va">logfoldchange</span>,</span>
-<span>                                  <span class="va">countdata_sims</span><span class="op">$</span><span class="va">logfoldchange_list</span><span class="op">$</span><span class="va">sim_1</span><span class="op">)</span>,</span>
-<span>                 type  <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"observation"</span>,<span class="st">"simulation"</span><span class="op">)</span>, each <span class="op">=</span> <span class="va">notu</span><span class="op">)</span> <span class="op">)</span></span>
+<p>We compare the following comparisions bettween our simulation and the
+actual dataset</p>
+<ul>
+<li><p>we come distribution of variances of counts of taxa and</p></li>
+<li><p>the means of taxa from out simulation with those of the actual
+dataset</p></li>
+</ul>
+<div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://renkun-ken.github.io/rlist/" class="external-link">rlist</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://www.stefanom.io/latex2exp/" class="external-link">latex2exp</a></span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">p1</span> <span class="op">=</span> <span class="fu">ggplot</span><span class="op">(</span><span class="va">dd</span>, <span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">logmean</span>, group <span class="op">=</span> <span class="va">type</span>, colour <span class="op">=</span> <span class="va">type</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">geom_density</span><span class="op">(</span><span class="op">)</span>  <span class="op">+</span></span>
-<span>  <span class="fu">theme_bw</span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">p2</span> <span class="op">=</span> <span class="fu">ggplot</span><span class="op">(</span><span class="va">dd</span>, <span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">logfoldchange</span>, group <span class="op">=</span> <span class="va">type</span>, colour <span class="op">=</span> <span class="va">type</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">geom_density</span><span class="op">(</span><span class="op">)</span>  <span class="op">+</span></span>
-<span>  <span class="fu">theme_bw</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co"># means</span></span>
+<span><span class="va">dd_mean</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>value <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/apply.html" class="external-link">apply</a></span><span class="op">(</span><span class="va">countdata_sims</span><span class="op">$</span><span class="va">countdata_list</span><span class="op">$</span><span class="va">sim_1</span>, <span class="fl">1</span>, <span class="va">mean</span><span class="op">)</span>,</span>
+<span>             type <span class="op">=</span> <span class="st">"simulation"</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>value <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/apply.html" class="external-link">apply</a></span><span class="op">(</span><span class="va">filter_data</span>, <span class="fl">1</span>, <span class="va">mean</span><span class="op">)</span>,</span>
+<span>             type <span class="op">=</span> <span class="st">"observation"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
 <span></span>
-<span><span class="op">(</span><span class="va">p1</span><span class="op">|</span><span class="va">p2</span><span class="op">)</span> <span class="op">+</span> <span class="fu">plot_layout</span><span class="op">(</span>guides <span class="op">=</span> <span class="st">"collect"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">p1_</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">dd_mean</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">value</span> <span class="op">+</span> <span class="fl">1e-8</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_density.html" class="external-link">geom_density</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>colour <span class="op">=</span> <span class="va">type</span><span class="op">)</span>, linewidth <span class="op">=</span> <span class="fl">1.2</span>,</span>
+<span>               data <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">dd_mean</span>, <span class="va">type</span> <span class="op">==</span> <span class="st">"simulation"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_density.html" class="external-link">geom_density</a></span><span class="op">(</span>linetype <span class="op">=</span> <span class="st">"dashed"</span>, colour <span class="op">=</span> <span class="st">"black"</span>, linewidth <span class="op">=</span> <span class="fl">1.2</span>,</span>
+<span>               data <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">dd_mean</span>, <span class="va">type</span> <span class="op">==</span> <span class="st">"observation"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_bw</a></span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># variances</span></span>
+<span><span class="va">dd_var</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>value <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/apply.html" class="external-link">apply</a></span><span class="op">(</span><span class="va">countdata_sims</span><span class="op">$</span><span class="va">countdata_list</span><span class="op">$</span><span class="va">sim_1</span>, <span class="fl">1</span>, <span class="va">var</span><span class="op">)</span>,</span>
+<span>             type <span class="op">=</span> <span class="st">"simulation"</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>value <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/apply.html" class="external-link">apply</a></span><span class="op">(</span><span class="va">filter_data</span>, <span class="fl">1</span>, <span class="va">var</span><span class="op">)</span>,</span>
+<span>             type <span class="op">=</span> <span class="st">"observation"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">p2_</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">dd_var</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">value</span> <span class="op">+</span> <span class="fl">1e-8</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_density.html" class="external-link">geom_density</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>colour <span class="op">=</span> <span class="va">type</span><span class="op">)</span>, linewidth <span class="op">=</span> <span class="fl">1.2</span>,</span>
+<span>               data <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">dd_var</span>, <span class="va">type</span> <span class="op">==</span> <span class="st">"simulation"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_density.html" class="external-link">geom_density</a></span><span class="op">(</span>linetype <span class="op">=</span> <span class="st">"dashed"</span>, colour <span class="op">=</span> <span class="st">"black"</span>, linewidth <span class="op">=</span> <span class="fl">1.2</span>,</span>
+<span>               data <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">dd_var</span>, <span class="va">type</span> <span class="op">==</span> <span class="st">"observation"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_bw</a></span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="op">(</span><span class="va">p1_</span> <span class="op">|</span> <span class="va">p2_</span><span class="op">)</span> <span class="op">+</span> <span class="fu">patchwork</span><span class="fu">::</span><span class="fu"><a href="https://patchwork.data-imaginist.com/reference/plot_layout.html" class="external-link">plot_layout</a></span><span class="op">(</span>guides <span class="op">=</span> <span class="st">"collect"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="stub_files/figure-html/unnamed-chunk-8-1.png" class="r-plt" width="700"></p>
+<div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">pp1</span><span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/apply.html" class="external-link">apply</a></span><span class="op">(</span><span class="va">countdata_sims</span><span class="op">$</span><span class="va">countdata_list</span><span class="op">$</span><span class="va">sim_1</span>, <span class="fl">1</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">{</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">}</span><span class="op">)</span></span>
+<span><span class="va">pp2</span><span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/apply.html" class="external-link">apply</a></span><span class="op">(</span><span class="va">filter_data</span>, <span class="fl">1</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">{</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">}</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">pp11</span><span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/apply.html" class="external-link">apply</a></span><span class="op">(</span><span class="va">countdata_sims</span><span class="op">$</span><span class="va">countdata_list</span><span class="op">$</span><span class="va">sim_1</span>, <span class="fl">1</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">{</span><span class="fu"><a href="https://rdrr.io/r/stats/cor.html" class="external-link">var</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">}</span><span class="op">)</span></span>
+<span><span class="va">pp21</span><span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/apply.html" class="external-link">apply</a></span><span class="op">(</span><span class="va">filter_data</span>, <span class="fl">1</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">{</span><span class="fu"><a href="https://rdrr.io/r/stats/cor.html" class="external-link">var</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">}</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">dd_</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>mean <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">pp2</span><span class="op">)</span>,<span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">pp1</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>                 var <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">pp21</span><span class="op">)</span>,<span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">pp11</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>                type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"observation"</span>,<span class="st">"simulation"</span><span class="op">)</span>, each <span class="op">=</span> <span class="va">notu</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span></span>
+<span><span class="va">p1_</span> <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">dd_</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">mean</span><span class="op">)</span>, group <span class="op">=</span> <span class="va">type</span>, colour <span class="op">=</span> <span class="va">type</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_density.html" class="external-link">geom_density</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_bw</a></span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">p2_</span> <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">dd_</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">var</span><span class="op">)</span>, group <span class="op">=</span> <span class="va">type</span>, colour <span class="op">=</span> <span class="va">type</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_density.html" class="external-link">geom_density</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_bw</a></span><span class="op">(</span><span class="op">)</span></span>
+<span>                 </span>
+<span><span class="op">(</span><span class="va">p1_</span><span class="op">|</span><span class="va">p2_</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://patchwork.data-imaginist.com/reference/plot_layout.html" class="external-link">plot_layout</a></span><span class="op">(</span>guides <span class="op">=</span> <span class="st">"collect"</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## Warning: Removed 1 row containing non-finite outside the scale range (`stat_density()`).</span></span>
+<span><span class="co">## Removed 1 row containing non-finite outside the scale range (`stat_density()`).</span></span></code></pre>
+<p><img src="stub_files/figure-html/unnamed-chunk-8-2.png" class="r-plt" width="700"></p>
+<div class="sourceCode" id="cb43"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">compare_dataset</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">countdata_sim_list</span>,<span class="va">countdata_obs</span>,<span class="va">method</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"var"</span>, <span class="st">"mean"</span><span class="op">)</span><span class="op">)</span><span class="op">{</span></span>
+<span>  </span>
+<span>  <span class="co"># Check if method is either "var" or "mean"</span></span>
+<span>  <span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="op">(</span><span class="va">method</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"var"</span>, <span class="st">"mean"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="kw"><a href="https://rdrr.io/r/base/stop.html" class="external-link">stop</a></span><span class="op">(</span><span class="st">"Invalid method. Please choose either 'var' or 'mean'."</span><span class="op">)</span></span>
+<span>  <span class="op">}</span></span>
+<span>  </span>
+<span>  <span class="co"># Calculate variance or mean based on the chosen method</span></span>
+<span>  <span class="kw">if</span> <span class="op">(</span><span class="va">method</span> <span class="op">==</span> <span class="st">"var"</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="va">calc_func</span> <span class="op">&lt;-</span> <span class="fu">stats</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/r/stats/cor.html" class="external-link">var</a></span></span>
+<span>    <span class="va">xlab_text</span> <span class="op">&lt;-</span> <span class="st">"$\\log$(variance of taxa)"</span></span>
+<span>  <span class="op">}</span> <span class="kw">else</span> <span class="op">{</span></span>
+<span>    <span class="va">calc_func</span> <span class="op">&lt;-</span> <span class="va">mean</span></span>
+<span>    <span class="va">xlab_text</span> <span class="op">&lt;-</span> <span class="st">"$\\log$(mean of taxa)"</span></span>
+<span>  <span class="op">}</span></span>
+<span>  </span>
+<span>  <span class="co"># Create a list combining simulation data and observed data</span></span>
+<span>  <span class="va">dlist</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/rlist/man/list.append.html" class="external-link">list.append</a></span><span class="op">(</span><span class="va">countdata_sim_list</span>, obs_filt <span class="op">=</span> <span class="va">countdata_obs</span><span class="op">)</span></span>
+<span>  </span>
+<span>  <span class="co"># Calculate variance or mean for each dataset in the list</span></span>
+<span>  <span class="va">vars</span> <span class="op">&lt;-</span> <span class="va">dlist</span> <span class="op">|&gt;</span> <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map</a></span><span class="op">(</span><span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/apply.html" class="external-link">apply</a></span><span class="op">(</span><span class="va">.</span>, <span class="fl">1</span>, <span class="va">calc_func</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map_dfr.html" class="external-link">map_dfr</a></span><span class="op">(</span><span class="op">~</span> <span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span>var <span class="op">=</span> <span class="va">.</span><span class="op">)</span>, .id <span class="op">=</span> <span class="st">"type"</span><span class="op">)</span></span>
+<span>  </span>
+<span>  <span class="co"># Separate observed and simulated data</span></span>
+<span>  <span class="va">vars_obs</span> <span class="op">&lt;-</span> <span class="va">vars</span><span class="op">[</span><span class="va">vars</span><span class="op">$</span><span class="va">type</span> <span class="op">==</span> <span class="st">"obs_filt"</span>, <span class="op">]</span></span>
+<span>  <span class="va">vars_sim</span> <span class="op">&lt;-</span> <span class="va">vars</span><span class="op">[</span><span class="va">vars</span><span class="op">$</span><span class="va">type</span> <span class="op">!=</span> <span class="st">"obs_filt"</span>, <span class="op">]</span></span>
+<span>  </span>
+<span>  <span class="co"># Create ggplot for visualization</span></span>
+<span>  <span class="va">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">vars_sim</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">var</span><span class="op">)</span>, colour <span class="op">=</span> <span class="va">type</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_density.html" class="external-link">geom_density</a></span><span class="op">(</span>lwd <span class="op">=</span> <span class="fl">1.5</span><span class="op">)</span> <span class="op">+</span></span>
+<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_density.html" class="external-link">geom_density</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">vars_obs</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">var</span><span class="op">)</span><span class="op">)</span>, </span>
+<span>                 colour <span class="op">=</span> <span class="st">"black"</span>, linetype <span class="op">=</span> <span class="st">"dashed"</span>, lwd <span class="op">=</span> <span class="fl">1.5</span><span class="op">)</span> <span class="op">+</span></span>
+<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">xlab</a></span><span class="op">(</span><span class="fu"><a href="https://www.stefanom.io/latex2exp/reference/TeX.html" class="external-link">TeX</a></span><span class="op">(</span><span class="va">xlab_text</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_bw</a></span><span class="op">(</span><span class="op">)</span></span>
+<span>  </span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">p</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span>                                   </span>
+<span><span class="va">countdata_sim_list</span> <span class="op">=</span>  <span class="va">countdata_sims</span><span class="op">$</span><span class="va">countdata_list</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span></span>
+<span><span class="va">countdata_obs</span>      <span class="op">=</span>  <span class="va">filter_data</span></span>
+<span><span class="va">p11</span> <span class="op">=</span> <span class="fu">compare_dataset</span><span class="op">(</span><span class="va">countdata_sim_list</span>,<span class="va">countdata_obs</span>,method <span class="op">=</span> <span class="st">"mean"</span><span class="op">)</span></span>
+<span><span class="va">p12</span> <span class="op">=</span> <span class="fu">compare_dataset</span><span class="op">(</span><span class="va">countdata_sim_list</span>,<span class="va">countdata_obs</span>,method <span class="op">=</span> <span class="st">"var"</span><span class="op">)</span></span>
+<span><span class="op">(</span><span class="va">p11</span><span class="op">|</span><span class="va">p12</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://patchwork.data-imaginist.com/reference/plot_layout.html" class="external-link">plot_layout</a></span><span class="op">(</span>guides <span class="op">=</span> <span class="st">"collect"</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## Warning: Removed 1 row containing non-finite outside the scale range (`stat_density()`).</span></span>
+<span><span class="co">## Removed 1 row containing non-finite outside the scale range (`stat_density()`).</span></span></code></pre>
+<p><img src="stub_files/figure-html/unnamed-chunk-8-3.png" class="r-plt" width="700"></p>
+<div class="sourceCode" id="cb45"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/dim.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">countdata_obs</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## [1] 903  52</span></span></code></pre>
 </div>
 </div>
+</div>
+<div class="section level2">
+<h2 id="estimating-statistical-power-for-individual-taxa">Estimating Statistical Power for Individual Taxa<a class="anchor" aria-label="anchor" href="#estimating-statistical-power-for-individual-taxa"></a>
+</h2>
+<p>We estimate statistical power for a given taxon as the probability of
+rejecting the null hypothesis that the mean abundance in the control and
+treatment groups are the same for that given taxon. To estimate
+statistical power for various combinations of log mean abundance and log
+fold change, we fitted a shape-constrained generalized additive model
+(GAM) <span class="citation">(Pya and Wood 2015)</span>. The event that
+a given taxon is significantly different between groups is treated as a
+Bernoulli trial. The model predicting statistical power as a function of
+log fold change and log mean abundance is given by:</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable><mtr><mtd columnalign="right" style="text-align: right"><mi>y</mi></mtd><mtd columnalign="left" style="text-align: left"><mo>∼</mo><mtext mathvariant="normal">Bernoulli</mtext><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>p</mi><mi>i</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right"><msub><mi>p</mi><mi>i</mi></msub></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><mfrac><mn>1</mn><mrow><mn>1</mn><mo>+</mo><msup><mi>e</mi><mrow><mo>−</mo><mi>η</mi></mrow></msup></mrow></mfrac></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right"><mi>η</mi></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><msub><mi>β</mi><mn>0</mn></msub><mo>+</mo><msub><mi>f</mi><mn>1</mn></msub><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>x</mi><mn>1</mn></msub><mo>,</mo><msub><mi>x</mi><mn>2</mn></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>+</mo><mi>ϵ</mi><mo>,</mo></mtd></mtr></mtable><annotation encoding="application/x-tex">\begin{align}
+y &amp;\sim \text{Bernoulli}(p_i) \\
+p_i &amp;= \frac{1}{1 + e^{-\eta}} \\
+\eta &amp;= \beta_0 + f_1(x_1, x_2) + \epsilon,
+\end{align}</annotation></semantics></math></p>
+<p>where:</p>
+<ul>
+<li>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>y</mi><annotation encoding="application/x-tex">y</annotation></semantics></math>
+is a binary value (1 if the p-value was below the critical threshold,
+and 0 otherwise);</li>
+<li>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>p</mi><mi>i</mi></msub><annotation encoding="application/x-tex">p_i</annotation></semantics></math>
+is the estimated statistical power for taxon
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>;</li>
+<li>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>β</mi><mn>0</mn></msub><annotation encoding="application/x-tex">\beta_0</annotation></semantics></math>
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>ϵ</mi><annotation encoding="application/x-tex">\epsilon</annotation></semantics></math>
+are the intercept and error terms, respectively;</li>
+<li>The predictors
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>x</mi><mn>1</mn></msub><annotation encoding="application/x-tex">x_1</annotation></semantics></math>
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>x</mi><mn>2</mn></msub><annotation encoding="application/x-tex">x_2</annotation></semantics></math>
+represent log mean abundance and log fold change, respectively;</li>
+<li>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>f</mi><mn>1</mn></msub><mrow><mo stretchy="true" form="prefix">(</mo><mo>⋅</mo><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">f_1(\cdot)</annotation></semantics></math>
+is a two-dimensional smoothing surface, generated using a tensor product
+smooth of log mean abundance and log fold change.</li>
+</ul>
+<p>Power and fold change are positively correlated. Additionally, effect
+sizes of highly abundant taxa are more likely to be detected—hence
+having higher power—than those of rare taxa. To account for these
+relationships, the function
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>f</mi><mn>1</mn></msub><annotation encoding="application/x-tex">f_1</annotation></semantics></math>
+was constrained to be a monotonically increasing function of both log
+mean abundance and log fold change.</p>
+<p>We used the <code>DESeq2</code> package to compute p-values for each
+taxon, applying the Benjamini and Hochberg method for false discovery
+rate (FDR) correction. We used the default critical p-value threshold of
+0.1 in the <code>DESeq2</code> package.</p>
+<p>The follow steps outlines the power estimation procedure:</p>
 <div class="section level3">
-<h3 id="estimate-p-values-associated-to-fold-changes-for-each-taxa">Estimate p-values associated to fold changes for each taxa<a class="anchor" aria-label="anchor" href="#estimate-p-values-associated-to-fold-changes-for-each-taxa"></a>
+<h3 id="estimate-p-values-associated-with-simulated-fold-changes">Estimate p-values associated with simulated fold changes<a class="anchor" aria-label="anchor" href="#estimate-p-values-associated-with-simulated-fold-changes"></a>
 </h3>
-<p>We now run each simulated count adata to the to calculate pvalues
-associated to each foldchanes for each taxa. ]</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co">###############################################################</span></span>
-<span><span class="va">countdata_list</span>  <span class="op">=</span>   <span class="va">countdata_sims</span><span class="op">$</span><span class="va">countdata_list</span></span>
+<p>To train the GAM on a sufficiently large sample size, we generate
+multiple microbiome count datasets following the procedure described in
+the section <a href="#simulate-count-microbiome-data">Simulate count
+microbiome data</a>. We then estimate p-values associated with the
+simulated fold changes using the <code>DESeq2</code> package.</p>
+<div class="sourceCode" id="cb47"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">countdata_list</span>  <span class="op">=</span>   <span class="va">countdata_sims</span><span class="op">$</span><span class="va">countdata_list</span></span>
 <span><span class="va">metadata_list</span>   <span class="op">=</span>   <span class="va">countdata_sims</span><span class="op">$</span><span class="va">metadata_list</span></span>
-<span><span class="va">desq_est</span>   <span class="op">=</span>   <span class="fu"><a href="../reference/deseq_fun_est.html">deseq_fun_est</a></span><span class="op">(</span>metadata_list <span class="op">=</span>  <span class="va">metadata_list</span>,</span>
+<span><span class="va">desq_est</span>   <span class="op">=</span>   <span class="fu">quiet</span><span class="op">(</span><span class="fu"><a href="../reference/deseq_fun_est.html">deseq_fun_est</a></span><span class="op">(</span>metadata_list <span class="op">=</span>  <span class="va">metadata_list</span>,</span>
 <span>                            countdata_list <span class="op">=</span>  <span class="va">countdata_list</span>,</span>
 <span>                            alpha_level    <span class="op">=</span>  <span class="fl">0.1</span>,</span>
 <span>                            group_colname  <span class="op">=</span> <span class="st">"Groups"</span>,</span>
 <span>                            sample_colname <span class="op">=</span> <span class="st">"Samples"</span>,</span>
 <span>                            num_cores      <span class="op">=</span>  <span class="fl">4</span>,</span>
-<span>                            ref_name       <span class="op">=</span> <span class="st">"control"</span><span class="op">)</span></span>
-<span><span class="co">###############################################################</span></span>
-<span><span class="va">true_lmean_list</span>    <span class="op">=</span>    <span class="va">countdata_sims</span><span class="op">$</span><span class="va">logmean_list</span></span>
-<span><span class="va">deseq_est_list</span>     <span class="op">=</span>    <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">desq_est</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">{</span><span class="va">x</span><span class="op">$</span><span class="va">deseq_estimate</span><span class="op">}</span><span class="op">)</span></span>
-<span><span class="va">true_lfoldchange_list</span> <span class="op">=</span> <span class="va">countdata_sims</span><span class="op">$</span><span class="va">logfoldchange_list</span></span>
-<span><span class="co">###############################################################</span></span></code></pre></div>
+<span>                            ref_name       <span class="op">=</span> <span class="st">"control"</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">desq_est</span><span class="op">$</span><span class="va">sim_1</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## [1] "logfoldchange"  "dispersion"     "deseq_estimate" "deseq_object"  </span></span>
+<span><span class="co">## [5] "metadata"       "countdata"</span></span></code></pre>
+<div class="sourceCode" id="cb49"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">deseq_est_list</span>     <span class="op">=</span>    <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">desq_est</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">{</span><span class="va">x</span><span class="op">$</span><span class="va">deseq_estimate</span><span class="op">}</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
-<h3 id="fit-generalized-additive-model-gam-for-power-estimation">Fit Generalized Additive Model (GAM) for power estimation<a class="anchor" aria-label="anchor" href="#fit-generalized-additive-model-gam-for-power-estimation"></a>
+<h3 id="fitting-the-generalized-additive-model-gam">Fitting the Generalized Additive Model (GAM)<a class="anchor" aria-label="anchor" href="#fitting-the-generalized-additive-model-gam"></a>
 </h3>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">gamFit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/gam_fit.html">gam_fit</a></span><span class="op">(</span><span class="va">deseq_est_list</span>,</span>
+<p>We now fit the GAM for predicting statistical power for individual
+taxon.</p>
+<div class="sourceCode" id="cb50"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">true_lmean_list</span>       <span class="op">=</span>    <span class="va">countdata_sims</span><span class="op">$</span><span class="va">logmean_list</span></span>
+<span><span class="va">true_lfoldchange_list</span> <span class="op">=</span>    <span class="va">countdata_sims</span><span class="op">$</span><span class="va">logfoldchange_list</span></span>
+<span></span>
+<span><span class="va">gamFit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/gam_fit.html">gam_fit</a></span><span class="op">(</span><span class="va">deseq_est_list</span>,</span>
 <span>                  <span class="va">true_lfoldchange_list</span>,</span>
 <span>                  <span class="va">true_lmean_list</span>,</span>
 <span>                  grid_len <span class="op">=</span> <span class="fl">50</span>,</span>
 <span>                  alpha_level<span class="op">=</span><span class="fl">0.1</span><span class="op">)</span></span>
-<span>  </span>
 <span></span>
-<span><span class="va">cont_breaks</span>     <span class="op">=</span>  <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>,<span class="fl">1</span>,<span class="fl">0.1</span><span class="op">)</span></span>
+<span><span class="co">#plot(gamFit$fit_2d)</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="contour-plot-showing-power-for-various-combinations-of-mean-abundance-and-fold-change">Contour plot showing power for various combinations of mean
+abundance and fold change<a class="anchor" aria-label="anchor" href="#contour-plot-showing-power-for-various-combinations-of-mean-abundance-and-fold-change"></a>
+</h3>
+<div class="sourceCode" id="cb51"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">cont_breaks</span>     <span class="op">=</span>  <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>,<span class="fl">1</span>,<span class="fl">0.1</span><span class="op">)</span></span>
 <span><span class="va">combined_data</span>   <span class="op">=</span>  <span class="va">gamFit</span><span class="op">$</span><span class="va">combined_data</span></span>
 <span><span class="va">power_estimate</span>  <span class="op">=</span>  <span class="va">gamFit</span><span class="op">$</span><span class="va">power_estimate</span></span>
-<span><span class="co">#plot(gamFit$fit_2d)</span></span>
 <span></span>
 <span><span class="va">contour_plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/contour_plot_fun.html">contour_plot_fun</a></span><span class="op">(</span><span class="va">combined_data</span>,</span>
 <span>                                 <span class="va">power_estimate</span>,</span>
 <span>                                 <span class="va">cont_breaks</span><span class="op">)</span></span>
 <span><span class="va">contour_plot</span></span></code></pre></div>
-</div>
-<div class="section level3">
-<h3 id="estimate-statistical-power-given-fold-change-and-mean-abundance-for-taxa">Estimate statistical power given fold change and mean abundance for
-taxa<a class="anchor" aria-label="anchor" href="#estimate-statistical-power-given-fold-change-and-mean-abundance-for-taxa"></a>
-</h3>
 </div>
 </div>
 <div class="section level2">
@@ -440,7 +840,7 @@ taxa<a class="anchor" aria-label="anchor" href="#estimate-statistical-power-give
 <div class="section level3">
 <h3 id="simulate-count-data-for-various-ranges-of-sample-sizes">Simulate count data for various ranges of sample sizes<a class="anchor" aria-label="anchor" href="#simulate-count-data-for-various-ranges-of-sample-sizes"></a>
 </h3>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb52"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">nsim</span> <span class="op">=</span> <span class="fl">50</span></span>
 <span><span class="va">nsamp_vec</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">20</span>, <span class="fl">50</span>, <span class="fl">70</span><span class="op">)</span></span>
 <span><span class="va">countdata_sims_list</span>  <span class="op">=</span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span></span>
@@ -459,14 +859,13 @@ taxa<a class="anchor" aria-label="anchor" href="#estimate-statistical-power-give
 <span>                                                 seed <span class="op">=</span> <span class="fl">121</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">countdata_sims_list</span><span class="op">)</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"sample_"</span>,<span class="va">nsamp_vec</span><span class="op">)</span></span>
-<span><span class="co">###############################################################</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">countdata_sims_list</span><span class="op">)</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"sample_"</span>,<span class="va">nsamp_vec</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="estimate-p-values-associated-to-fold-changes-for-each-taxa-for-simulated-data-per-sample-size">Estimate p-values associated to fold changes for each taxa for
 simulated data per sample size<a class="anchor" aria-label="anchor" href="#estimate-p-values-associated-to-fold-changes-for-each-taxa-for-simulated-data-per-sample-size"></a>
 </h3>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb53"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">desq_est_list</span>  <span class="op">=</span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="kw">for</span><span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">countdata_sims_list</span><span class="op">)</span><span class="op">)</span><span class="op">{</span></span>
 <span>  </span>
@@ -483,114 +882,23 @@ simulated data per sample size<a class="anchor" aria-label="anchor" href="#estim
 <span><span class="op">}</span></span></code></pre></div>
 </div>
 <div class="section level3">
-<h3 id="fit-generalized-additive-model-gam-for-power-estimation-1">Fit Generalized Additive Model (GAM) for power estimation<a class="anchor" aria-label="anchor" href="#fit-generalized-additive-model-gam-for-power-estimation-1"></a>
+<h3 id="fit-generalized-additive-model-gam-for-power-estimation">Fit Generalized Additive Model (GAM) for power estimation<a class="anchor" aria-label="anchor" href="#fit-generalized-additive-model-gam-for-power-estimation"></a>
 </h3>
 </div>
 <div class="section level3">
 <h3 id="estimate-sample-size-for-a-given-statistical-power-fold-change-and-mean-abundance">Estimate sample size for a given statistical power, fold change and
 mean abundance<a class="anchor" aria-label="anchor" href="#estimate-sample-size-for-a-given-statistical-power-fold-change-and-mean-abundance"></a>
 </h3>
-<div class="section level6">
-<h6 id="data-preprocessing">Data preprocessing<a class="anchor" aria-label="anchor" href="#data-preprocessing"></a>
-</h6>
-<p>Low abundant tax exhibit high variability, posing challenges in
-detecting significant differences between groups cite{m}. Pre-filtering
-steps, as is routinely done in differential abundance analysis, is used
-to filter out these low abundant taxa. In this vignette, we filter out
-taxa with less that 10 count in less that 5 samples.</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># load library</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">power.nb</span><span class="op">)</span> </span>
-<span></span>
-<span><span class="co">#filter out low abundant taxa</span></span>
-<span><span class="va">filter_data</span>  <span class="op">=</span> <span class="fu"><a href="../reference/filter_low_count.html">filter_low_count</a></span><span class="op">(</span>countdata <span class="op">=</span> <span class="va">data</span>,</span>
-<span>                                metadata  <span class="op">=</span> <span class="va">metadata</span>,</span>
-<span>                                abund_thresh <span class="op">=</span> <span class="fl">10</span>,</span>
-<span>                                sample_thresh <span class="op">=</span> <span class="fl">5</span>,</span>
-<span>                                sample_colname <span class="op">=</span> <span class="st">"SampleID"</span>,</span>
-<span>                                group_colname  <span class="op">=</span> <span class="st">"Groups"</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">filter_data</span><span class="op">)</span></span></code></pre></div>
-</div>
-<div class="section level6">
-<h6 id="model-fitting">Model Fitting<a class="anchor" aria-label="anchor" href="#model-fitting"></a>
-</h6>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co">#Fit log mean count</span></span>
-<span><span class="va">logmean</span>    <span class="op">=</span>  <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">rowMeans</a></span><span class="op">(</span><span class="va">filter_data</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">logmeanFit</span> <span class="op">=</span>  <span class="fu"><a href="../reference/logmean_fit.html">logmean_fit</a></span><span class="op">(</span><span class="va">logmean</span>, sig <span class="op">=</span> <span class="fl">0.05</span>, </span>
-<span>                         max.comp <span class="op">=</span> <span class="fl">4</span>, max.boot <span class="op">=</span> <span class="fl">100</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">logmeanFit</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co">#Estimate foldchange from Deseq</span></span>
-<span><span class="va">foldchange_est</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/deseqfun.html">deseqfun</a></span><span class="op">(</span>countdata <span class="op">=</span> <span class="va">data</span>,</span>
-<span>                           metadata  <span class="op">=</span> <span class="va">metadata</span>,</span>
-<span>                          alpha_level <span class="op">=</span> <span class="fl">0.1</span>,</span>
-<span>                          ref_name  <span class="op">=</span> <span class="st">"Control"</span>,</span>
-<span>                          group_colname <span class="op">=</span> <span class="st">"Groups"</span>,</span>
-<span>                          sample_colname <span class="op">=</span> <span class="st">"SampleID"</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">logfoldchange</span> <span class="op">=</span>  <span class="va">foldchange_est</span><span class="op">$</span><span class="va">log2FoldChange</span></span>
-<span></span>
-<span><span class="co">## Fit foldchange from Deseq</span></span>
-<span><span class="va">logfoldchangeFit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/logfoldchange_fit.html">logfoldchange_fit</a></span><span class="op">(</span><span class="va">logmean</span>,</span>
-<span>                                       <span class="va">logfoldchange</span>,</span>
-<span>                                       ncore <span class="op">=</span> <span class="fl">2</span>,</span>
-<span>                                       max_sd_ord <span class="op">=</span> <span class="fl">2</span>,</span>
-<span>                                       max_np <span class="op">=</span> <span class="fl">5</span>,</span>
-<span>                                       minval <span class="op">=</span> <span class="op">-</span><span class="fl">5</span>,</span>
-<span>                                       maxval <span class="op">=</span> <span class="fl">5</span>,</span>
-<span>                                       itermax <span class="op">=</span> <span class="fl">100</span>,</span>
-<span>                                       NP <span class="op">=</span> <span class="fl">800</span>,</span>
-<span>                                       seed <span class="op">=</span> <span class="fl">100</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">logfoldchangeFit</span></span></code></pre></div>
-</div>
-</div>
-<div class="section level3">
-<h3 id="simulating-data">Simulating Data<a class="anchor" aria-label="anchor" href="#simulating-data"></a>
-</h3>
-<ul>
-<li><p>Simulate log mean count from the fitted Mixture of Gaussian
-(using existing dataset) or from the pre-specified parameters for the
-Gaussian Mixture</p></li>
-<li><p>Simulate log fold change using the estimated parameters or the
-prespecified parameters and the simulated as the input for the variance
-and mean of the log fold change</p></li>
-<li><p>Simulate dispersion parameters from the estimated nonlinear
-function of the dispersion function</p></li>
-<li><p>Simulate count data from a negative binomial model and
-then</p></li>
-<li><p>Use the simulated procedure outline above to simulate n number of
-count data</p></li>
-</ul>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">sim</span> <span class="op">&lt;-</span> <span class="fu">simulate_data</span><span class="op">(</span><span class="va">fit</span>,</span>
-<span>                     n_taxa <span class="op">=</span> <span class="fl">1000</span>,</span>
-<span>                     n_per_group <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">30</span>, <span class="fl">30</span><span class="op">)</span>,</span>
-<span>                     fold_changes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1.5</span>, <span class="fl">2</span>, <span class="fl">4</span><span class="op">)</span>,</span>
-<span>                     nsim <span class="op">=</span> <span class="fl">100</span><span class="op">)</span></span></code></pre></div>
-</div>
-<div class="section level3">
-<h3 id="power-estimation-procedure">Power estimation procedure<a class="anchor" aria-label="anchor" href="#power-estimation-procedure"></a>
-</h3>
-<ul>
-<li><p>Fit the count data with the negative binomial model in the desert
-package to estimate pvalues for each fold change estimated fold
-change</p></li>
-<li><p>Construct a vector of binaries with 1 for a taxa where value is
-less than a specified threshold and 0 otherwise.</p></li>
-<li><p>We fit a Generalised additive model to predict the probability of
-obtaining 1 (also the statistical power) for any combination of mean
-count and log fold change</p></li>
-<li><p>Figure shows a contour plot for 3 of the datasets. From the
-plots, there is low statistical power. a Concatenation all the</p></li>
-</ul>
 </div>
 </div>
 <div class="section level2">
 <h2 id="appendix">Appendix<a class="anchor" aria-label="anchor" href="#appendix"></a>
 </h2>
+<pre><code><span><span class="co">## </span></span>
+<span><span class="co">## Attaching package: 'kableExtra'</span></span></code></pre>
+<pre><code><span><span class="co">## The following object is masked from 'package:dplyr':</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">##     group_rows</span></span></code></pre>
 <table class="table table" style="margin-left: auto; margin-right: auto;">
 <caption>
 Data description and parameter estimates from actual microbiome datasets
@@ -719,6 +1027,10 @@ Example row 2
 </tr>
 </tbody>
 </table>
+</div>
+<div class="section level2">
+<h2 class="unnumbered" id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
+</h2>
 <div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0">
 <div id="ref-agronah2025novel" class="csl-entry">
 Agronah, Michael. 2025. <span>“A Novel Approach for Simulation-Based
@@ -730,11 +1042,20 @@ Agronah, Michael, and Benjamin Bolker. 2025. <span>“Investigating
 Statistical Power of Differential Abundance Studies.”</span> <em>PloS
 One</em> 20 (4): e0318820.
 </div>
+<div id="ref-anders2010differential" class="csl-entry">
+Anders, Simon, and Wolfgang Huber. 2010. <span>“Differential Expression
+Analysis for Sequence Count Data.”</span> <em>Nature Precedings</em>, 1.
+</div>
 <div id="ref-arnold2011simulation" class="csl-entry">
 Arnold, Benjamin F, Daniel R Hogan, John M Colford, and Alan E Hubbard.
 2011. <span>“Simulation Methods to Estimate Design Power: An Overview
 for Applied Research.”</span> <em>BMC Medical Research Methodology</em>
 11: 1–10.
+</div>
+<div id="ref-benaglia2010mixtools" class="csl-entry">
+Benaglia, Tatiana, Didier Chauveau, David R Hunter, and Derek S Young.
+2010. <span>“Mixtools: An <span>R</span> Package for Analyzing Mixture
+Models.”</span> <em>Journal of Statistical Software</em> 32: 1–29.
 </div>
 <div id="ref-love2014moderated" class="csl-entry">
 Love, Michael I, Wolfgang Huber, and Simon Anders. 2014.
@@ -754,6 +1075,20 @@ MacDonald, Devika K. Desai, Nicholas Allward, Caitlin Jones, et al.
 Results Across 38 Datasets.”</span> <em>Nature Communications</em> 13:
 342. <a href="https://doi.org/10.1038/s41467-022-28034-z" class="external-link">https://doi.org/10.1038/s41467-022-28034-z</a>.
 </div>
+<div id="ref-pya2015shape" class="csl-entry">
+Pya, Natalya, and Simon N Wood. 2015. <span>“Shape Constrained Additive
+Models.”</span> <em>Statistics and Computing</em> 25: 543–59.
+</div>
+<div id="ref-robinson2010edger" class="csl-entry">
+Robinson, Mark D, Davis J McCarthy, and Gordon K Smyth. 2010.
+<span>“edgeR: A Bioconductor Package for Differential Expression
+Analysis of Digital Gene Expression Data.”</span>
+<em>Bioinformatics</em> 26 (1): 139–40.
+</div>
+<div id="ref-yi2020nbzimm" class="csl-entry">
+Yi, N. 2020. <span>“NBZIMM: Negative Binomial and Zero-Inflated Mixed
+Models.”</span> <em>R Package Version</em> 1.
+</div>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
@@ -767,7 +1102,7 @@ Results Across 38 Datasets.”</span> <em>Nature Communications</em> 13:
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer>

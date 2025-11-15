@@ -39,8 +39,7 @@
 
 
 
-
-    </div><div class="section level2">
+      <dl></dl></div><div class="section level2">
 
 
 
@@ -51,133 +50,155 @@
 
         </dt>
         <dd>Contour plot for showing predicted power</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="countdata_sim_fun.html">countdata_sim_fun()</a></code>
 
         </dt>
         <dd>Simulate Count Data for Microbiome Studies</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="deseq_fun_est.html">deseq_fun_est()</a></code>
 
         </dt>
         <dd>Fold change and p-value estimations for a many simulations</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="deseqfun.html">deseqfun()</a></code>
 
         </dt>
         <dd>Estimate log fold changes using <code>DESeq2</code>.</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="dispersion_fit.html">dispersion_fit()</a></code>
 
         </dt>
         <dd>Fit the non-linear function to dispersion estimates</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="dispersion_fun.html">dispersion_fun()</a></code>
 
         </dt>
         <dd>Calculate Dispersion for Microbiome Data</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="dnormmix.html">dnormmix()</a></code>
 
         </dt>
         <dd>Density of a Normal Mixture Model</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="dnormmix0.html">dnormmix0()</a></code>
 
         </dt>
         <dd>Density function for the mixture of Gaussian distributions</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="filter_low_count.html">filter_low_count()</a></code>
 
         </dt>
         <dd>Filter to remove low abundant taxa</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="gam_fit.html">gam_fit()</a></code>
 
         </dt>
         <dd>Title</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="gen_parnames.html">gen_parnames()</a></code>
 
         </dt>
         <dd>Generate Parameter Names for Mixture Model</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="genmixpars.html">genmixpars()</a></code>
 
         </dt>
         <dd>generate normal mixture parameters (prob vector, mean vector, sd vector for a specified set of 'x' values (logmean)</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="logfoldchange_fit.html">logfoldchange_fit()</a></code>
 
         </dt>
         <dd>Fit a mixture of Gaussian distributions to log fold change</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="logfoldchange_sim_fun.html">logfoldchange_sim_fun()</a></code>
 
         </dt>
         <dd>Simulate Log Fold Change Values</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="logmean_fit.html">logmean_fit()</a></code>
 
         </dt>
         <dd>Fit a mixture of Gaussian Distributions to log mean count of taxa.</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="logmean_sim_fun.html">logmean_sim_fun()</a></code>
 
         </dt>
         <dd>Simulate Log Means for OTUs</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="myrnormmix.html">myrnormmix()</a></code>
 
         </dt>
         <dd>Simulating from a mixture of Gaussian</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="nllfun.html">nllfun()</a></code>
 
         </dt>
         <dd>Objective function</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="optimal.comp.html">optimal.comp()</a></code>
 
         </dt>
         <dd>Computes the optimal number of gaussian components for log mean count</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="polyfun.html">polyfun()</a></code>
 
         </dt>
         <dd>General-purpose log-likelihood function, vectorized sum(pars*x^i)</dd>
-      </dl><dl><dt>
 
-          <code><a href="power_fun_ss.html">power_fun_ss</a></code>
+        <dt>
+
+          <code><a href="power_fun_ss.html">power_fun_ss()</a></code>
 
         </dt>
-        <dd>####################################################################### inverse_fun &lt;- function(target,lmb,abs_lfc, model,xmin, xmax) power_fun_ss( deseq_est_list, true_logfoldchange, true_logmean, sample_vec, alpha_level = 0.1, notu ) if (length(target) != length(lmb) || length(target) != length(abs_lfc)) stop("Lengths of 'target', 'lmb', and 'abs_lfc' must be the same.") Initialize an empty list to store the roots roots &lt;- list() roots &lt;- list() roots &lt;- list() Loop through each element and solve for the root for (i in 1:length(target)) roots[i] &lt;- uniroot(function(s) predict(model, type = "response", newdata = data.frame(sample_size = s, lmean_abund = lmbi, abs_lfc = abs_lfci) ) - targeti , interval = c(xmin, xmax), extendInt = "yes")$root unlist(roots) uniroot_lmb = function(target_power,sample_size,abs_lfc,model,xmin,xmax) root &lt;- uniroot(function(lmb) predict(model, type = "response", newdata = data.frame(sample_size = sample_size, lmean_abund = lmb, abs_lfc = abs_lfc) ) - target_power , interval = c(xmin, xmax), extendInt = "yes")$root root inverse_lfc &lt;- function(target,lmb,samp_size, model,xmin, xmax) if (length(target) != length(lmb) || length(target) != length(samp_size)) stop("Lengths of 'target', 'lmb', and 'abs_lfc' must be the same.") for (i in 1:length(target)) roots[i] &lt;- uniroot(function(s) predict(model, type = "response", newdata = data.frame(sample_size = samp_sizei, lmean_abund = lmbi, abs_lfc = s) ) - targeti , interval = c(xmin, xmax), extendInt = "yes")$root unlist(roots) inverse_lmb &lt;- function(target,abs_lfc,samp_size, model,xmin, xmax) if (length(target) != length(abs_lfc) || length(target) != length(samp_size)) stop("Lengths of 'target', 'lmb', and 'abs_lfc' must be the same.") Function to compute the missing input</dd>
-      </dl><dl><dt>
+        <dd>Power function</dd>
+
+        <dt>
 
           <code><a href="read_data.html">read_data()</a></code>
 
         </dt>
         <dd>Extract specified data from a list of datasets</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="rnormmix0.html">rnormmix0()</a></code>
 
@@ -192,7 +213,7 @@
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer></div>

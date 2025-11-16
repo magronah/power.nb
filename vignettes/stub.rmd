@@ -142,15 +142,20 @@ where $\pi_{j,k}$ are the mixing proportions satisfying $\sum_{j=1}^{k} \pi_{j,k
 
 To test whether adding an additional component improves model fit, we formulated the hypotheses as:
 
+<!-- try to protect LaTeX: https://github.com/jgm/pandoc/issues/6259 ;
+https://github.com/jekyll/jekyll/issues/9487 -->
+'
 $$
 \begin{cases} 
 H_0: \mathbf{y} \sim f_k(y_i \mid \boldsymbol{\theta}_k) & \textrm{(the data follow a $k$-component mixture model)} \\
 H_a: \mathbf{y} \sim f_{k+1}(y_i \mid \boldsymbol{\theta}_{k+1}) & \textrm{(the data follow a $(k+1)$-component mixture model)} \end{cases}$$
-
+{=latex}'
 The test statistic is the likelihood ratio statistic:
 
+'
 $$\Lambda = 2 \left[ \ell_{k+1}(\widehat{\boldsymbol{\theta}}_{k+1}) - \ell_{k}(\widehat{\boldsymbol{\theta}}_{k}) \right],$$
 where $\ell_{k}(\widehat{\boldsymbol{\theta}}_{k})$ and $\ell_{k+1}(\widehat{\boldsymbol{\theta}}_{k+1})$ are the maximized log-likelihoods under the $k$- and $(k+1)$-component models, respectively.
+{=latex}'
 
 To approximate the null distribution of $\Lambda$, we performed a parametric bootstrap using $B = 100$ bootstrap samples generated under $H_0$. For each bootstrap replicate $b = 1, \dots, B$, data were simulated from the fitted $k$-component model, and both the null and alternative models were re-fitted to obtain $\Lambda^{(b)}$. The empirical $p$-value is computed as
 

@@ -1,29 +1,20 @@
 # Power and Sample Size Estimation for Microbiome Analysis
 
-## Acknowledgments
-
-We would like to express our sincere gratitude to Dr. Jacob T. Nearing
-for his generosity in granting us access to the 38 microbiome datasets
-used in the paper “Microbiome differential abundance methods produce
-different results across 38 datasets” (Nearing et al. 2022). These
-datasets were invaluable in developing, testing, and validating this R
-package for power and sample size calculation in microbiome studies.
-
 ## Package Description and Functionalities
 
 `power.nb` is a package developed for estimating statistical power and
 sample sizes in differential abundance microbiome studies. The package
 presents novel methods for estimating statistical power for individual
-taxa (feature, otu, or species) and for sample size calculation
+taxa (feature, OTU/ASV, or species) and for sample size calculation
 accounting for effect sizes and mean abundance of taxa.
 
 `power.nb` also presents two novel microbiome data simulations
-frameworks: `MixGassSim` and `RRSim`. The method implemented in
-`MixGassSim` models the distribution of mean abundance of taxa and the
+frameworks: `Cask's` and `RRSim`. The method implemented in
+`MixGaussSim` models the distribution of mean abundance of taxa and the
 distribution of fold change (as a function of mean abundance of taxa) by
 finite Mixture of Gaussian distributions. Microbiome count data is then
 simulated from a negative binomial distribution. Detailed description of
-the `MixGassSim` method is presented in the paper [“Investigating
+the `MixGaussSim` method is presented in the paper [“Investigating
 statistical power of differential abundance
 studies”](https://doi.org/10.1371/journal.pone.0318820) (Agronah and
 Bolker 2025).
@@ -94,7 +85,7 @@ process for estimating parameters from an existing dataset.
 
 ### Dataset
 
-We use a subset of the Obsesity dataset, one of the datasets analyzed in
+We use a subset of the Obesity dataset, one of the datasets analyzed in
 (Nearing et al. 2022). The full dataset contains 52 samples and 1203
 taxa.
 
@@ -220,7 +211,7 @@ dim(filter_data)
 
     ## [1] 903  52
 
-### Foldchange and Dispersion Estimation
+### Fold change and Dispersion Estimation
 
 We estimate fold change for each taxon and dispersion parameters using
 the negative binomial model implemented in the `DESeq2` package (Love,
@@ -420,17 +411,17 @@ dispersionFit$param
 
 To simulate microbiome data, we first simulate log mean counts and
 corresponding log fold changes. The simulated log mean counts represent
-overall log mean counts (ie, log of the arithmetic mean of the counts in
-all of treatment and control groups). We then use the simulated log mean
-count to estimate corresponding dispersion values for each sample
+overall log mean counts (i.e., log of the arithmetic mean of the counts
+in all of treatment and control groups). We then use the simulated log
+mean count to estimate corresponding dispersion values for each sample
 through the fitted nonlinear function described in the equation
 [here](#disp-eq) ([see section on Modelling the Distribution of Log Fold
 Changes](#modelling-the-distribution-of-log-fold-changes)). Using the
 simulated log mean counts and fold changes, we now compute the group
-specific mean counts (ie, mean counts of taxa for control group and mean
-count of taxa for treatment group). We then simulate microbiome count
-data from the negative binomial distribution using the group specific
-mean counts and the estimated dispersion values.
+specific mean counts (i.e., mean counts of taxa for control group and
+mean count of taxa for treatment group). We then simulate microbiome
+count data from the negative binomial distribution using the group
+specific mean counts and the estimated dispersion values.
 
 #### Simulate log mean count and log fold change
 
@@ -533,7 +524,7 @@ length(countdata_sims$logmean_list$sim_1)
 
 #### Comparing the distributions between simulated count d of mean count and fold change from simulation with actual data
 
-We compare the following comparisions bettween our simulation and the
+We compare the following comparisons between our simulation and the
 actual dataset
 
 - we come distribution of variances of counts of taxa and
@@ -830,6 +821,15 @@ for(i in 1:length(countdata_sims_list)){
 [TABLE]
 
 Data description and parameter estimates from actual microbiome datasets
+
+## Acknowledgments
+
+We would like to express our sincere gratitude to Dr. Jacob T. Nearing
+for his generosity in granting us access to the 38 microbiome datasets
+used in the paper “Microbiome differential abundance methods produce
+different results across 38 datasets” (Nearing et al. 2022). These
+datasets were invaluable in developing, testing, and validating this R
+package for power and sample size calculation in microbiome studies.
 
 ## References
 

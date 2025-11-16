@@ -59,7 +59,7 @@
                         <h4 data-toc-skip class="author">Michael Agronah
 and Benjamin Bolker</h4>
             
-            <h4 data-toc-skip class="date">2025-11-15</h4>
+            <h4 data-toc-skip class="date">2025-11-16</h4>
       
 
       <div class="d-none name"><code>stub.rmd</code></div>
@@ -68,31 +68,22 @@ and Benjamin Bolker</h4>
     
     
 <div class="section level2">
-<h2 id="acknowledgments">Acknowledgments<a class="anchor" aria-label="anchor" href="#acknowledgments"></a>
-</h2>
-<p>We would like to express our sincere gratitude to Dr. Jacob T.
-Nearing for his generosity in granting us access to the 38 microbiome
-datasets used in the paper “Microbiome differential abundance methods
-produce different results across 38 datasets” <span class="citation">(Nearing et al. 2022)</span>. These datasets were
-invaluable in developing, testing, and validating this R package for
-power and sample size calculation in microbiome studies.</p>
-</div>
-<div class="section level2">
 <h2 id="package-description-and-functionalities">Package Description and Functionalities<a class="anchor" aria-label="anchor" href="#package-description-and-functionalities"></a>
 </h2>
 <p><code>power.nb</code> is a package developed for estimating
 statistical power and sample sizes in differential abundance microbiome
 studies. The package presents novel methods for estimating statistical
-power for individual taxa (feature, otu, or species) and for sample size
-calculation accounting for effect sizes and mean abundance of taxa.</p>
+power for individual taxa (feature, OTU/ASV, or species) and for sample
+size calculation accounting for effect sizes and mean abundance of
+taxa.</p>
 <p><code>power.nb</code> also presents two novel microbiome data
-simulations frameworks: <code>MixGassSim</code> and <code>RRSim</code>.
-The method implemented in <code>MixGassSim</code> models the
-distribution of mean abundance of taxa and the distribution of fold
-change (as a function of mean abundance of taxa) by finite Mixture of
-Gaussian distributions. Microbiome count data is then simulated from a
-negative binomial distribution. Detailed description of the
-<code>MixGassSim</code> method is presented in the paper <a href="https://doi.org/10.1371/journal.pone.0318820" class="external-link">“Investigating
+simulations frameworks: <code>Cask's</code> and <code>RRSim</code>. The
+method implemented in <code>MixGaussSim</code> models the distribution
+of mean abundance of taxa and the distribution of fold change (as a
+function of mean abundance of taxa) by finite Mixture of Gaussian
+distributions. Microbiome count data is then simulated from a negative
+binomial distribution. Detailed description of the
+<code>MixGaussSim</code> method is presented in the paper <a href="https://doi.org/10.1371/journal.pone.0318820" class="external-link">“Investigating
 statistical power of differential abundance studies”</a> <span class="citation">(Agronah and Bolker 2025)</span>.</p>
 <p><code>RRSim</code> (this simulation method is still under development
 and some functions in <code>RRSim</code> are yet to tested), on the
@@ -162,7 +153,7 @@ existing dataset.</p>
 <div class="section level3">
 <h3 id="dataset">Dataset<a class="anchor" aria-label="anchor" href="#dataset"></a>
 </h3>
-<p>We use a subset of the Obsesity dataset, one of the datasets analyzed
+<p>We use a subset of the Obesity dataset, one of the datasets analyzed
 in <span class="citation">(Nearing et al. 2022)</span>. The full dataset
 contains 52 samples and 1203 taxa.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
@@ -279,7 +270,7 @@ to filter out these low abundant taxa. We filter out taxa with less that
 <pre><code><span><span class="co">## [1] 903  52</span></span></code></pre>
 </div>
 <div class="section level3">
-<h3 id="foldchange-and-dispersion-estimation">Foldchange and Dispersion Estimation<a class="anchor" aria-label="anchor" href="#foldchange-and-dispersion-estimation"></a>
+<h3 id="fold-change-and-dispersion-estimation">Fold change and Dispersion Estimation<a class="anchor" aria-label="anchor" href="#fold-change-and-dispersion-estimation"></a>
 </h3>
 <p>We estimate fold change for each taxon and dispersion parameters
 using the negative binomial model implemented in the <code>DESeq2</code>
@@ -519,16 +510,16 @@ facilitating their use in downstream simulations and power analyses.</p>
 </h3>
 <p>To simulate microbiome data, we first simulate log mean counts and
 corresponding log fold changes. The simulated log mean counts represent
-overall log mean counts (ie, log of the arithmetic mean of the counts in
-all of treatment and control groups). We then use the simulated log mean
-count to estimate corresponding dispersion values for each sample
+overall log mean counts (i.e., log of the arithmetic mean of the counts
+in all of treatment and control groups). We then use the simulated log
+mean count to estimate corresponding dispersion values for each sample
 through the fitted nonlinear function described in the equation <a href="#disp-eq">here</a> (<a href="#modelling-the-distribution-of-log-fold-changes">see section on
 Modelling the Distribution of Log Fold Changes</a>). Using the simulated
 log mean counts and fold changes, we now compute the group specific mean
-counts (ie, mean counts of taxa for control group and mean count of taxa
-for treatment group). We then simulate microbiome count data from the
-negative binomial distribution using the group specific mean counts and
-the estimated dispersion values.</p>
+counts (i.e., mean counts of taxa for control group and mean count of
+taxa for treatment group). We then simulate microbiome count data from
+the negative binomial distribution using the group specific mean counts
+and the estimated dispersion values.</p>
 <div class="section level4">
 <h4 id="simulate-log-mean-count-and-log-fold-change">Simulate log mean count and log fold change<a class="anchor" aria-label="anchor" href="#simulate-log-mean-count-and-log-fold-change"></a>
 </h4>
@@ -605,7 +596,7 @@ the estimated dispersion values.</p>
 <h4 id="comparing-the-distributions-between-simulated-count-d-of-mean-count-and-fold-change-from-simulation-with-actual-data">Comparing the distributions between simulated count d of mean count
 and fold change from simulation with actual data<a class="anchor" aria-label="anchor" href="#comparing-the-distributions-between-simulated-count-d-of-mean-count-and-fold-change-from-simulation-with-actual-data"></a>
 </h4>
-<p>We compare the following comparisions bettween our simulation and the
+<p>We compare the following comparisons between our simulation and the
 actual dataset</p>
 <ul>
 <li><p>we come distribution of variances of counts of taxa and</p></li>
@@ -1029,6 +1020,16 @@ Example row 2
 </tr>
 </tbody>
 </table>
+</div>
+<div class="section level2">
+<h2 id="acknowledgments">Acknowledgments<a class="anchor" aria-label="anchor" href="#acknowledgments"></a>
+</h2>
+<p>We would like to express our sincere gratitude to Dr. Jacob T.
+Nearing for his generosity in granting us access to the 38 microbiome
+datasets used in the paper “Microbiome differential abundance methods
+produce different results across 38 datasets” <span class="citation">(Nearing et al. 2022)</span>. These datasets were
+invaluable in developing, testing, and validating this R package for
+power and sample size calculation in microbiome studies.</p>
 </div>
 <div class="section level2">
 <h2 class="unnumbered" id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>

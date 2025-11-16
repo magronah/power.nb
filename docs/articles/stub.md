@@ -283,18 +283,18 @@ density with mean $\mu$ and variance $\sigma^{2}$.
 To test whether adding an additional component improves model fit, we
 formulated the hypotheses as:
 
-$$\begin{cases}
+’ $$\begin{cases}
 {H_{0}:\mathbf{y} \sim f_{k}\left( y_{i} \mid {\mathbf{θ}}_{k} \right)} & {{\text{(the data follow a}\mspace{6mu}}k\text{-component mixture model)}} \\
 {H_{a}:\mathbf{y} \sim f_{k + 1}\left( y_{i} \mid {\mathbf{θ}}_{k + 1} \right)} & {{\text{(the data follow a}\mspace{6mu}}(k + 1)\text{-component mixture model)}}
-\end{cases}$$
+\end{cases}$$ {=latex}’ The test statistic is the likelihood ratio
+statistic:
 
-The test statistic is the likelihood ratio statistic:
-
+’
 $$\Lambda = 2\left\lbrack \ell_{k + 1}\left( {\widehat{\mathbf{θ}}}_{k + 1} \right) - \ell_{k}\left( {\widehat{\mathbf{θ}}}_{k} \right) \right\rbrack,$$
 where $\ell_{k}\left( {\widehat{\mathbf{θ}}}_{k} \right)$ and
 $\ell_{k + 1}\left( {\widehat{\mathbf{θ}}}_{k + 1} \right)$ are the
 maximized log-likelihoods under the $k$- and $(k + 1)$-component models,
-respectively.
+respectively. {=latex}’
 
 To approximate the null distribution of $\Lambda$, we performed a
 parametric bootstrap using $B = 100$ bootstrap samples generated under

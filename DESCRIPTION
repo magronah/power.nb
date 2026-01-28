@@ -19,3 +19,4 @@ Imports: DESeq2, fitdistrplus,minpack.lm,foreach,tibble, purrr, mixtools, scam, 
 Suggests: rmarkdown, knitr, kableExtra, tidyverse, patchwork, dplyr, rlist
 biocViews:
 RoxygenNote: 7.3.3
+

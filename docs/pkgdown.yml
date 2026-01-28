@@ -1,9 +1,9 @@
-pandoc: 3.1.11
+pandoc: 3.1.3
 pkgdown: 2.2.0
 pkgdown_sha: ~
 articles:
   stub: stub.html
-last_built: 2025-11-16T00:54Z
+last_built: 2026-01-28T16:57Z
 urls:
   reference: https://michaelagronah.com/power.nb/reference
   article: https://michaelagronah.com/power.nb/articles

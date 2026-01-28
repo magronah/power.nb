@@ -21,7 +21,7 @@ jobs:
  #   runs-on: macOS-latest
     runs-on: ubuntu-latest
     container:
-	image: rocker/r2u:latest
+       image: rocker/r2u:latest
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       R_REMOTES_NO_ERRORS_FROM_WARNINGS: true

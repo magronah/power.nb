@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>Power and Sample Size Estimation for Microbiome Analysis • power.nb</title>
-<script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<script src="../deps/jquery-3.6.1/jquery-3.6.1.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
@@ -59,7 +59,7 @@
                         <h4 data-toc-skip class="author">Michael Agronah
 and Benjamin Bolker</h4>
             
-            <h4 data-toc-skip class="date">2025-11-16</h4>
+            <h4 data-toc-skip class="date">2026-01-28</h4>
       
 
       <div class="d-none name"><code>stub.rmd</code></div>
@@ -364,12 +364,14 @@ and variance
 formulated the hypotheses as:</p>
 <!-- try to protect LaTeX: https://github.com/jgm/pandoc/issues/6259 ;
 https://github.com/jekyll/jekyll/issues/9487 -->
+<!-- {% raw %} -->
 <p>’
 <math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="true" form="prefix">{</mo><mtable><mtr><mtd columnalign="left" style="text-align: left"><msub><mi>H</mi><mn>0</mn></msub><mo>:</mo><mi>𝐲</mi><mo>∼</mo><msub><mi>f</mi><mi>k</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>y</mi><mi>i</mi></msub><mo>∣</mo><msub><mi>𝛉</mi><mi>k</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow></mtd><mtd columnalign="left" style="text-align: left"><mrow><mtext mathvariant="normal">(the data follow a </mtext><mspace width="0.333em"></mspace></mrow><mi>k</mi><mtext mathvariant="normal">-component mixture model)</mtext></mtd></mtr><mtr><mtd columnalign="left" style="text-align: left"><msub><mi>H</mi><mi>a</mi></msub><mo>:</mo><mi>𝐲</mi><mo>∼</mo><msub><mi>f</mi><mrow><mi>k</mi><mo>+</mo><mn>1</mn></mrow></msub><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>y</mi><mi>i</mi></msub><mo>∣</mo><msub><mi>𝛉</mi><mrow><mi>k</mi><mo>+</mo><mn>1</mn></mrow></msub><mo stretchy="true" form="postfix">)</mo></mrow></mtd><mtd columnalign="left" style="text-align: left"><mrow><mtext mathvariant="normal">(the data follow a </mtext><mspace width="0.333em"></mspace></mrow><mrow><mo stretchy="true" form="prefix">(</mo><mi>k</mi><mo>+</mo><mn>1</mn><mo stretchy="true" form="postfix">)</mo></mrow><mtext mathvariant="normal">-component mixture model)</mtext></mtd></mtr></mtable></mrow><annotation encoding="application/x-tex">
 \begin{cases} 
 H_0: \mathbf{y} \sim f_k(y_i \mid \boldsymbol{\theta}_k) &amp; \textrm{(the data follow a $k$-component mixture model)} \\
 H_a: \mathbf{y} \sim f_{k+1}(y_i \mid \boldsymbol{\theta}_{k+1}) &amp; \textrm{(the data follow a $(k+1)$-component mixture model)} \end{cases}</annotation></semantics></math>
-{=latex}’ The test statistic is the likelihood ratio statistic:</p>
+{=latex}’ <!-- {% endraw %} --></p>
+<p>The test statistic is the likelihood ratio statistic:</p>
 <p>’
 <math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Λ</mi><mo>=</mo><mn>2</mn><mrow><mo stretchy="true" form="prefix">[</mo><msub><mo>ℓ</mo><mrow><mi>k</mi><mo>+</mo><mn>1</mn></mrow></msub><mrow><mo stretchy="true" form="prefix">(</mo><msub><mover><mi>𝛉</mi><mo accent="true">̂</mo></mover><mrow><mi>k</mi><mo>+</mo><mn>1</mn></mrow></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>−</mo><msub><mo>ℓ</mo><mi>k</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><msub><mover><mi>𝛉</mi><mo accent="true">̂</mo></mover><mi>k</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">]</mo></mrow><mo>,</mo></mrow><annotation encoding="application/x-tex">\Lambda = 2 \left[ \ell_{k+1}(\widehat{\boldsymbol{\theta}}_{k+1}) - \ell_{k}(\widehat{\boldsymbol{\theta}}_{k}) \right],</annotation></semantics></math>
 where
@@ -439,7 +441,7 @@ size <span class="citation">(Benaglia et al. 2010)</span>.</p>
 <span><span class="co">## </span></span>
 <span><span class="co">## $components</span></span>
 <span><span class="co">## [1] 3</span></span></code></pre>
-<p><img src="stub_files/figure-html/unnamed-chunk-3-1.png" class="r-plt" width="700"></p>
+<p><img src="stub_files/figure-html/unnamed-chunk-3-1.png" class="r-plt" alt="" width="700"></p>
 </div>
 <div class="section level3">
 <h3 id="modelling-the-distribution-of-log-fold-change-estimates">Modelling the distribution of log fold change estimates<a class="anchor" aria-label="anchor" href="#modelling-the-distribution-of-log-fold-change-estimates"></a>
@@ -643,7 +645,7 @@ dataset</p></li>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_bw</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
 <span><span class="op">(</span><span class="va">p1_</span> <span class="op">|</span> <span class="va">p2_</span><span class="op">)</span> <span class="op">+</span> <span class="fu">patchwork</span><span class="fu">::</span><span class="fu"><a href="https://patchwork.data-imaginist.com/reference/plot_layout.html" class="external-link">plot_layout</a></span><span class="op">(</span>guides <span class="op">=</span> <span class="st">"collect"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="stub_files/figure-html/unnamed-chunk-8-1.png" class="r-plt" width="700"></p>
+<p><img src="stub_files/figure-html/unnamed-chunk-8-1.png" class="r-plt" alt="" width="700"></p>
 <div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">pp1</span><span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/apply.html" class="external-link">apply</a></span><span class="op">(</span><span class="va">countdata_sims</span><span class="op">$</span><span class="va">countdata_list</span><span class="op">$</span><span class="va">sim_1</span>, <span class="fl">1</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">{</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">}</span><span class="op">)</span></span>
 <span><span class="va">pp2</span><span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/apply.html" class="external-link">apply</a></span><span class="op">(</span><span class="va">filter_data</span>, <span class="fl">1</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">{</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">}</span><span class="op">)</span></span>
@@ -667,7 +669,7 @@ dataset</p></li>
 <span><span class="op">(</span><span class="va">p1_</span><span class="op">|</span><span class="va">p2_</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://patchwork.data-imaginist.com/reference/plot_layout.html" class="external-link">plot_layout</a></span><span class="op">(</span>guides <span class="op">=</span> <span class="st">"collect"</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Warning: Removed 1 row containing non-finite outside the scale range (`stat_density()`).</span></span>
 <span><span class="co">## Removed 1 row containing non-finite outside the scale range (`stat_density()`).</span></span></code></pre>
-<p><img src="stub_files/figure-html/unnamed-chunk-8-2.png" class="r-plt" width="700"></p>
+<p><img src="stub_files/figure-html/unnamed-chunk-8-2.png" class="r-plt" alt="" width="700"></p>
 <div class="sourceCode" id="cb43"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">compare_dataset</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">countdata_sim_list</span>,<span class="va">countdata_obs</span>,<span class="va">method</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"var"</span>, <span class="st">"mean"</span><span class="op">)</span><span class="op">)</span><span class="op">{</span></span>
 <span>  </span>
@@ -713,7 +715,7 @@ dataset</p></li>
 <span><span class="op">(</span><span class="va">p11</span><span class="op">|</span><span class="va">p12</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://patchwork.data-imaginist.com/reference/plot_layout.html" class="external-link">plot_layout</a></span><span class="op">(</span>guides <span class="op">=</span> <span class="st">"collect"</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Warning: Removed 1 row containing non-finite outside the scale range (`stat_density()`).</span></span>
 <span><span class="co">## Removed 1 row containing non-finite outside the scale range (`stat_density()`).</span></span></code></pre>
-<p><img src="stub_files/figure-html/unnamed-chunk-8-3.png" class="r-plt" width="700"></p>
+<p><img src="stub_files/figure-html/unnamed-chunk-8-3.png" class="r-plt" alt="" width="700"></p>
 <div class="sourceCode" id="cb45"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/dim.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">countdata_obs</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] 903  52</span></span></code></pre>
@@ -1038,7 +1040,7 @@ power and sample size calculation in microbiome studies.</p>
 <div class="section level2">
 <h2 class="unnumbered" id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
 </h2>
-<div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0">
+<div id="refs" class="references csl-bib-body hanging-indent">
 <div id="ref-agronah2025novel" class="csl-entry">
 Agronah, Michael. 2025. <span>“A Novel Approach for Simulation-Based
 Power Estimation and Joint Modeling of Microbiome Counts.”</span> PhD

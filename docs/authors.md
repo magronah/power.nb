@@ -9,13 +9,13 @@
 
 ## Citation
 
-Agronah M, Bolker B (2025). *power.nb: Power and Sample Size Calculation
+Agronah M, Bolker B (2026). *power.nb: Power and Sample Size Calculation
 for Differential Abundance Microbiome Studies*. R package version
 0.0.0.9000.
 
     @Manual{,
       title = {power.nb: Power and Sample Size Calculation for Differential Abundance Microbiome Studies},
       author = {Michael Agronah and Ben Bolker},
-      year = {2025},
+      year = {2026},
       note = {R package version 0.0.0.9000},
     }

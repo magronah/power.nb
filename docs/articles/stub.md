@@ -286,8 +286,9 @@ formulated the hypotheses as:
 ’ $$\begin{cases}
 {H_{0}:\mathbf{y} \sim f_{k}\left( y_{i} \mid {\mathbf{θ}}_{k} \right)} & {{\text{(the data follow a}\mspace{6mu}}k\text{-component mixture model)}} \\
 {H_{a}:\mathbf{y} \sim f_{k + 1}\left( y_{i} \mid {\mathbf{θ}}_{k + 1} \right)} & {{\text{(the data follow a}\mspace{6mu}}(k + 1)\text{-component mixture model)}}
-\end{cases}$$ {=latex}’ The test statistic is the likelihood ratio
-statistic:
+\end{cases}$$ {=latex}’
+
+The test statistic is the likelihood ratio statistic:
 
 ’
 $$\Lambda = 2\left\lbrack \ell_{k + 1}\left( {\widehat{\mathbf{θ}}}_{k + 1} \right) - \ell_{k}\left( {\widehat{\mathbf{θ}}}_{k} \right) \right\rbrack,$$

@@ -505,7 +505,7 @@ contour_plot_fun <- function(combined_data,
                + xlab(TeX("$\\log_2$(mean counts)"))
                + ylab(TeX("|$\\log_2$(fold change)|"))
                + scale_colour_manual(values = c("black", "red"))
-               + geom_contour(data = power_estimate,
+               + ggplot2::geom_contour(data = power_estimate,
                               aes(z=power),lwd=1,
                               breaks = cont_breaks)
                + metR::geom_label_contour(data = power_estimate,

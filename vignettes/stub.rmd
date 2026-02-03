@@ -469,7 +469,7 @@ gamFit <- gam_fit(deseq_est_list,
 
 ## Contour plot showing power for various combinations of mean abundance and fold change
 
-```{r, eval=FALSE}
+```{r, eval}
 cont_breaks     =  seq(0,1,0.1)
 combined_data   =  gamFit$combined_data
 power_estimate  =  gamFit$power_estimate
@@ -486,7 +486,7 @@ contour_plot
 
 # Sample size calculation
 
-## Simulate count data for various ranges of sample sizes
+## Simulate count data for various sample sizes
 
 ```{r, eval = FALSE}
 nsim = 50
@@ -532,6 +532,7 @@ for(i in 1:length(countdata_sims_list)){
 
 ## Fit Generalized Additive Model (GAM) for power estimation 
 
+We now fit a GAM model to predict statistical power. This time, we predict GAM with covariates as mean count of taxa, fold change of taxa and sample sizes
 
 
 ## Estimate sample size for a given statistical power, fold change and mean abundance

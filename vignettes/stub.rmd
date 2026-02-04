@@ -31,7 +31,7 @@ biblio-title: "References"
 
 Install the package from GitHub using `devtools`:
 
-```{r, eval=FALSE}
+```{r install-from-github, eval=FALSE}
 install.packages("devtools")
 devtools::install_github("magronah/power.nb")
 ```
@@ -113,7 +113,7 @@ $$\mathrm{Var}(K_{ij}) = \mu_i + \alpha_i \mu_i^2.$$
 Estimation of the regression coefficients $\hat{\beta}_{ir}$ and dispersion parameters $\hat{\alpha}_i$ was carried out using the empirical Bayes shrinkage procedures implemented in the `DESeq2` package [@love2014moderated,@anders2010differential]. 
 
 
-```{r,message=FALSE}
+```{r logfoldchange, message=FALSE, cache = TRUE}
 
 unique(metadata$Groups)
 
@@ -168,7 +168,7 @@ where $\Lambda_{\text{obs}}$ is the observed likelihood ratio statistic.
 
 If $p < 0.05$, the null hypothesis $H_0$ is rejected in favor of the $(k+1)$-component model. Testing proceeds sequentially for $k = 1, 2, \dots, 5$ until the $p$-value exceeds the $5\%$ significance threshold, at which point the $k$-component model from the last accepted test is selected as the optimal mixture size [@benaglia2010mixtools].
 
-```{r, message=FALSE, warning=FALSE}
+```{r logmean, message=FALSE, warning=FALSE, cache = TRUE}
 logmean    =  log(rowMeans(filter_data))
 
 ### function to mute printing out messages about
@@ -193,7 +193,7 @@ logmeanFit
 We also modelled log fold change of taxa as a finite mixture of Gaussian distributions. Fold change is typically related to mean abundance [@love2014moderated]; therefore, we expressed the mean and standard deviation parameters of the individual Gaussian components as functions of log mean abundance. Detailed description of the model fitted to log fold changes is presented in the paper ["Investigating statistical power of differential abundance studies"](https://doi.org/10.1371/journal.pone.0318820) [@agronahnbolker].  
 
 
-```{r}
+```{r logfoldchangeFit, cache=TRUE}
 logfoldchangeFit <- quiet(logfoldchange_fit(logmean,
                                             logfoldchange,
                                             ncore = 3,
@@ -220,7 +220,7 @@ $$
 where $d$ and $m$ denote the scaled dispersion and mean abundance respectively. The term $c_0$ represents the asymptotic dispersion level for high abundance taxa, and $c_1$ captures additional dispersion variability. This procedure enables estimation of dispersion values corresponding to given mean counts, facilitating their use in downstream simulations and power analyses.
 
 
-```{r,message=FALSE, warning=FALSE}
+```{r dispersion,message=FALSE, warning=FALSE}
 dispersion    =  foldchange_est$dispersion
 dispersionFit =  dispersion_fit(dispersion, logmean)
 dispersionFit$param
@@ -233,7 +233,7 @@ To simulate microbiome data, we first simulate log mean counts and corresponding
 
 ### Simulate log mean count and log fold change
 
-```{r}
+```{r sim-counts}
 
 ### Simulated log mean count and log foldchange from the fitted 
 ### log mean count and log foldchange models
@@ -258,7 +258,7 @@ head(logfoldchange_sim)
 
 Estimating the dispersion values is done internally within the `countdata_sim_fun` function. 
 
-```{r}
+```{r sim-counts-nb}
 
 nsim = 4
 ntreat = sum(metadata$Groups == "OB")
@@ -297,7 +297,7 @@ We compare the following comparisons between our simulation and the actual datas
 
 - the means of taxa from out simulation with those of the actual dataset
 
-```{r}
+```{r compare-with-sim}
 library(rlist)
 library(latex2exp)
 
@@ -434,7 +434,7 @@ The follow steps outlines the power estimation procedure:
 
 To train the GAM on a sufficiently large sample size, we generate multiple microbiome count datasets following the procedure described in the section [Simulate count microbiome data](#simulate-count-microbiome-data). We then estimate p-values associated with the simulated fold changes using the `DESeq2` package. 
 
-```{r}
+```{r est-p-values, cache = TRUE}
 
 countdata_list  =   countdata_sims$countdata_list
 metadata_list   =   countdata_sims$metadata_list
@@ -453,7 +453,7 @@ deseq_est_list     =    lapply(desq_est, function(x){x$deseq_estimate})
 ## Fitting the Generalized Additive Model (GAM) 
 
 We now fit the GAM for predicting statistical power for individual taxon.
-```{r}
+```{r gam-fit}
 true_lmean_list       =    countdata_sims$logmean_list
 true_lfoldchange_list =    countdata_sims$logfoldchange_list
 
@@ -469,7 +469,7 @@ gamFit <- gam_fit(deseq_est_list,
 
 ## Contour plot showing power for various combinations of mean abundance and fold change
 
-```{r, eval}
+```{r contour-plot, eval=TRUE}
 cont_breaks     =  seq(0,1,0.1)
 combined_data   =  gamFit$combined_data
 power_estimate  =  gamFit$power_estimate

@@ -60,7 +60,6 @@ by linear functions of log mean count
 \examples{
 logmean        =  rnorm(100)
 logfoldchange  =  rnorm(100)
-\dontrun{
 logfoldchange_fit(logmean,logfoldchange)
-}
+
 }

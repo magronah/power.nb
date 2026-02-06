@@ -494,7 +494,7 @@ contour_plot_fun <- function(combined_data,
 
     ## utils::globalVariables(c("lmean_abund", "abs_lfc"))
     ## deal with code checking: not sure why 'globalVariables' not working
-    lmean_abund <- abs_lfc <- power <- power_estimate <-
+    lmean_abund <- abs_lfc <- power <-
         pvalue_reject <- level <- NULL
 
   combined_data$pvalue_reject <- factor(combined_data$pval_reject)

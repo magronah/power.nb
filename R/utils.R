@@ -506,14 +506,18 @@ contour_plot_fun <- function(combined_data,
                + ylab(TeX("|$\\log_2$(fold change)|"))
                + scale_colour_manual(values = c("black", "red"))
                + ggplot2::geom_contour(data = power_estimate,
-                              aes(z=power),lwd=1,
+                              aes(z=.data$power),lwd=1,
                               breaks = cont_breaks)
                + metR::geom_label_contour(data = power_estimate,
-                                    aes(z= power,label = sprintf("%.3f", after_stat(level))),
+                                    aes(z= .data$power,label = sprintf("%.3f", after_stat(level))),
                                     breaks = cont_breaks)
                + ggplot2::theme_bw()
 
   )
+  gg_2dimc
+
+}
+
   # if(!is.null(multiple_samples)){
   #   gg_2dimc <- (ggplot(combined_data)
   #                + aes(lmean_abund, abs_lfc, color = sample_size_vec)
@@ -531,9 +535,6 @@ contour_plot_fun <- function(combined_data,
   #
   #   )
   # }
-  gg_2dimc
-
-}
 
 
 

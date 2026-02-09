@@ -453,7 +453,7 @@ deseq_est_list     =    lapply(desq_est, function(x){x$deseq_estimate})
 ## Fitting the Generalized Additive Model (GAM) 
 
 We now fit the GAM for predicting statistical power for individual taxon.
-```{r gam-fit}
+```{r gam-fit, cache = TRUE}
 true_lmean_list       =    countdata_sims$logmean_list
 true_lfoldchange_list =    countdata_sims$logfoldchange_list
 
@@ -470,8 +470,9 @@ gamFit <- gam_fit(deseq_est_list,
 ## Contour plot showing power for various combinations of mean abundance and fold change
 
 
-```{r contour-plot, eval=TRUE}
-cont_breaks     =  seq(0,1,0.1)
+```{r contour-plot, eval=TRUE, cache = TRUE}
+
+cont_breaks     =  seq(0,1,0.01)
 combined_data   =  gamFit$combined_data
 power_estimate  =  gamFit$power_estimate
 
@@ -489,7 +490,7 @@ contour_plot
 
 ## Simulate count data for various sample sizes
 
-```{r, eval = FALSE}
+```{r, eval = FALSE, cache = TRUE}
 nsim = 50
 nsamp_vec = c(20, 50, 70)
 countdata_sims_list  =  list()
@@ -513,7 +514,7 @@ names(countdata_sims_list) = paste0("sample_",nsamp_vec)
 
 ## Estimate p-values associated to fold changes for each taxa for simulated data per sample size
 
-```{r, eval = FALSE}
+```{r, eval = FALSE, cache = TRUE}
 desq_est_list  =  list()
 for(i in 1:length(countdata_sims_list)){
   

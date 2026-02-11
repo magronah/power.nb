@@ -490,8 +490,8 @@ contour_plot
 
 ## Simulate count data for various sample sizes
 
-```{r, eval = FALSE, cache = TRUE}
-nsim = 50
+```{r sim_multi_ss, eval = TRUE, cache = TRUE}
+nsim = 10
 nsamp_vec = c(20, 50, 70)
 countdata_sims_list  =  list()
 for(j in 1:length(nsamp_vec)){
@@ -514,7 +514,7 @@ names(countdata_sims_list) = paste0("sample_",nsamp_vec)
 
 ## Estimate p-values associated to fold changes for each taxa for simulated data per sample size
 
-```{r, eval = FALSE, cache = TRUE}
+```{r deseq_multi_ss, eval = TRUE, cache = TRUE}
 desq_est_list  =  list()
 for(i in 1:length(countdata_sims_list)){
   
@@ -535,6 +535,15 @@ for(i in 1:length(countdata_sims_list)){
 ## Fit Generalized Additive Model (GAM) for power estimation 
 
 We now fit a GAM model to predict statistical power. This time, we predict GAM with covariates as mean count of taxa, fold change of taxa and sample sizes
+
+```{r gam_multi_ss, eval = FALSE, cache = TRUE}
+power_multi_ss <- power_fun_ss(deseq_est_list,
+                         true_logfoldchange,
+                         true_logmean,
+                         sample_vec,
+                         alpha_level=0.1,notu)
+  
+```
 
 
 ## Estimate sample size for a given statistical power, fold change and mean abundance
@@ -580,6 +589,8 @@ kbl(df, booktabs = TRUE, longtable = TRUE,
 
 We would like to express our sincere gratitude to Dr. Jacob T. Nearing for his generosity in granting us access to the 38 microbiome datasets used in the paper “Microbiome differential abundance methods produce different results across 38 datasets” [@Nearing2022]. These datasets were invaluable in developing, testing, and validating this R package for power and sample size calculation in microbiome studies.
 
+We would also like to thank the following students for the University of Alberta who took time to run the functions in this package to estimates the parameters in the table in the appendix for the vairous datasets: 
+Nevin Nu, Mir Akbaar, Gosh, George, Alim, Akja, etc. 
 
 # References
 

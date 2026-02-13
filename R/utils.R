@@ -507,6 +507,7 @@ contour_plot_fun <- function(combined_data,
                + scale_colour_manual(values = c("black", "red"))
                + ggplot2::geom_contour(data = power_estimate,
                               aes(z=.data$power),lwd=1,
+                              #dont know why z=.data$power works and not z = power
                               breaks = cont_breaks)
                + metR::geom_label_contour(data = power_estimate,
                                     aes(z= .data$power,label = sprintf("%.3f", after_stat(level))),
@@ -515,7 +516,6 @@ contour_plot_fun <- function(combined_data,
 
   )
   gg_2dimc
-
 }
 
   # if(!is.null(multiple_samples)){

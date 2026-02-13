@@ -537,6 +537,11 @@ for(i in 1:length(countdata_sims_list)){
 We now fit a GAM model to predict statistical power. This time, we predict GAM with covariates as mean count of taxa, fold change of taxa and sample sizes
 
 ```{r gam_multi_ss, eval = FALSE, cache = TRUE}
+true_logfoldchange
+true_logmean
+logfoldchange_list
+true_logmean
+
 power_multi_ss <- power_fun_ss(deseq_est_list,
                          true_logfoldchange,
                          true_logmean,
@@ -563,25 +568,26 @@ power_multi_ss <- power_fun_ss(deseq_est_list,
 library(knitr)
 library(kableExtra)
 
-# Example data (two rows like in your LaTeX version)
 df <- data.frame(
   `Data description` = c("Example row 1", "Example row 2"),
-  n1 = c(5, 5),
-  mu1 = c("(2,3,4,5,7)", "(2,3,4,5,7)"),
-  sigma1 = c("(2,3,4,5,7)", "(2,3,4,5,7)"),
-  p1 = c("(2,3,4,5,7)", "(2,3,4,5,7)"),
-  n2 = c(5, 5),
-  mu2 = c("(2,3,4,5,7)", "(2,3,4,5,7)"),
-  sigma2 = c("(2,3,4,5,7)", "(2,3,4,5,7)"),
-  p2 = c("(2,3,4,5,7)", "(2,3,4,5,7)"),
-  fx = c("(2,3,4,5,7)", "(2,3,4,5,7)")
+  `n_1` = c(5, 5),
+  `$\\mu_1$` = c("(2,3,4,5,7)", "(2,3,4,5,7)"),
+  `$\\sigma_1$` = c("(2,3,4,5,7)", "(2,3,4,5,7)"),
+  `p_1` = c("(2,3,4,5,7)", "(2,3,4,5,7)"),
+  `n_2` = c(5, 5),
+  `$\\mu_2$` = c("(2,3,4,5,7)", "(2,3,4,5,7)"),
+  `$\\sigma_2$` = c("(2,3,4,5,7)", "(2,3,4,5,7)"),
+  `p_2` = c("(2,3,4,5,7)", "(2,3,4,5,7)"),
+  `$f(x)$` = c("(2,3,4,5,7)", "(2,3,4,5,7)")
 )
 
-kbl(df, booktabs = TRUE, longtable = TRUE,
+kbl(df,
+    booktabs = TRUE,
+    longtable = TRUE,
+    escape = FALSE,
     caption = "Data description and parameter estimates from actual microbiome datasets") %>%
   kable_styling(latex_options = c("hold_position", "repeat_header")) %>%
-  add_header_above(c(" " = 1, "Log mean count" = 4, "Log foldchange" = 5)) %>%
-  add_header_above(c(" " = 1, "Parameters" = 9)) # optional extra grouping
+  add_header_above(c(" " = 1, "Log mean count" = 4, "Log fold change" = 5))
 
 ```
 
@@ -589,8 +595,8 @@ kbl(df, booktabs = TRUE, longtable = TRUE,
 
 We would like to express our sincere gratitude to Dr. Jacob T. Nearing for his generosity in granting us access to the 38 microbiome datasets used in the paper “Microbiome differential abundance methods produce different results across 38 datasets” [@Nearing2022]. These datasets were invaluable in developing, testing, and validating this R package for power and sample size calculation in microbiome studies.
 
-We would also like to thank the following students for the University of Alberta who took time to run the functions in this package to estimates the parameters in the table in the appendix for the vairous datasets: 
-Nevin Nu, Mir Akbaar, Gosh, George, Alim, Akja, etc. 
+We also sincerely appreciate the following people for running the functions in this package on the microbiome datasets published in [@Nearing2022] to provide users with plausible parameter values for thier research work: Alim Tuguzbay, Nevin Nu, Mir Akbaar Khaled, Gosh, George, Alim, Akja, etc. and Roda (all from University of Alberta) and mmm (McMaster University)
+
 
 # References
 

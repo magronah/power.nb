@@ -557,6 +557,7 @@ power_multi_ss <- power_fun_ss(deseq_est_list,
 
 
 
+i want to use latex format for mu1 and mu2 instead. Ie, mu_1
 
 
 
@@ -570,15 +571,16 @@ library(kableExtra)
 
 df <- data.frame(
   `Data description` = c("Example row 1", "Example row 2"),
-  `n_1` = c(5, 5),
+  `$n_{comp}$` = c(5, 5),
   `$\\mu_1$` = c("(2,3,4,5,7)", "(2,3,4,5,7)"),
   `$\\sigma_1$` = c("(2,3,4,5,7)", "(2,3,4,5,7)"),
-  `p_1` = c("(2,3,4,5,7)", "(2,3,4,5,7)"),
-  `n_2` = c(5, 5),
+  `$p_1$` = c("(2,3,4,5,7)", "(2,3,4,5,7)"),
+  `$n_{comp}$` = c(5, 5),
   `$\\mu_2$` = c("(2,3,4,5,7)", "(2,3,4,5,7)"),
   `$\\sigma_2$` = c("(2,3,4,5,7)", "(2,3,4,5,7)"),
   `p_2` = c("(2,3,4,5,7)", "(2,3,4,5,7)"),
-  `$f(x)$` = c("(2,3,4,5,7)", "(2,3,4,5,7)")
+  `$f(x)$` = c("(2,3,4,5,7)", "(2,3,4,5,7)"),
+  check.names = FALSE   # 
 )
 
 kbl(df,
@@ -595,7 +597,10 @@ kbl(df,
 
 We would like to express our sincere gratitude to Dr. Jacob T. Nearing for his generosity in granting us access to the 38 microbiome datasets used in the paper “Microbiome differential abundance methods produce different results across 38 datasets” [@Nearing2022]. These datasets were invaluable in developing, testing, and validating this R package for power and sample size calculation in microbiome studies.
 
-We also sincerely appreciate the following people for running the functions in this package on the microbiome datasets published in [@Nearing2022] to provide users with plausible parameter values for thier research work: Alim Tuguzbay, Nevin Nu, Mir Akbaar Khaled, Gosh, George, Alim, Akja, etc. and Roda (all from University of Alberta) and mmm (McMaster University)
+We also sincerely appreciate the following individuals for running the functions in this package on the microbiome datasets published in [@Nearing2022], thereby providing users with plausible parameter values for their research work: Alim Tuguzbay, Arjya Bhattacharjee, Atiyah Sulaiman, George Vinichenko, Josh Effero, Mahdiya Adnan, Mir Akbaar Khaled, Nevin Xu, Nichole, Riya, and Shaira Habib (University of Alberta: Alim Tuguzbay, Arjya Bhattacharjee, Atiyah Sulaiman, George Vinichenko, Josh Effero, Mahdiya Adnan, Mir Akbaar Khaled, Nevin Xu, and Shaira Habib; McMaster University: Nichole and Riya).
+
+<!--We also sincerely appreciate the following people for running the functions in this package on the microbiome datasets published in [@Nearing2022] to provide users with plausible parameter values for thier research work: Alim Tuguzbay, Nevin Nu, Mir Akbaar Khaled, Gosh, logfoldchangeFit, Alim, Akja, etc. and Roda (all from University of Alberta) and mmm (McMaster University)-->
+
 
 
 # References

@@ -102,21 +102,28 @@
 #
 #
 #
-# uniroot_ss =  function(target_power,lmean_abund, abs_lfc,model,xmin,xmax){
-#
-#   root <- uniroot(function(ss) {
-#     predict(model,
-#             type = "response",
-#             newdata = data.frame(sample_size = ss,
-#                                  lmean_abund = lmean_abund,
-#                                  abs_lfc = abs_lfc)
-#     ) - target_power
-#   },
-#   interval = c(xmin, xmax),
-#   extendInt = "yes")$root
-#   root
-# }
-#
+uniroot_ss =  function(target_power,logmean, abs_lfc,model,xmin,xmax){
+
+  root <- uniroot(function(ss) {
+
+    data = data.frame(logsample_size = ss,
+                         logmean = logmean,
+                         abs_lfc = abs_lfc)
+
+    ##' predict.scam seem to have a bug and
+    ##' would not predict row data with only one row
+   pred = predict(model,
+            type = "response",
+            newdata = data[rep(1,2),])
+
+   pred[[1]] - target_power
+  },
+  interval = c(xmin, xmax),
+  extendInt = "no")$root
+  #2^root
+}
+
+
 # # Function to compute the missing input
 # power.nb <- function(power, sample_size, logfoldchange, logmean_abundance, gam_mod) {
 #
@@ -154,36 +161,30 @@
 #' @param deseq_est_list a list containing fold change, pvalues and other estimates from `DESeq2`
 #' @param true_logfoldchange  list containing simulated log fold change used  for simulating the count data
 #' @param true_logmean list containing simulated log mean counte used  for simulating the count data
-#' @param sample_vec vector of sample sizes
+#' @param nsample_vec vector of sample sizes
 #' @param alpha_level sign containing simulated log fold change used  for simulating the count data
 #' @param notu number of OTUs
-#' 
 #'
-power_fun_ss <- function(deseq_est_list,
-                         true_logfoldchange,
-                         true_logmean,
-                         sample_vec,
-                         alpha_level=0.1,notu){
+#'
+power_fun_ss <- function(pval_est_list,
+                         logmean_list,
+                         nsample_vec,
+                         logfoldchange_list,
+                         alpha_level=0.1){
 
   # concatenate all p-values from all the sample size
-  est_list <- do.call("c", deseq_est_list)
-  p_val <- do.call("c", lapply(est_list, function(est) est$deseq_estimate$padj))
+        p_val    =   unname(unlist(pval_est_list))
+  pval_reject    =   (!is.na(p_val) & p_val < alpha_level)
+  sample_size    =   rep(nsample_vec,
+                         times = sapply(lapply(logfoldchange_list, unlist),
+                                        length))
 
-  # concatenate all log foldchange, logmean from all the sample size
-  #true_logfoldchange <- do.call("c", do.call("c", sim_logfoldchange_list))
-  #true_logmean  <-  do.call("c", do.call("c", sim_logmean_list))
-
-  #deseq_est_list = deseq_sample_size[[1]]
-  # find p-values that were rejected
-  p_val =  deseq_est_list$padj
-
-  pval_reject   =   (!is.na(p_val) & p_val < 0.1)
   # create a table with all the information
-  comb   = tibble::tibble(lmean_abund  =   true_logmean,
-                          abs_lfc      =   abs(true_logfoldchange),
-                          pval_reject  =   as.numeric(pval_reject))
+  comb   = tibble::tibble(logmean      =   unname(unlist(logmean_list)),
+                          abs_lfc      =   abs(unname(unlist(logfoldchange_list))),
+                          pval_reject  =   as.numeric(pval_reject),
+                          sample_size  =   sample_size)
 
-  comb$sample_size = deseq_est_list$sample_size #rep(sample_vec, each = nsim*notu)
   #' fit GAM with covariates as tensor product (ie,interaction between
   #' log mean abundance and absolute log fold changes
   #' and then a spline for the sample sizes
@@ -191,18 +192,11 @@ power_fun_ss <- function(deseq_est_list,
   #' interaction but sample size is not quite related to log mean abundance
   #' and log fold changes directly
 
-  df =  length(sample_vec) -1 # degrees of freedom
-  comb$lss = log2(comb$sample_size)
+  comb$logsample_size = log2(comb$sample_size)
 
-  # fit_3d <- scam(pval_reject ~ s(lmean_abund, abs_lfc,bs="tedmi") + s(lss, k = df),
-  #                data = comb, family = binomial)
-  # fit_3d <- scam(pval_reject ~ s(lmean_abund, abs_lfc,bs="tedmi") + s(sample_size,bs="mpi"),
-  #                data = comb, family = binomial)
-
-  fit_3d <- scam::scam(pval_reject ~ s(lmean_abund, abs_lfc,bs="tedmi") +
-                   s(sample_size,lmean_abund,bs="tedmi") +
-                   s(sample_size,abs_lfc,bs="tedmi"),
-                   data = comb, family = binomial)
+  fit_3d <- scam::scam(pval_reject ~ s(logmean, abs_lfc,bs="tedmi") +
+                                     s(logsample_size,bs="mpi"),
+                                     data = comb, family = binomial)
 
   list(combined_data=comb, gam_mod = fit_3d)
 }

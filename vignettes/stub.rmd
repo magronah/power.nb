@@ -278,7 +278,6 @@ countdata_sims = countdata_sim_fun(logmean_param,
                                    maxlfc_iter = 1000,
                                    seed = 121)
 
-names(countdata_sim_fun)
 dim(countdata_sims$treat_countdata_list$sim_1)
 dim(countdata_sims$control_countdata_list$sim_1)
 dim(countdata_sims$countdata_list$sim_1)
@@ -491,14 +490,14 @@ contour_plot
 ## Simulate count data for various sample sizes
 
 ```{r sim_multi_ss, eval = TRUE, cache = TRUE}
-nsim = 10
-nsamp_vec = c(20, 50, 70)
+nsim = 4
+nsample_vec = seq(10, 100, 10)
 countdata_sims_list  =  list()
-for(j in 1:length(nsamp_vec)){
+for(j in 1:length(nsample_vec)){
   countdata_sims_list[[j]]  =  countdata_sim_fun(logmean_param,
                                                  logfoldchange_param,
                                                  dispersion_param,
-                                                 nsamp_per_group = nsamp_vec[j],
+                                                 nsamp_per_group = nsample_vec[j],
                                                  ncont  = NULL,
                                                  ntreat = NULL,
                                                  notu,
@@ -509,7 +508,7 @@ for(j in 1:length(nsamp_vec)){
                                                  seed = 121)
 }
 
-names(countdata_sims_list) = paste0("sample_",nsamp_vec)
+names(countdata_sims_list) = paste0("sample_",nsample_vec)
 ```
 
 ## Estimate p-values associated to fold changes for each taxa for simulated data per sample size
@@ -529,6 +528,7 @@ for(i in 1:length(countdata_sims_list)){
                                ref_name       = "control")
   
 }
+names(desq_est_list) = paste0("sample_",nsample_vec)
 ```
 
 
@@ -537,29 +537,33 @@ for(i in 1:length(countdata_sims_list)){
 We now fit a GAM model to predict statistical power. This time, we predict GAM with covariates as mean count of taxa, fold change of taxa and sample sizes
 
 ```{r gam_multi_ss, eval = FALSE, cache = TRUE}
-true_logfoldchange
-true_logmean
-logfoldchange_list
-true_logmean
 
-power_multi_ss <- power_fun_ss(deseq_est_list,
-                         true_logfoldchange,
-                         true_logmean,
-                         sample_vec,
-                         alpha_level=0.1,notu)
+deseq_list = lapply(desq_est_list, function(x){
+  read_data(x, "deseq_estimate") 
+})
+
+padj_list <- lapply(deseq_list, function(sample_list) {
+  lapply(sample_list, function(sim_df) {
+    sim_df$padj
+  })
+})
+ 
+
+logfoldchange_list  =   read_data(countdata_sims_list,"logfoldchange_list")
+logmean_list        =   read_data(countdata_sims_list,"logmean_list")
+
+pow_ss <- power_fun_ss(pval_est_list = padj_list,
+                         logmean_list,
+                         nsample_vec = nsample_vec,
+                         logfoldchange_list,
+                         alpha_level=0.1)
   
 ```
 
 
+
+
 ## Estimate sample size for a given statistical power, fold change and mean abundance
-
-
-
-
-
-i want to use latex format for mu1 and mu2 instead. Ie, mu_1
-
-
 
 
 

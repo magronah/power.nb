@@ -81,7 +81,6 @@ metadata <- metadata %>%
 
 dim(data); dim(metadata)
 head(data); head(metadata)
-
 ```
 
 ## Pre-filtering low abundant taxa
@@ -569,12 +568,14 @@ pow_ss <- power_fun_ss(pval_est_list = padj_list,
 
 # Appendix 
 
+### Data description and parameter estimates from actual microbiome datasets
+
 ```{r, echo=FALSE}
 library(knitr)
 library(kableExtra)
 
 df <- data.frame(
-  `Data description` = c("Example row 1", "Example row 2"),
+  `$Dataset$` = c("Example row 1", "Example row 2"),
   `$n_{comp}$` = c(5, 5),
   `$\\mu_1$` = c("(2,3,4,5,7)", "(2,3,4,5,7)"),
   `$\\sigma_1$` = c("(2,3,4,5,7)", "(2,3,4,5,7)"),
@@ -590,8 +591,7 @@ df <- data.frame(
 kbl(df,
     booktabs = TRUE,
     longtable = TRUE,
-    escape = FALSE,
-    caption = "Data description and parameter estimates from actual microbiome datasets") %>%
+    escape = FALSE) %>%
   kable_styling(latex_options = c("hold_position", "repeat_header")) %>%
   add_header_above(c(" " = 1, "Log mean count" = 4, "Log fold change" = 5))
 

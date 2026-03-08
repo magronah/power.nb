@@ -204,6 +204,7 @@ power_fun_ss <- function(pval_est_list,
                                      data = comb, family = binomial)
 
   list(combined_data=comb, gam_mod = fit_3d)
+
 }
 
 

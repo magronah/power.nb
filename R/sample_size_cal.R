@@ -120,7 +120,7 @@ uniroot_ss =  function(target_power,logmean, abs_lfc,model,xmin,xmax){
   },
   interval = c(xmin, xmax),
   extendInt = "no")$root
-  #2^root
+  2^root
 }
 
 
@@ -194,11 +194,24 @@ power_fun_ss <- function(pval_est_list,
 
   comb$logsample_size = log2(comb$sample_size)
 
+  # fit_3d <- scam::scam(pval_reject ~ s(logmean, abs_lfc,bs="tedmi") +
+  #                                    s(sample_size,logmean,bs="tedmi") +
+  #                                    s(sample_size,abs_lfc,bs="tedmi"),
+  #                                    data = comb, family = binomial)
+
   fit_3d <- scam::scam(pval_reject ~ s(logmean, abs_lfc,bs="tedmi") +
                                      s(logsample_size,bs="mpi"),
                                      data = comb, family = binomial)
 
   list(combined_data=comb, gam_mod = fit_3d)
 }
+
+
+## Diagnosis
+##' I want to check if the power predictions make sense
+##' Simulate logfoldchange and logmean and then predict power
+##'
+
+
 
 

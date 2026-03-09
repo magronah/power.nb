@@ -444,8 +444,8 @@ desq_est   =   quiet(deseq_fun_est(metadata_list =  metadata_list,
                             num_cores      =  4,
                             ref_name       = "control"))
 
-names(desq_est$sim_1)
 deseq_est_list     =    lapply(desq_est, function(x){x$deseq_estimate})
+names(desq_est$sim_1)
 ```
 
 ## Fitting the Generalized Additive Model (GAM) 

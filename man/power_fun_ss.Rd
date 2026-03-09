@@ -5,34 +5,42 @@
 \title{Power function}
 \usage{
 power_fun_ss(
-  deseq_est_list,
-  true_logfoldchange,
-  true_logmean,
-  sample_vec,
-  alpha_level = 0.1,
-  notu
+  pval_est_list,
+  logmean_list,
+  nsample_vec,
+  logfoldchange_list,
+  alpha_level = 0.1
 )
 }
 \arguments{
+\item{nsample_vec}{vector of sample sizes}
+
+\item{alpha_level}{sign containing simulated log fold change used  for simulating the count data}
+
 \item{deseq_est_list}{a list containing fold change, pvalues and other estimates from \code{DESeq2}}
 
 \item{true_logfoldchange}{list containing simulated log fold change used  for simulating the count data}
 
 \item{true_logmean}{list containing simulated log mean counte used  for simulating the count data}
 
-\item{sample_vec}{vector of sample sizes}
-
-\item{alpha_level}{sign containing simulated log fold change used  for simulating the count data}
-
-\item{notu}{number of OTUs
+\item{notu}{number of OTUs}
+}
+\value{
+A list containing:
+\itemize{
+\item \code{gam_mod}: The scam object
+\item \code{combined_data}: The data used for fitting the GAM model
+}
+}
+\description{
+Power function
+}
+\examples{
 
 fit GAM with covariates as tensor product (ie,interaction between
 log mean abundance and absolute log fold changes
 and then a spline for the sample sizes
 log mean abundance and log fold changes are related directly,hence the
 interaction but sample size is not quite related to log mean abundance
-and log fold changes directly}
-}
-\description{
-Power function
+and log fold changes directly
 }

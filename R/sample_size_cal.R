@@ -164,7 +164,14 @@ uniroot_ss =  function(target_power,logmean, abs_lfc,model,xmin,xmax){
 #' @param nsample_vec vector of sample sizes
 #' @param alpha_level sign containing simulated log fold change used  for simulating the count data
 #' @param notu number of OTUs
+#' @return A list containing:
+#'   \itemize{
+#'     \item \code{gam_mod}: The scam object
+#'     \item \code{combined_data}: The data used for fitting the GAM model
+#'   }
+#'
 #' @export
+#' @examples
 #'
 power_fun_ss <- function(pval_est_list,
                          logmean_list,

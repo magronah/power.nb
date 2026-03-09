@@ -164,7 +164,7 @@ uniroot_ss =  function(target_power,logmean, abs_lfc,model,xmin,xmax){
 #' @param nsample_vec vector of sample sizes
 #' @param alpha_level sign containing simulated log fold change used  for simulating the count data
 #' @param notu number of OTUs
-#'
+#' @export
 #'
 power_fun_ss <- function(pval_est_list,
                          logmean_list,

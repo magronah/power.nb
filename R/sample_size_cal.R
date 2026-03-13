@@ -102,26 +102,7 @@
 #
 #
 #
-uniroot_ss =  function(target_power,logmean, abs_lfc,model,xmin,xmax){
 
-  root <- uniroot(function(ss) {
-
-    data = data.frame(logsample_size = ss,
-                         logmean = logmean,
-                         abs_lfc = abs_lfc)
-
-    ##' predict.scam seem to have a bug and
-    ##' would not predict row data with only one row
-   pred = predict(model,
-            type = "response",
-            newdata = data[rep(1,2),])
-
-   pred[[1]] - target_power
-  },
-  interval = c(xmin, xmax),
-  extendInt = "no")$root
-  2^root
-}
 
 
 # # Function to compute the missing input
@@ -152,10 +133,8 @@ uniroot_ss =  function(target_power,logmean, abs_lfc,model,xmin,xmax){
 #     stop("Inputs must be numeric values.")
 #   }
 # }
-#
-#
-#
-#
+
+
 #' Power function
 #'
 #' @param deseq_est_list a list containing fold change, pvalues and other estimates from `DESeq2`
@@ -171,7 +150,6 @@ uniroot_ss =  function(target_power,logmean, abs_lfc,model,xmin,xmax){
 #'   }
 #'
 #' @export
-#' @examples
 #'
 power_fun_ss <- function(pval_est_list,
                          logmean_list,
@@ -192,13 +170,6 @@ power_fun_ss <- function(pval_est_list,
                           pval_reject  =   as.numeric(pval_reject),
                           sample_size  =   sample_size)
 
-  #' fit GAM with covariates as tensor product (ie,interaction between
-  #' log mean abundance and absolute log fold changes
-  #' and then a spline for the sample sizes
-  #' log mean abundance and log fold changes are related directly,hence the
-  #' interaction but sample size is not quite related to log mean abundance
-  #' and log fold changes directly
-
   comb$logsample_size = log2(comb$sample_size)
 
   fit_2d <- tryCatch(
@@ -213,12 +184,14 @@ power_fun_ss <- function(pval_est_list,
       )
     },
     error = function(e) {
-      message(
-        "Full SCAM model failed to fit. ",
-        "Fitting simpler fallback model instead.\n",
-        "Original error: ", e$message
-      )
-
+      warning(
+        "Full SCAM model failed to converge due to numerical instability. ",
+        "A simpler fallback model was fitted instead (removing the interactions ",
+        "between sample size and log mean abundance and between sample size and ",
+        "effect size).\n",
+        "To attempt the full model, consider refitting with a reduced set of sample sizes \n",
+        "Original error: ", e$message,
+        call. = FALSE)
       scam::scam(
         pval_reject ~
           s(logmean, abs_lfc, bs = "tedmi") +
@@ -228,19 +201,167 @@ power_fun_ss <- function(pval_est_list,
       )
     }
   )
-
-
   list(combined_data=comb, gam_mod = fit_2d)
-
-
 }
 
 
-## Diagnosis
-##' I want to check if the power predictions make sense
-##' Simulate logfoldchange and logmean and then predict power
-##'
+###############################################################
+#' Sample Size estimation function uisng uniroot
+#'
+#' @param target_power Numeric value specifying the desired statistical power.
+#' @param logmean Numeric value representing the log of the mean abundance.
+#' @param abs_lfc Numeric value representing the absolute log fold change.
+#' @param model A fitted GAM/SCAM model used to predict statistical power.
+#' @param xmin Numeric value giving the minimum sample size considered in the search.
+#' @param xmax Numeric value giving the maximum sample size considered in the search.
+#' @return A numeric value corresponding to the estimated sample size required to achieve the target power.
+#' @export
+uniroot_ss =  function(target_power,logmean, abs_lfc,model,xmin,xmax){
 
+  root <- stats::uniroot(function(ss) {
 
+    data = data.frame(logsample_size = ss,
+                      logmean = logmean,
+                      abs_lfc = abs_lfc)
 
+    ##' predict.scam seem to have a bug and
+    ##' would not predict row data with only one row
+    pred = predict(model,
+                   type = "response",
+                   newdata = data[rep(1,2),])
 
+    pred[[1]] - target_power
+  },
+  interval = c(xmin, xmax),
+  extendInt = "no")$root
+  2^root
+}
+###############################################################
+#' Estimate sample size required to achieve a target statistical power
+#'
+#' This function estimates the sample size required to achieve a specified
+#' target power using predictions from a fitted GAM/SCAM power model.
+#' The function evaluates predicted power across a grid of candidate sample
+#' sizes and identifies the smallest sample size for which the predicted
+#' power reaches or exceeds the target value. Linear interpolation is then
+#' used on the log2(sample size) scale to obtain a more precise estimate.
+#'
+#' @param target_power Numeric value specifying the desired statistical power.
+#' @param logmean Numeric value representing the log mean abundance.
+#' @param abs_lfc Numeric value representing the absolute log fold change.
+#' @param model A fitted GAM/SCAM model used to predict statistical power.
+#' @param xmin Numeric value giving the minimum log2(sample size) considered
+#'   in the search. Default is \code{log2(5)}.
+#' @param xmax Numeric value giving the maximum log2(sample size) considered
+#'   in the search. Default is \code{log2(500)}.
+#' @param ngrid Integer specifying the number of grid points used when
+#'   searching for the sample size solution. Default is \code{1000}.
+#'
+#' @return A numeric value representing the estimated sample size required
+#'   to achieve the target power. Returns \code{NA} if the target power is
+#'   not reached within the specified search range.
+#'
+#' @details
+#' The function first constructs a grid of candidate sample sizes on the
+#' log2 scale between \code{xmin} and \code{xmax}. Predicted power values are
+#' then obtained from the fitted model for each grid point. The smallest
+#' sample size at which the predicted power reaches the target value is
+#' identified, and linear interpolation is used to refine the estimate.
+#'
+#' @export
+#'
+sample_size_ss_interp <- function(target_power, logmean, abs_lfc, model,
+                                  xmin = log2(5), xmax = log2(500),
+                                  ngrid = 1000) {
+
+  ss_grid <- seq(xmin, xmax, length.out = ngrid)
+
+  nd <- data.frame(
+    logsample_size = ss_grid,
+    logmean = logmean,
+    abs_lfc = abs_lfc
+  )
+
+  pred <- predict(model, type = "response", newdata = nd)
+
+  idx <- which(pred >= target_power)[1]
+
+  if (is.na(idx)) return(NA_real_)     # target never reached
+  if (idx == 1) return(2^ss_grid[1])   # already achieved at minimum
+
+  x0 <- ss_grid[idx - 1]
+  x1 <- ss_grid[idx]
+  y0 <- pred[idx - 1]
+  y1 <- pred[idx]
+
+  # linear interpolation on log2(sample size) scale
+  x_star <- x0 + (target_power - y0) * (x1 - x0) / (y1 - y0)
+
+  2^x_star
+}
+##########################################################
+#' Solve for the sample size required to achieve a target statistical power
+#'
+#' This function estimates the sample size required to achieve a specified
+#' target statistical power using a fitted GAM/SCAM power model. The function
+#' first attempts to solve for the sample size using a root-finding algorithm.
+#' If the root-finding procedure fails, a grid-based interpolation method is
+#' used as a fallback to obtain an approximate solution.
+#'
+#' @param target_power Numeric value specifying the desired statistical power.
+#' @param logmean Numeric value representing the log mean abundance.
+#' @param abs_lfc Numeric value representing the absolute log fold change.
+#' @param model A fitted GAM/SCAM model used to predict statistical power.
+#' @param xmin Numeric value giving the minimum log2(sample size) considered
+#'   in the search. Default is \code{log2(5)}.
+#' @param xmax Numeric value giving the maximum log2(sample size) considered
+#'   in the search. Default is \code{log2(500)}.
+#'
+#' @return A numeric value representing the estimated sample size required
+#'   to achieve the target power.
+#'
+#' @details
+#' The function first attempts to compute the required sample size using a
+#' root-finding approach implemented in \code{uniroot_ss()}. If this method
+#' fails (for example, due to numerical issues or if the root cannot be
+#' bracketed within the specified interval), the function falls back to
+#' a grid-based interpolation approach implemented in
+#' \code{sample_size_ss_interp()}.
+#'
+#' A warning is issued if the target power is specified as 0 or 1, since
+#' these values correspond to unrealistic design targets in most practical
+#' applications.
+#'
+#' @export
+ss_solver <- function(target_power, logmean, abs_lfc, model,
+                      xmin = log2(5), xmax = log2(500)) {
+
+  if(target_power == 0 || target_power == 1){
+    warning("statistical power for  0% or 100% is  unlikely")
+  }
+  out <- tryCatch({
+
+    uniroot_ss(
+      target_power = target_power,
+      logmean = logmean,
+      abs_lfc = abs_lfc,
+      model = model,
+      xmin = xmin,
+      xmax = xmax
+    )
+
+  }, error = function(e) {
+
+    sample_size_ss_interp(
+      target_power = target_power,
+      logmean = logmean,
+      abs_lfc = abs_lfc,
+      model = model,
+      xmin = xmin,
+      xmax = xmax
+    )
+
+  })
+
+  out
+}

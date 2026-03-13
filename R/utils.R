@@ -499,12 +499,12 @@ contour_plot_fun <- function(combined_data,
 
   combined_data$pvalue_reject <- factor(combined_data$pval_reject)
 
-  gg_2dimc <- (ggplot(combined_data)
+  gg_2dimc <- (ggplot2::ggplot(combined_data)
                + aes(lmean_abund, abs_lfc)
                + ggrastr::rasterise(geom_point(aes(color = pvalue_reject), alpha = 0.5))
-               + xlab(TeX("$\\log_2$(mean counts)"))
-               + ylab(TeX("|$\\log_2$(fold change)|"))
-               + scale_colour_manual(values = c("black", "red"))
+               + xlab(latex2exp::TeX("$\\log_2$(mean counts)"))
+               + ylab(latex2exp::TeX("|$\\log_2$(fold change)|"))
+               + ggplot2::scale_colour_manual(values = c("black", "red"))
                + ggplot2::geom_contour(data = power_estimate,
                               aes(z=.data$power),lwd=1,
                               #dont know why z=.data$power works and not z = power

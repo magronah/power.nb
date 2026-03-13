@@ -201,16 +201,36 @@ power_fun_ss <- function(pval_est_list,
 
   comb$logsample_size = log2(comb$sample_size)
 
-  # fit_3d <- scam::scam(pval_reject ~ s(logmean, abs_lfc,bs="tedmi") +
-  #                                    s(sample_size,logmean,bs="tedmi") +
-  #                                    s(sample_size,abs_lfc,bs="tedmi"),
-  #                                    data = comb, family = binomial)
+  fit_2d <- tryCatch(
+    {
+      scam::scam(
+        pval_reject ~
+          s(logmean, abs_lfc, bs = "tedmi") +
+          s(abs_lfc, logsample_size, bs = "tedmi") +
+          s(logmean, logsample_size, bs = "tedmi"),
+        data = comb,
+        family = binomial
+      )
+    },
+    error = function(e) {
+      message(
+        "Full SCAM model failed to fit. ",
+        "Fitting simpler fallback model instead.\n",
+        "Original error: ", e$message
+      )
 
-  fit_3d <- scam::scam(pval_reject ~ s(logmean, abs_lfc,bs="tedmi") +
-                                     s(logsample_size,bs="mpi"),
-                                     data = comb, family = binomial)
+      scam::scam(
+        pval_reject ~
+          s(logmean, abs_lfc, bs = "tedmi") +
+          s(logsample_size, bs = "mpi"),
+        data = comb,
+        family = binomial
+      )
+    }
+  )
 
-  list(combined_data=comb, gam_mod = fit_3d)
+
+  list(combined_data=comb, gam_mod = fit_2d)
 
 
 }

@@ -59,7 +59,7 @@
                         <h4 data-toc-skip class="author">Michael Agronah
 and Benjamin Bolker</h4>
             
-            <h4 data-toc-skip class="date">2026-02-27</h4>
+            <h4 data-toc-skip class="date">2026-03-14</h4>
       
 
       <div class="d-none name"><code>stub.rmd</code></div>
@@ -107,7 +107,7 @@ Microbiome Counts”</a> <span class="citation">(Agronah 2025)</span></p>
 <p>Install the package from GitHub using <code>devtools</code>:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"devtools"</span><span class="op">)</span></span>
-<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"magronah/power.nb"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://devtools.r-lib.org/reference/install-deprecated.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"magronah/power.nb"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="simulating-microbiome-data">Simulating microbiome data<a class="anchor" aria-label="anchor" href="#simulating-microbiome-data"></a>
@@ -792,18 +792,17 @@ simulated fold changes using the <code>DESeq2</code> package.</p>
 <span>                            num_cores      <span class="op">=</span>  <span class="fl">4</span>,</span>
 <span>                            ref_name       <span class="op">=</span> <span class="st">"control"</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
+<span><span class="va">deseq_est_list</span>     <span class="op">=</span>    <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">desq_est</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">{</span><span class="va">x</span><span class="op">$</span><span class="va">deseq_estimate</span><span class="op">}</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">desq_est</span><span class="op">$</span><span class="va">sim_1</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] "logfoldchange"  "dispersion"     "deseq_estimate" "deseq_object"  </span></span>
 <span><span class="co">## [5] "metadata"       "countdata"</span></span></code></pre>
-<div class="sourceCode" id="cb47"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">deseq_est_list</span>     <span class="op">=</span>    <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">desq_est</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">{</span><span class="va">x</span><span class="op">$</span><span class="va">deseq_estimate</span><span class="op">}</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="fitting-the-generalized-additive-model-gam">Fitting the Generalized Additive Model (GAM)<a class="anchor" aria-label="anchor" href="#fitting-the-generalized-additive-model-gam"></a>
 </h3>
 <p>We now fit the GAM for predicting statistical power for individual
 taxon.</p>
-<div class="sourceCode" id="cb48"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb47"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">true_lmean_list</span>       <span class="op">=</span>    <span class="va">countdata_sims</span><span class="op">$</span><span class="va">logmean_list</span></span>
 <span><span class="va">true_lfoldchange_list</span> <span class="op">=</span>    <span class="va">countdata_sims</span><span class="op">$</span><span class="va">logfoldchange_list</span></span>
 <span></span>
@@ -813,13 +812,19 @@ taxon.</p>
 <span>                  grid_len <span class="op">=</span> <span class="fl">50</span>,</span>
 <span>                  alpha_level<span class="op">=</span><span class="fl">0.1</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co">#plot(gamFit$fit_2d)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/base/range.html" class="external-link">range</a></span><span class="op">(</span><span class="va">true_lfoldchange_list</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## [1] -2.773278  3.112099</span></span></code></pre>
+<div class="sourceCode" id="cb49"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/range.html" class="external-link">range</a></span><span class="op">(</span><span class="va">true_lmean_list</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## [1] -3.573524  5.958783</span></span></code></pre>
+<div class="sourceCode" id="cb51"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co">#plot(gamFit$fit_2d)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="contour-plot-showing-power-for-various-combinations-of-mean-abundance-and-fold-change">Contour plot showing power for various combinations of mean
 abundance and fold change<a class="anchor" aria-label="anchor" href="#contour-plot-showing-power-for-various-combinations-of-mean-abundance-and-fold-change"></a>
 </h3>
-<div class="sourceCode" id="cb49"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb52"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cont_breaks</span>     <span class="op">=</span>  <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>,<span class="fl">1</span>,<span class="fl">0.01</span><span class="op">)</span></span>
 <span><span class="va">combined_data</span>   <span class="op">=</span>  <span class="va">gamFit</span><span class="op">$</span><span class="va">combined_data</span></span>
 <span><span class="va">power_estimate</span>  <span class="op">=</span>  <span class="va">gamFit</span><span class="op">$</span><span class="va">power_estimate</span></span>
@@ -837,7 +842,7 @@ abundance and fold change<a class="anchor" aria-label="anchor" href="#contour-pl
 <div class="section level3">
 <h3 id="simulate-count-data-for-various-sample-sizes">Simulate count data for various sample sizes<a class="anchor" aria-label="anchor" href="#simulate-count-data-for-various-sample-sizes"></a>
 </h3>
-<div class="sourceCode" id="cb50"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb53"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">nsim</span> <span class="op">=</span> <span class="fl">4</span></span>
 <span><span class="va">nsample_vec</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">100</span>, <span class="fl">10</span><span class="op">)</span></span>
 <span><span class="va">countdata_sims_list</span>  <span class="op">=</span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span></span>
@@ -862,7 +867,7 @@ abundance and fold change<a class="anchor" aria-label="anchor" href="#contour-pl
 <h3 id="estimate-p-values-associated-to-fold-changes-for-each-taxa-for-simulated-data-per-sample-size">Estimate p-values associated to fold changes for each taxa for
 simulated data per sample size<a class="anchor" aria-label="anchor" href="#estimate-p-values-associated-to-fold-changes-for-each-taxa-for-simulated-data-per-sample-size"></a>
 </h3>
-<div class="sourceCode" id="cb51"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb54"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">desq_est_list</span>  <span class="op">=</span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="kw">for</span><span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">countdata_sims_list</span><span class="op">)</span><span class="op">)</span><span class="op">{</span></span>
 <span>  </span>
@@ -885,12 +890,12 @@ simulated data per sample size<a class="anchor" aria-label="anchor" href="#estim
 <p>We now fit a GAM model to predict statistical power. This time, we
 predict GAM with covariates as mean count of taxa, fold change of taxa
 and sample sizes</p>
-<div class="sourceCode" id="cb52"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb55"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">deseq_list</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">desq_est_list</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">{</span></span>
 <span>  <span class="fu"><a href="../reference/read_data.html">read_data</a></span><span class="op">(</span><span class="va">x</span>, <span class="st">"deseq_estimate"</span><span class="op">)</span> </span>
 <span><span class="op">}</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">padj_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">deseq_list</span>, <span class="kw">function</span><span class="op">(</span><span class="va">sample_list</span><span class="op">)</span> <span class="op">{</span></span>
+<span><span class="va">pval_est_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">deseq_list</span>, <span class="kw">function</span><span class="op">(</span><span class="va">sample_list</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">sample_list</span>, <span class="kw">function</span><span class="op">(</span><span class="va">sim_df</span><span class="op">)</span> <span class="op">{</span></span>
 <span>    <span class="va">sim_df</span><span class="op">$</span><span class="va">padj</span></span>
 <span>  <span class="op">}</span><span class="op">)</span></span>
@@ -900,7 +905,7 @@ and sample sizes</p>
 <span><span class="va">logfoldchange_list</span>  <span class="op">=</span>   <span class="fu"><a href="../reference/read_data.html">read_data</a></span><span class="op">(</span><span class="va">countdata_sims_list</span>,<span class="st">"logfoldchange_list"</span><span class="op">)</span></span>
 <span><span class="va">logmean_list</span>        <span class="op">=</span>   <span class="fu"><a href="../reference/read_data.html">read_data</a></span><span class="op">(</span><span class="va">countdata_sims_list</span>,<span class="st">"logmean_list"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">pow_ss</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/power_fun_ss.html">power_fun_ss</a></span><span class="op">(</span>pval_est_list <span class="op">=</span> <span class="va">padj_list</span>,</span>
+<span><span class="va">pow_ss</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/power_fun_ss.html">power_fun_ss</a></span><span class="op">(</span><span class="va">pval_est_list</span>,</span>
 <span>                         <span class="va">logmean_list</span>,</span>
 <span>                         nsample_vec <span class="op">=</span> <span class="va">nsample_vec</span>,</span>
 <span>                         <span class="va">logfoldchange_list</span>,</span>
@@ -1056,11 +1061,11 @@ the functions in this package on the microbiome datasets published in
 <span class="citation">(Nearing et al. 2022)</span>, thereby providing
 users with plausible parameter values for their research work: Alim
 Tuguzbay, Arjya Bhattacharjee, Atiyah Sulaiman, George Vinichenko, Josh
-Effero, Mahdiya Adnan, Mir Akbaar Khaled, Nevin Xu, Nichole, Riya, and
-Shaira Habib (University of Alberta: Alim Tuguzbay, Arjya Bhattacharjee,
-Atiyah Sulaiman, George Vinichenko, Josh Effero, Mahdiya Adnan, Mir
-Akbaar Khaled, Nevin Xu, and Shaira Habib; McMaster University: Nichole
-and Riya).</p>
+Effero, Mahdiya Adnan, Mir Akbaar Khaled, Nevin Xu, Nicole Padoun, Riya
+Srivastava, and Shaira Habib (University of Alberta: Alim Tuguzbay,
+Arjya Bhattacharjee, Atiyah Sulaiman, George Vinichenko, Josh Effero,
+Mahdiya Adnan, Mir Akbaar Khaled, Nevin Xu, and Shaira Habib; McMaster
+University: Nicole Padoun and Riya Srivastava).</p>
 <!--We also sincerely appreciate the following people for running the functions in this package on the microbiome datasets published in [@Nearing2022] to provide users with plausible parameter values for thier research work: Alim Tuguzbay, Nevin Nu, Mir Akbaar Khaled, Gosh, logfoldchangeFit, Alim, Akja, etc. and Roda (all from University of Alberta) and mmm (McMaster University)-->
 </div>
 <div class="section level2">

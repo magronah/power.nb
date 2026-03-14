@@ -2,12 +2,26 @@
 % Please edit documentation in R/sample_size_cal.R
 \name{uniroot_ss}
 \alias{uniroot_ss}
-\title{predict.scam seem to have a bug and
-would not predict row data with only one row}
+\title{Sample Size estimation function uisng uniroot}
 \usage{
 uniroot_ss(target_power, logmean, abs_lfc, model, xmin, xmax)
 }
+\arguments{
+\item{target_power}{Numeric value specifying the desired statistical power.}
+
+\item{logmean}{Numeric value representing the log of the mean abundance.}
+
+\item{abs_lfc}{Numeric value representing the absolute log fold change.}
+
+\item{model}{A fitted GAM/SCAM model used to predict statistical power.}
+
+\item{xmin}{Numeric value giving the minimum sample size considered in the search.}
+
+\item{xmax}{Numeric value giving the maximum sample size considered in the search.}
+}
+\value{
+A numeric value corresponding to the estimated sample size required to achieve the target power.
+}
 \description{
-predict.scam seem to have a bug and
-would not predict row data with only one row
+Sample Size estimation function uisng uniroot
 }

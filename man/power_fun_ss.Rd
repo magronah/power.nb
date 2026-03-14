@@ -2,7 +2,7 @@
 % Please edit documentation in R/sample_size_cal.R
 \name{power_fun_ss}
 \alias{power_fun_ss}
-\title{Power function}
+\title{Fit a smooth power model for sample size estimation}
 \usage{
 power_fun_ss(
   pval_est_list,
@@ -13,25 +13,109 @@ power_fun_ss(
 )
 }
 \arguments{
-\item{nsample_vec}{vector of sample sizes}
+\item{pval_est_list}{A list of p-value vectors obtained from
+estimating the fold change estimates from the simulated datasets
+across different sample sizes.
+Each p-value corresponds to a test result for a particular combination of
+mean abundance, log fold change, and sample size.}
 
-\item{alpha_level}{sign containing simulated log fold change used  for simulating the count data}
+\item{logmean_list}{A list containing the simulated log mean abundance values
+corresponding to the p-values in \code{pval_est_list}.}
 
-\item{deseq_est_list}{a list containing fold change, pvalues and other estimates from \code{DESeq2}}
+\item{nsample_vec}{A numeric vector of sample sizes used in the simulations.}
 
-\item{true_logfoldchange}{list containing simulated log fold change used  for simulating the count data}
+\item{logfoldchange_list}{A list containing the simulated log fold change values
+corresponding to the p-values in \code{pval_est_list}.}
 
-\item{true_logmean}{list containing simulated log mean counte used  for simulating the count data}
-
-\item{notu}{number of OTUs}
+\item{alpha_level}{Numeric significance level used to define rejection of the
+null hypothesis. Default is \code{0.1}.}
 }
 \value{
-A list containing:
+A list with two components:
 \itemize{
-\item \code{gam_mod}: The scam object
-\item \code{combined_data}: The data used for fitting the GAM model
+\item \code{combined_data}: A tibble containing the combined simulation inputs
+and rejection indicators used for model fitting.
+\item \code{gam_mod}: The fitted \code{scam} model object.
 }
 }
 \description{
-Power function
+Fits a shape-constrained additive model (SCAM) to estimate statistical power
+as a function of mean abundance, absolute log fold change, and sample size.
+The function takes p-values obtained across simulation settings, converts them
+to rejection indicators based on a chosen significance level, and then models
+the probability of rejection using smooth terms.
+}
+\details{
+The returned model can be used as a smooth approximation to the empirical power
+surface, which is useful for interpolation and sample size prediction.
+
+The function first pools all p-values from \code{pval_est_list} and converts them
+into binary rejection indicators:
+\deqn{I(p < \alpha)}
+where \code{alpha_level} is the chosen significance threshold.
+
+A data frame is then constructed with:
+\itemize{
+\item \code{logmean}: log mean abundance,
+\item \code{abs_lfc}: absolute log fold change,
+\item \code{pval_reject}: binary rejection indicator,
+\item \code{sample_size}: sample size,
+\item \code{logsample_size}: base-2 logarithm of sample size.
+}
+
+The function attempts to fit the following SCAM model:
+\deqn{
+\mathrm{logit}\{P(\text{reject})\} =
+s(\text{logmean}, \text{abs\_lfc}) +
+s(\text{abs\_lfc}, \text{logsample\_size}) +
+s(\text{logmean}, \text{logsample\_size})
+}
+
+using a binomial family.
+
+If the full model fails due to numerical instability, a simpler fallback model
+is fitted instead:
+\deqn{
+\mathrm{logit}\{P(\text{reject})\} =
+s(\text{logmean}, \text{abs\_lfc}) +
+s(\text{logsample\_size})
+}
+
+A warning is issued when the fallback model is used.
+}
+\examples{
+\dontrun{
+# Example structure only
+pval_est_list <- list(
+  c(0.01, 0.20, 0.03),
+  c(0.15, 0.04, 0.08)
+)
+
+logmean_list <- list(
+  c(2, 2, 2),
+  c(3, 3, 3)
+)
+
+logfoldchange_list <- list(
+  c(1, 1, 1),
+  c(2, 2, 2)
+)
+
+nsample_vec <- c(20, 40, 80)
+
+out <- power_fun_ss(
+  pval_est_list = pval_est_list,
+  logmean_list = logmean_list,
+  nsample_vec = nsample_vec,
+  logfoldchange_list = logfoldchange_list,
+  alpha_level = 0.1
+)
+
+out$combined_data
+out$gam_mod
+}
+
+}
+\seealso{
+\code{\link[scam:scam]{scam::scam()}}
 }

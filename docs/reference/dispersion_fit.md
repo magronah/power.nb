@@ -35,7 +35,7 @@ dispersion_fit(dispersion,logmean)
 #> Waiting for profiling to be done...
 #> $param
 #>   asymptDisp extraPois
-#> 1   1.040575         0
+#> 1   1.035139         0
 #> 
 #> $confint
 #>            2.5 % 97.5 %

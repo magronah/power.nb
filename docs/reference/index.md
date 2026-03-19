@@ -67,7 +67,7 @@
   : General-purpose log-likelihood function, vectorized sum(pars\*x^i)
 
 - [`power_fun_ss()`](https://michaelagronah.com/power.nb/reference/power_fun_ss.md)
-  : Power function
+  : Fit a smooth power model for sample size estimation
 
 - [`read_data()`](https://michaelagronah.com/power.nb/reference/read_data.md)
   : Extract specified data from a list of datasets
@@ -77,3 +77,13 @@
 
   general-purpose normal-mixture deviate generator: takes *matrices* of
   probabilities, means, sds
+
+- [`sample_size_ss_interp()`](https://michaelagronah.com/power.nb/reference/sample_size_ss_interp.md)
+  : Estimate sample size required to achieve a target statistical power
+
+- [`ss_solver()`](https://michaelagronah.com/power.nb/reference/ss_solver.md)
+  : Solve for the sample size required to achieve a target statistical
+  power
+
+- [`uniroot_ss()`](https://michaelagronah.com/power.nb/reference/uniroot_ss.md)
+  : Sample Size estimation function uisng uniroot

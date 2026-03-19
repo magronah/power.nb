@@ -178,9 +178,9 @@
 #' The function attempts to fit the following SCAM model:
 #' \deqn{
 #' \mathrm{logit}\{P(\text{reject})\} =
-#' s(\text{logmean}, \text{abs\_lfc}) +
-#' s(\text{abs\_lfc}, \text{logsample\_size}) +
-#' s(\text{logmean}, \text{logsample\_size})
+#' s(\text{logmean}, \text{abs\_lfc}, \text{bs = "tedmi"}) +
+#' s(\text{abs\_lfc}, \text{logsample\_size}, \text{bs = "tedmi"}) +
+#' s(\text{logmean}, \text{logsample\_size}, \text{bs = "tedmi"})
 #' }
 #'
 #' using a binomial family.
@@ -189,8 +189,8 @@
 #' is fitted instead:
 #' \deqn{
 #' \mathrm{logit}\{P(\text{reject})\} =
-#' s(\text{logmean}, \text{abs\_lfc}) +
-#' s(\text{logsample\_size})
+#' s(\text{logmean}, \text{abs\_lfc}, \text{bs = "tedmi"}) +
+#' s(\text{logsample\_size}, \text{bs = "mpi"})
 #' }
 #'
 #' A warning is issued when the fallback model is used.
@@ -237,29 +237,51 @@
 #' @seealso [scam::scam()]
 #' @export
 
-
 power_fun_ss <- function(pval_est_list,
                          logmean_list,
                          nsample_vec,
                          logfoldchange_list,
-                         alpha_level=0.1){
+                         alpha_level = 0.1) {
 
-  # concatenate all p-values from all the sample size
-        p_val    =   unname(unlist(pval_est_list))
-  pval_reject    =   (!is.na(p_val) & p_val < alpha_level)
-  sample_size    =   rep(nsample_vec,
-                         times = sapply(lapply(logfoldchange_list, unlist),
-                                        length))
+  p_val <- unname(unlist(pval_est_list))
+  pval_reject <- (!is.na(p_val) & p_val < alpha_level)
 
-  # create a table with all the information
-  comb   = tibble::tibble(logmean      =   unname(unlist(logmean_list)),
-                          abs_lfc      =   abs(unname(unlist(logfoldchange_list))),
-                          pval_reject  =   as.numeric(pval_reject),
-                          sample_size  =   sample_size)
+  sample_size <- rep(
+    nsample_vec,
+    times = sapply(lapply(logfoldchange_list, unlist), length)
+  )
 
-  comb$logsample_size = log2(comb$sample_size)
+  comb <- tibble::tibble(
+    logmean = unname(unlist(logmean_list)),
+    abs_lfc = abs(unname(unlist(logfoldchange_list))),
+    pval_reject = as.numeric(pval_reject),
+    sample_size = sample_size
+  )
 
-  fit_2d <- tryCatch(
+  comb$logsample_size <- log2(comb$sample_size)
+
+  # Fit simpler model (always)
+  simple_mod <- tryCatch(
+    {
+      scam::scam(
+        pval_reject ~
+          s(logmean, abs_lfc, bs = "tedmi") +
+          s(logsample_size, bs = "mpi"),
+        data = comb,
+        family = binomial
+      )
+    },
+    error = function(e) {
+      stop(
+        "The simpler SCAM model failed to converge.\n",
+        "Original error: ", e$message,
+        call. = FALSE
+      )
+    }
+  )
+
+  # Try full model
+  full_mod <- tryCatch(
     {
       scam::scam(
         pval_reject ~
@@ -272,26 +294,70 @@ power_fun_ss <- function(pval_est_list,
     },
     error = function(e) {
       warning(
-        "Full SCAM model failed to converge due to numerical instability. ",
-        "A simpler fallback model was fitted instead (removing the interactions ",
-        "between sample size and log mean abundance and between sample size and ",
-        "effect size).\n",
-        "To attempt the full model, consider refitting with a reduced set of sample sizes \n",
+        "Full SCAM model failed to converge due to numerical instability.\n",
+        "The simpler model will be used instead.\n",
         "Original error: ", e$message,
-        call. = FALSE)
-      scam::scam(
-        pval_reject ~
-          s(logmean, abs_lfc, bs = "tedmi") +
-          s(logsample_size, bs = "mpi"),
-        data = comb,
-        family = binomial
+        call. = FALSE
       )
+      NULL
     }
   )
-  list(combined_data=comb, gam_mod = fit_2d)
+
+  # Model selection
+  if (is.null(full_mod)) {
+
+    aic_table <- data.frame(
+      model = "simple",
+      AIC = AIC(simple_mod)
+    )
+
+    selected_model <- "simple"
+    best_mod <- simple_mod
+
+    message("Selected model: simpler model (full model did not converge).")
+
+  } else {
+
+    aic_simple <- AIC(simple_mod)
+    aic_full   <- AIC(full_mod)
+
+    aic_table <- data.frame(
+      model = c("simple", "full"),
+      AIC = c(aic_simple, aic_full)
+    )
+
+    if (aic_simple <= aic_full) {
+
+      selected_model <- "simple"
+      best_mod <- simple_mod
+
+      message(
+        "Selected model: simpler model.\n",
+        "Reason: lower (or equal) AIC compared to the full model.\n",
+        sprintf("AIC(simple) = %.2f, AIC(full) = %.2f.", aic_simple, aic_full)
+      )
+
+    } else {
+
+      selected_model <- "full"
+      best_mod <- full_mod
+
+      message(
+        "Selected model: full model.\n",
+        sprintf("AIC(full) = %.2f is lower than AIC(simple) = %.2f.", aic_full, aic_simple)
+      )
+    }
+  }
+
+  list(
+    combined_data = comb,
+    simple_mod = simple_mod,
+    full_mod = full_mod,
+    aic_table = aic_table,
+    selected_model = selected_model,
+    gam_mod = best_mod
+  )
 }
-
-
 ###############################################################
 #' Sample Size estimation function uisng uniroot
 #'

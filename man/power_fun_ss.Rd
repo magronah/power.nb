@@ -66,9 +66,9 @@ A data frame is then constructed with:
 The function attempts to fit the following SCAM model:
 \deqn{
 \mathrm{logit}\{P(\text{reject})\} =
-s(\text{logmean}, \text{abs\_lfc}) +
-s(\text{abs\_lfc}, \text{logsample\_size}) +
-s(\text{logmean}, \text{logsample\_size})
+s(\text{logmean}, \text{abs\_lfc}, \text{bs = "tedmi"}) +
+s(\text{abs\_lfc}, \text{logsample\_size}, \text{bs = "tedmi"}) +
+s(\text{logmean}, \text{logsample\_size}, \text{bs = "tedmi"})
 }
 
 using a binomial family.
@@ -77,8 +77,8 @@ If the full model fails due to numerical instability, a simpler fallback model
 is fitted instead:
 \deqn{
 \mathrm{logit}\{P(\text{reject})\} =
-s(\text{logmean}, \text{abs\_lfc}) +
-s(\text{logsample\_size})
+s(\text{logmean}, \text{abs\_lfc}, \text{bs = "tedmi"}) +
+s(\text{logsample\_size}, \text{bs = "mpi"})
 }
 
 A warning is issued when the fallback model is used.

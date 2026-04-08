@@ -90,7 +90,7 @@ Low abundant tax exhibit high variability, posing challenges in detecting signif
 ```{r filter-data}
 filter_data  =  filter_low_count(countdata     =  data,
                                 metadata       =  metadata,
-                                abund_thresh   =  2,
+                                abund_thresh   =  3,
                                 sample_thresh  =  2,
                                 sample_colname =  "SampleID",
                                 group_colname  =  "Groups")
@@ -195,7 +195,7 @@ We also modelled log fold change of taxa as a finite mixture of Gaussian distrib
 ```{r logfoldchangeFit, cache=FALSE}
 logfoldchangeFit <- quiet(logfoldchange_fit(logmean,
                                             logfoldchange,
-                                            ncore = 3,
+                                            ncore = 1,
                                             max_sd_ord = 2,
                                             max_np = 5,
                                             minval = -5,
@@ -442,7 +442,7 @@ desq_est   =   quiet(deseq_fun_est(metadata_list =  metadata_list,
                             alpha_level    =  0.1,
                             group_colname  = "Groups",
                             sample_colname = "Samples",
-                            num_cores      =  4,
+                            num_cores      =  2,
                             ref_name       = "control"))
 
 deseq_est_list     =    lapply(desq_est, function(x){x$deseq_estimate})

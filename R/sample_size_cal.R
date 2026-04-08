@@ -308,7 +308,7 @@ power_fun_ss <- function(pval_est_list,
 
     aic_table <- data.frame(
       model = "simple",
-      AIC = AIC(simple_mod)
+      AIC = stats::AIC(simple_mod)
     )
 
     selected_model <- "simple"
@@ -318,8 +318,8 @@ power_fun_ss <- function(pval_est_list,
 
   } else {
 
-    aic_simple <- AIC(simple_mod)
-    aic_full   <- AIC(full_mod)
+    aic_simple <- stats::AIC(simple_mod)
+    aic_full   <- stats::AIC(full_mod)
 
     aic_table <- data.frame(
       model = c("simple", "full"),

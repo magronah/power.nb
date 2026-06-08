@@ -23,6 +23,8 @@ The number of gaussian components is determined using the
 using parametric bootstrap
 }
 \examples{
+\donttest{
 logmean  = rnorm(100)
 optimal.comp(logmean,sig=0.05,max.comp=4,max.boot=100)
+}
 }

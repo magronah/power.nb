@@ -84,36 +84,25 @@ s(\text{logsample\_size}, \text{bs = "mpi"})
 A warning is issued when the fallback model is used.
 }
 \examples{
-\dontrun{
+#' @examples
+
 # Example structure only
-pval_est_list <- list(
-  c(0.01, 0.20, 0.03),
-  c(0.15, 0.04, 0.08)
-)
-
-logmean_list <- list(
-  c(2, 2, 2),
-  c(3, 3, 3)
-)
-
-logfoldchange_list <- list(
-  c(1, 1, 1),
-  c(2, 2, 2)
-)
-
-nsample_vec <- c(20, 40, 80)
-
+set.seed(101)
+n = 70
+pval_est_list = list(rnorm(n),rnorm(n))
+logmean_list = list(rnorm(n),rnorm(n))
+logfoldchange_list = list(rnorm(n),rnorm(n))
+nsample_vec <- c(20, 40)
 out <- power_fun_ss(
-  pval_est_list = pval_est_list,
-  logmean_list = logmean_list,
-  nsample_vec = nsample_vec,
-  logfoldchange_list = logfoldchange_list,
-  alpha_level = 0.1
+pval_est_list = pval_est_list,
+logmean_list = logmean_list,
+nsample_vec = nsample_vec,
+logfoldchange_list = logfoldchange_list,
+alpha_level = 0.1
 )
-
 out$combined_data
 out$gam_mod
-}
+
 
 }
 \seealso{

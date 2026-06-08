@@ -61,10 +61,11 @@ These options are particularly useful when estimating fold changes to fit the mi
 }
 }
 \examples{
+\donttest{
 # Example usage
 set.seed(101)
-nr = 10; nc =50
-countdata <- matrix(rpois(500, 3), ncol = nc, nrow = nr)
+nr = 10; nc = 35
+countdata <- matrix(rpois(350, 3), ncol = nc, nrow = nr)
 # Simulated OTU count data with 50 taxa and 10 samples
 countdata  <- as.data.frame(countdata)
 rownames(countdata)  <- paste("Sample", 1:nr, sep = "_")
@@ -88,5 +89,5 @@ result$logmean  # Log mean counts
 result$dispersion  # Dispersion estimates
 result$deseq_estimate  # DESeq2 results
 result$normalised_count  # Normalized count data
-
+}
 }

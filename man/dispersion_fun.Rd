@@ -22,7 +22,7 @@ provided parameters: mean abundance, asymptotic dispersion, and extra Poisson di
 }
 \details{
 The dispersion is calculated using the formula:
-\deqn{\text{dispersion} = \text{asymptDisp} + \frac{\text{extraPois}}{\text{mean_abund}}}
+\deqn{dispersion = asymptDisp + \frac{extraPois}{meanAbund}}
 }
 \examples{
 mean_abund <- 10

@@ -1,141 +1,3 @@
-#
-# #######################################################################
-# inverse_fun <- function(target,lmb,abs_lfc, model,xmin, xmax) {
-#
-#   if (length(target) != length(lmb) || length(target) != length(abs_lfc)) {
-#     stop("Lengths of 'target', 'lmb', and 'abs_lfc' must be the same.")
-#   }
-#
-#   # Initialize an empty list to store the roots
-#   roots <- list()
-#
-#   # Loop through each element and solve for the root
-#   for (i in 1:length(target)) {
-#     roots[[i]] <- uniroot(function(s) {
-#       predict(model,
-#               type = "response",
-#               newdata = data.frame(sample_size = s,
-#                                    lmean_abund = lmb[i],
-#                                    abs_lfc = abs_lfc[i])
-#       ) - target[i]
-#     },
-#     interval = c(xmin, xmax),
-#     extendInt = "yes")$root
-#   }
-#
-#   unlist(roots)
-# }
-#
-#
-# uniroot_lmb =  function(target_power,sample_size,abs_lfc,model,xmin,xmax){
-#
-#   root <- uniroot(function(lmb) {
-#     predict(model,
-#             type = "response",
-#             newdata = data.frame(sample_size = sample_size,
-#                                  lmean_abund = lmb,
-#                                  abs_lfc = abs_lfc)
-#     ) - target_power
-#   },
-#   interval = c(xmin, xmax),
-#   extendInt = "yes")$root
-#   root
-# }
-#
-#
-#
-# inverse_lfc <- function(target,lmb,samp_size, model,xmin, xmax) {
-#
-#   if (length(target) != length(lmb) || length(target) != length(samp_size)) {
-#     stop("Lengths of 'target', 'lmb', and 'abs_lfc' must be the same.")
-#   }
-#
-#   # Initialize an empty list to store the roots
-#   roots <- list()
-#
-#   # Loop through each element and solve for the root
-#   for (i in 1:length(target)) {
-#     roots[[i]] <- uniroot(function(s) {
-#       predict(model,
-#               type = "response",
-#               newdata = data.frame(sample_size =  samp_size[i],
-#                                    lmean_abund =  lmb[i],
-#                                    abs_lfc     =  s)
-#       ) - target[i]
-#     },
-#     interval = c(xmin, xmax),
-#     extendInt = "yes")$root
-#   }
-#
-#   unlist(roots)
-# }
-#
-#
-#
-# inverse_lmb <- function(target,abs_lfc,samp_size, model,xmin, xmax) {
-#
-#   if (length(target) != length(abs_lfc) || length(target) != length(samp_size)) {
-#     stop("Lengths of 'target', 'lmb', and 'abs_lfc' must be the same.")
-#   }
-#
-#   # Initialize an empty list to store the roots
-#   roots <- list()
-#
-#   # Loop through each element and solve for the root
-#   for (i in 1:length(target)) {
-#     roots[[i]] <- uniroot(function(lmb) {
-#       predict(model,
-#               type = "response",
-#               newdata = data.frame(sample_size =  samp_size[i],
-#                                    lmean_abund =  lmb,
-#                                    abs_lfc     =  abs_lfc[i])
-#       ) - target[i]
-#     },
-#     interval = c(xmin, xmax),
-#     extendInt = "yes")$root
-#   }
-#
-#   unlist(roots)
-# }
-#
-#
-#
-#
-#
-
-
-
-# # Function to compute the missing input
-# power.nb <- function(power, sample_size, logfoldchange, logmean_abundance, gam_mod) {
-#
-#   if (is.numeric(power) && is.numeric(sample_size) && is.numeric(logfoldchange) && is.numeric(logmean_abundance)) {
-#     if (!missing(power) && !missing(sample_size) && !missing(logfoldchange)) {
-#       if (missing(logmean_abundance)) {
-#         # Compute the missing input
-#
-#       }
-#     } else if (!missing(power) && !missing(sample_size) && !missing(logmean_abundance)) {
-#       # Compute the missing input
-#       logfoldchange <- logmean_abundance - power - sample_size
-#     } else if (!missing(power) && !missing(logfoldchange) && !missing(logmean_abundance)) {
-#       # Compute the missing input
-#       sample_size <- logmean_abundance - power - logfoldchange
-#     } else if (!missing(sample_size) && !missing(logfoldchange) && !missing(logmean_abundance)) {
-#       # Compute the missing input
-#       power <- logmean_abundance - sample_size - logfoldchange
-#     } else {
-#       stop("Please specify at least 3 inputs.")
-#     }
-#
-#     # Return the computed inputs
-#     return(list(power = power, sample_size = sample_size, logfoldchange = logfoldchange, logmean_abundance = logmean_abundance))
-#   } else {
-#     stop("Inputs must be numeric values.")
-#   }
-# }
-
-
-
 #' Fit a smooth power model for sample size estimation
 #'
 #' Fits a shape-constrained additive model (SCAM) to estimate statistical power
@@ -202,40 +64,30 @@
 #'   \item `gam_mod`: The fitted `scam` model object.
 #' }
 #'
+#' @export
+#'
 #' @examples
-#' \dontrun{
+#' #' @examples
+#'
 #' # Example structure only
-#' pval_est_list <- list(
-#'   c(0.01, 0.20, 0.03),
-#'   c(0.15, 0.04, 0.08)
-#' )
-#'
-#' logmean_list <- list(
-#'   c(2, 2, 2),
-#'   c(3, 3, 3)
-#' )
-#'
-#' logfoldchange_list <- list(
-#'   c(1, 1, 1),
-#'   c(2, 2, 2)
-#' )
-#'
-#' nsample_vec <- c(20, 40, 80)
-#'
+#' set.seed(101)
+#' n = 70
+#' pval_est_list = list(rnorm(n),rnorm(n))
+#' logmean_list = list(rnorm(n),rnorm(n))
+#' logfoldchange_list = list(rnorm(n),rnorm(n))
+#' nsample_vec <- c(20, 40)
 #' out <- power_fun_ss(
-#'   pval_est_list = pval_est_list,
-#'   logmean_list = logmean_list,
-#'   nsample_vec = nsample_vec,
-#'   logfoldchange_list = logfoldchange_list,
-#'   alpha_level = 0.1
+#' pval_est_list = pval_est_list,
+#' logmean_list = logmean_list,
+#' nsample_vec = nsample_vec,
+#' logfoldchange_list = logfoldchange_list,
+#' alpha_level = 0.1
 #' )
-#'
 #' out$combined_data
 #' out$gam_mod
-#' }
+#'
 #'
 #' @seealso [scam::scam()]
-#' @export
 
 power_fun_ss <- function(pval_est_list,
                          logmean_list,
@@ -359,7 +211,7 @@ power_fun_ss <- function(pval_est_list,
   )
 }
 ###############################################################
-#' Sample Size estimation function uisng uniroot
+#' Sample Size estimation function using uniroot
 #'
 #' @param target_power Numeric value specifying the desired statistical power.
 #' @param logmean Numeric value representing the log of the mean abundance.
@@ -367,28 +219,116 @@ power_fun_ss <- function(pval_est_list,
 #' @param model A fitted GAM/SCAM model used to predict statistical power.
 #' @param xmin Numeric value giving the minimum sample size considered in the search.
 #' @param xmax Numeric value giving the maximum sample size considered in the search.
-#' @return A numeric value corresponding to the estimated sample size required to achieve the target power.
+#' @param maxiter maximum number of iterations
+#' @param max_report maximum group sample size to be predicted.
+#'                   Any predicted sample size that exceed max_report will be
+#'                   reported as "> max_report"
+#' @return A numeric value corresponding to the estimated sample size required
+#'        to achieve the target power.
 #' @export
-uniroot_ss =  function(target_power,logmean, abs_lfc,model,xmin,xmax){
 
-  root <- stats::uniroot(function(ss) {
+uniroot_ss <- function(target_power, logmean, abs_lfc, model,
+                        xmin = log2(10), xmax = log2(5000),
+                        maxiter = 10000,
+                        max_report = 2000) {
 
-    data = data.frame(logsample_size = ss,
-                      logmean = logmean,
-                      abs_lfc = abs_lfc)
+  f <- function(ss) {
 
-    ##' predict.scam seem to have a bug and
-    ##' would not predict row data with only one row
-    pred = predict(model,
-                   type = "response",
-                   newdata = data[rep(1,2),])
+    data <- data.frame(
+      logsample_size = ss,
+      logmean = logmean,
+      abs_lfc = abs_lfc
+    )
+
+    pred <- predict(
+      model,
+      type = "response",
+      newdata = data[rep(1, 2), ]
+    )
 
     pred[[1]] - target_power
-  },
-  interval = c(xmin, xmax),
-  extendInt = "no")$root
-  2^root
+  }
+
+  f_min <- f(xmin)
+  f_max <- f(xmax)
+
+  pred_min <- f_min + target_power
+  pred_max <- f_max + target_power
+
+  if (is.na(f_min) || is.na(f_max)) {
+    return(list(
+      sample_size_per_group = NA,
+      conclusion = "Sample size could not be estimated because the model returned NA predictions.",
+      predicted_power_min_n = pred_min,
+      predicted_power_max_n = pred_max
+    ))
+  }
+
+  if (f_min >= 0) {
+    ss_est <- 2^xmin
+
+    return(list(
+      sample_size_per_group = ss_est,
+      conclusion = "Target power is already achieved at the minimum sample size.",
+      predicted_power_min_n = pred_min,
+      predicted_power_max_n = pred_max
+    ))
+  }
+
+  if (f_max < 0) {
+    return(list(
+      sample_size_per_group = NA,
+      conclusion = paste0(
+        "No sign change was found. The predicted power does not reach the target power ",
+        "within the specified sample-size interval."
+      ),
+      predicted_power_min_n = pred_min,
+      predicted_power_max_n = pred_max
+    ))
+  }
+
+  root <- tryCatch(
+    stats::uniroot(
+      f,
+      interval = c(xmin, xmax),
+      maxiter = maxiter
+    )$root,
+    error = function(e) NA_real_
+  )
+
+  if (is.na(root)) {
+    return(list(
+      sample_size_per_group = NA,
+      conclusion = "Root finding failed even though the endpoint checks suggested a solution.",
+      predicted_power_min_n = pred_min,
+      predicted_power_max_n = pred_max
+    ))
+  }
+
+  ss_est <- 2^root
+
+  if (ss_est > max_report) {
+    return(list(
+      sample_size_per_group = paste0("> ", max_report),
+      conclusion = paste0(
+        "The estimated sample size exceeds ",
+        max_report,
+        "."
+      ),
+      predicted_power_min_n = pred_min,
+      predicted_power_max_n = pred_max
+    ))
+  }
+
+  list(
+    sample_size_per_group = ss_est,
+    conclusion = "Success.",
+    predicted_power_min_n = pred_min,
+    predicted_power_max_n = pred_max
+  )
 }
+
+
 ###############################################################
 #' Estimate sample size required to achieve a target statistical power
 #'
@@ -518,3 +458,5 @@ ss_solver <- function(target_power, logmean, abs_lfc, model,
 
   out
 }
+
+

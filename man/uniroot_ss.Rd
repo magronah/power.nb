@@ -2,9 +2,18 @@
 % Please edit documentation in R/sample_size_cal.R
 \name{uniroot_ss}
 \alias{uniroot_ss}
-\title{Sample Size estimation function uisng uniroot}
+\title{Sample Size estimation function using uniroot}
 \usage{
-uniroot_ss(target_power, logmean, abs_lfc, model, xmin, xmax)
+uniroot_ss(
+  target_power,
+  logmean,
+  abs_lfc,
+  model,
+  xmin = log2(10),
+  xmax = log2(5000),
+  maxiter = 10000,
+  max_report = 2000
+)
 }
 \arguments{
 \item{target_power}{Numeric value specifying the desired statistical power.}
@@ -18,10 +27,17 @@ uniroot_ss(target_power, logmean, abs_lfc, model, xmin, xmax)
 \item{xmin}{Numeric value giving the minimum sample size considered in the search.}
 
 \item{xmax}{Numeric value giving the maximum sample size considered in the search.}
+
+\item{maxiter}{maximum number of iterations}
+
+\item{max_report}{maximum group sample size to be predicted.
+Any predicted sample size that exceed max_report will be
+reported as "> max_report"}
 }
 \value{
-A numeric value corresponding to the estimated sample size required to achieve the target power.
+A numeric value corresponding to the estimated sample size required
+to achieve the target power.
 }
 \description{
-Sample Size estimation function uisng uniroot
+Sample Size estimation function using uniroot
 }

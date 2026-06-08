@@ -58,8 +58,9 @@ The standard deviation parameters are modeled either by linear or quadratic func
 by linear functions of log mean count
 }
 \examples{
+\donttest{
 logmean        =  rnorm(100)
 logfoldchange  =  rnorm(100)
 logfoldchange_fit(logmean,logfoldchange)
-
+}
 }

@@ -20,12 +20,13 @@ biblio-title: "References"
 
 #  Package Description and Functionalities 
 
-`power.nb` is a package developed for estimating statistical power and sample sizes in differential abundance microbiome studies. The package presents novel methods for estimating statistical power for individual taxa (feature, OTU/ASV, or species) and for sample size calculation accounting for effect sizes and mean abundance of taxa.
+`power.nb` is a package developed for estimating statistical power and required sample size in differential abundance microbiome studies using negative binomial models. The package includes tools for simulation-based power analysis and sample size estimation using generalized additive models (GAMs), and visualization utilities for exploring the relationship between power, effect size, abundance, and sample size.
+
+`power.nb` presents two novel microbiome data simulations frameworks: the Mixture of Gaussians  (MixGaussSim) and the Reduced Rank (RRSim) simulation approaches. MixGaussSim models the distribution of mean abundance of taxa and the distribution of fold change (as a function of mean abundance of taxa) by finite Mixture of Gaussian distributions.  Microbiome count data is then simulated from a negative binomial distribution. Detailed description of the MixGaussSim method is presented in the paper ["Investigating statistical power of differential abundance studies"](https://doi.org/10.1371/journal.pone.0318820) [@agronahnbolker].  
+
+RRSim (this simulation method is still under development and some functions in RRSim are yet to tested), on the other hand models the mean abundance of all taxa jointly with a mixed-effects model while accounting for correlations among taxa within subjects and zero inflation in microbiome data. Given the high dimensionality of microbiome data (usually having hundreds or thousands of taxa), modelling correlations between taxa requires estimating thousands or even millions of parameters for the correlation matrix. RRSim uses the reduced rank functionality implemented in the `glmmTMB` [@magnusson2017package] packages to reduce the number of parameter estimates required of the variance-correlation matrix. Details of this method is presented in the thesis ["A Novel Approach for Simulation-Based Power Estimation and Joint Modeling of Microbiome Counts"](https://macsphere.mcmaster.ca/handle/11375/31784) [@agronah2025novel]
 
 
-`power.nb` also presents two novel microbiome data simulations frameworks: `Cask's` and `RRSim`. The method implemented in `MixGaussSim` models the distribution of mean abundance of taxa and the distribution of fold change (as a function of mean abundance of taxa) by finite Mixture of Gaussian distributions.  Microbiome count data is then simulated from a negative binomial distribution. Detailed description of the `MixGaussSim` method is presented in the paper ["Investigating statistical power of differential abundance studies"](https://doi.org/10.1371/journal.pone.0318820) [@agronahnbolker].  
-
-`RRSim` (this simulation method is still under development and some functions in `RRSim` are yet to tested), on the other hand models the mean abundance of all taxa jointly with a mixed-effects model while accounting for correlations among taxa within subjects and zero inflation in microbiome data. Given the high dimensionality of microbiome data (usually having hundreds or thousands of taxa), modelling correlations between taxa requires estimating thousands or even millions of parameters for the correlation matrix. `RRSim` uses the reduced rank functionality implemented in the `glmmTMB` [@magnusson2017package] packages to reduce the number of parameter estimates required of the variance-correlation matrix. Details of this method is presented in the thesis ["A Novel Approach for Simulation-Based Power Estimation and Joint Modeling of Microbiome Counts"](https://macsphere.mcmaster.ca/handle/11375/31784) [@agronah2025novel]
 
 #  Installation
 
@@ -40,26 +41,28 @@ devtools::install_github("magronah/power.nb")
 
 Since the goal of differential abundance studies is to identify taxa that differ significantly between groups, statistical power must be estimated at the level of individual taxa. Because of the complexity of microbiome data, analytical approaches based on theoretical distributions of test statistics (e.g., non-central t or chi-squared distributions) are not feasible [@arnold2011simulation]. Therefore, power estimation typically relies on simulation-based methods that can mimic the characteristics of real microbiome data.
 
-Statistical power for a given taxon depends on both its mean abundance and effect size (defined in this package as fold changes) [@agronahnbolker]. Thus, estimating the distributions of mean abundance and fold change of taxa explicitly will offer great benefit for estimation of statistical power for individual taxon. We use the `MixGaussSim` simulation approach to simulate microbiome data for power calculation due to its flexibility in modelling the distributions of taxa mean abundances and effect sizes explicitly as as well as their relationship. 
+Statistical power for a given taxon depends on both its mean abundance and effect size (defined in this package as fold changes) [@agronahnbolker]. Thus, estimating the distributions of mean abundance and fold change of taxa explicitly will offer great benefit for estimation of statistical power for individual taxon. We use the MixGaussSim simulation approach to simulate microbiome data for power calculation due to its flexibility in modelling the distributions of taxa mean abundances and effect sizes explicitly as as well as their relationship. 
 
 
 ## Two ways to obtain parameters for data simulation using MixGaussSim
-There are one of two ways to obtain the parameters of the `MixGaussSim` method for data simulation.  Users can:
+There are one of two ways to obtain the parameters of the MixGaussSim method for data simulation.  Users can:
 
-**1. pre-specify a set of parameters:** To help users decide on plausible parameter values, we have run  `MixGaussSim` on some of the microbiome datasets used in the paper ["Microbiome differential abundance methods produce different results across 38 datasets"](10.1038/s41467-022-28034-z) [@Nearing2022] and presented the parameter estimates  obtained from each of these datasets ([see Appendix for the parameter estimates from these datasets](#appendix) ). 
+**1. pre-specify a set of parameters:** To help users decide on plausible parameter values, we have run  MixGaussSim on some of the microbiome datasets used in the paper ["Microbiome differential abundance methods produce different results across 38 datasets"](https://doi.org/10.1038/s41467-022-28034-z) [@Nearing2022] and presented the parameter estimates  obtained from each of these datasets ([see Appendix for the parameter estimates from these datasets](#appendix) ). 
 
-**2. estimate parameters from an existing dataset:** Secondly, users can also obtain estimates directly from fitting the model implemented in  `MixGaussSim`  to existing datasets. The following steps outlines the process for estimating parameters from an existing dataset. 
+**2. estimate parameters from an existing dataset:** Secondly, users can also obtain estimates directly from fitting the model implemented in  MixGaussSim  to existing datasets. The following steps outlines the process for estimating parameters from an existing dataset. 
 
 ## Dataset
 
 We use a subset of the Obesity dataset, one of the datasets analyzed in [@Nearing2022]. The full dataset contains 52 samples and 1203 taxa.
 
-```{r pkgs, message=FALSE}
+```{r pkgs, message=FALSE, warning=FALSE}
 ##Load libraries
 library(tidyverse)
 library(dplyr)
 library(power.nb)
 library(patchwork)
+library(rlist)
+library(latex2exp)
 
 data_path =  system.file("pkgdata", package = "power.nb")
 ##Read count data and metadata
@@ -80,7 +83,8 @@ metadata <- metadata %>%
   setNames(c("SampleID", "Groups"))
 
 dim(data); dim(metadata)
-head(data); head(metadata)
+head(data,2); head(metadata,2)
+
 ```
 
 ## Pre-filtering low abundant taxa
@@ -111,8 +115,8 @@ $$\mathrm{Var}(K_{ij}) = \mu_i + \alpha_i \mu_i^2.$$
 
 Estimation of the regression coefficients $\hat{\beta}_{ir}$ and dispersion parameters $\hat{\alpha}_i$ was carried out using the empirical Bayes shrinkage procedures implemented in the `DESeq2` package [@love2014moderated,@anders2010differential]. 
 
-
-```{r logfoldchange, message=FALSE, cache = FALSE}
+<!--- This chunk unsed to have cache = FALSE as well --->
+```{r logfoldchange, message=FALSE}
 
 unique(metadata$Groups)
 
@@ -144,8 +148,7 @@ To test whether adding an additional component improves model fit, we formulated
 <!-- try to protect LaTeX: https://github.com/jgm/pandoc/issues/6259 ;
 https://github.com/jekyll/jekyll/issues/9487 -->
 
-<!-- {% raw %} -->
-'
+
 $$
 \begin{cases} 
 H_0: \mathbf{y} \sim f_k(y_i \mid \boldsymbol{\theta}_k) & \textrm{(the data follow a $k$-component mixture model)} \\
@@ -167,24 +170,33 @@ where $\Lambda_{\text{obs}}$ is the observed likelihood ratio statistic.
 
 If $p < 0.05$, the null hypothesis $H_0$ is rejected in favor of the $(k+1)$-component model. Testing proceeds sequentially for $k = 1, 2, \dots, 5$ until the $p$-value exceeds the $5\%$ significance threshold, at which point the $k$-component model from the last accepted test is selected as the optimal mixture size [@benaglia2010mixtools].
 
-```{r logmean, message=FALSE, warning=FALSE, cache = FALSE}
-logmean    =  log(rowMeans(filter_data))
-
+```{r quiet_fun}
 ### function to mute printing out messages about
 ### update on the number of iterations 
+
 quiet <- function(expr) {
   out <- suppressWarnings(suppressMessages(
     capture.output(res <- eval.parent(substitute(expr)))
   ))
   res}
 
-logmeanFit =   quiet(logmean_fit(logmean, sig = 0.05,
-                                 max.comp = 4, max.boot = 100))
-
-logmeanFit
+### Path to other files used in this vignette
+extdata_path =  system.file("extdata", package = "power.nb")
 ```
 
 
+```{r logmean, message=FALSE, warning=FALSE}
+ logmean    =  log(rowMeans(filter_data))
+ logmeanFit <- readRDS(file.path(extdata_path, "logmeanFit.rds"))
+
+## The code below was used to generate the precomputed
+## `logmeanFit.rds` object. The saved result is loaded
+## throughout this vignette to reduce vignette build times.
+
+# logmeanFit =   quiet(logmean_fit(logmean, sig = 0.05,
+#                                  max.comp = 4, max.boot = 100))
+
+```
 
 
 ## Modelling the distribution of log fold change estimates
@@ -192,19 +204,27 @@ logmeanFit
 We also modelled log fold change of taxa as a finite mixture of Gaussian distributions. Fold change is typically related to mean abundance [@love2014moderated]; therefore, we expressed the mean and standard deviation parameters of the individual Gaussian components as functions of log mean abundance. Detailed description of the model fitted to log fold changes is presented in the paper ["Investigating statistical power of differential abundance studies"](https://doi.org/10.1371/journal.pone.0318820) [@agronahnbolker].  
 
 
-```{r logfoldchangeFit, cache=FALSE}
-logfoldchangeFit <- quiet(logfoldchange_fit(logmean,
-                                            logfoldchange,
-                                            ncore = 1,
-                                            max_sd_ord = 2,
-                                            max_np = 5,
-                                            minval = -5,
-                                            maxval = 5,
-                                            itermax = 100,
-                                            NP = 800,
-                                            seed = 100))
+```{r logfoldchangeFit}
+
+logfoldchangeFit <- readRDS(file.path(extdata_path, "logfoldchangeFit.rds"))
 
 logfoldchangeFit
+
+## The code below was used to generate the precomputed
+## `logfoldchangeFit.rds` object. The saved result is loaded
+## throughout this vignette to reduce vignette build times.
+
+# logfoldchangeFit <- quiet(logfoldchange_fit(logmean,
+#                                             logfoldchange,
+#                                             ncore = 1,
+#                                             max_sd_ord = 2,
+#                                             max_np = 5,
+#                                             minval = -5,
+#                                             maxval = 5,
+#                                             itermax = 100,
+#                                             NP = 800,
+#                                             seed = 100))
+
 
 ```
 
@@ -282,10 +302,6 @@ dim(countdata_sims$treat_countdata_list$sim_1)
 dim(countdata_sims$control_countdata_list$sim_1)
 dim(countdata_sims$countdata_list$sim_1)
 dim(countdata_sims$metadata_list$sim_1)
-
-
-length(countdata_sims$logfoldchange_list$sim_1)
-length(countdata_sims$logmean_list$sim_1)
 ```
 
 ### Comparing the distributions between simulated count d of mean count and fold change from simulation with actual data
@@ -296,64 +312,7 @@ We compare the following comparisons between our simulation and the actual datas
 
 - the means of taxa from out simulation with those of the actual dataset
 
-```{r compare-with-sim}
-library(rlist)
-library(latex2exp)
-
-
-# means
-dd_mean <- rbind(
-  data.frame(value = apply(countdata_sims$countdata_list$sim_1, 1, mean),
-             type = "simulation"),
-  data.frame(value = apply(filter_data, 1, mean),
-             type = "observation")
-)
-
-p1_ <- ggplot(dd_mean, aes(x = log(value + 1e-8))) +
-  geom_density(aes(colour = type), linewidth = 1.2,
-               data = subset(dd_mean, type == "simulation")) +
-  geom_density(linetype = "dashed", colour = "black", linewidth = 1.2,
-               data = subset(dd_mean, type == "observation")) +
-  theme_bw()
-
-# variances
-dd_var <- rbind(
-  data.frame(value = apply(countdata_sims$countdata_list$sim_1, 1, var),
-             type = "simulation"),
-  data.frame(value = apply(filter_data, 1, var),
-             type = "observation")
-)
-
-p2_ <- ggplot(dd_var, aes(x = log(value + 1e-8))) +
-  geom_density(aes(colour = type), linewidth = 1.2,
-               data = subset(dd_var, type == "simulation")) +
-  geom_density(linetype = "dashed", colour = "black", linewidth = 1.2,
-               data = subset(dd_var, type == "observation")) +
-  theme_bw()
-
-(p1_ | p2_) + patchwork::plot_layout(guides = "collect")
-
-
-pp1= apply(countdata_sims$countdata_list$sim_1, 1, function(x){mean(x)})
-pp2= apply(filter_data, 1, function(x){mean(x)})
-
-pp11= apply(countdata_sims$countdata_list$sim_1, 1, function(x){var(x)})
-pp21= apply(filter_data, 1, function(x){var(x)})
-
-dd_ = data.frame(mean = c( as.numeric(pp2),as.numeric(pp1)),
-                 var = c( as.numeric(pp21),as.numeric(pp11)),
-                type = rep(c("observation","simulation"), each = notu))
-
-
-p1_ = ggplot(dd_, aes(x = log(mean), group = type, colour = type)) +
-geom_density() +
-theme_bw()
-
-p2_ = ggplot(dd_, aes(x = log(var), group = type, colour = type)) +
-geom_density() +
-theme_bw()
-                 
-(p1_|p2_) + plot_layout(guides = "collect")
+```{r compare-with-sim, warning=FALSE}
 
 compare_dataset <- function(countdata_sim_list,countdata_obs,method = c("var", "mean")){
   
@@ -396,6 +355,7 @@ countdata_sim_list =  countdata_sims$countdata_list[1]
 countdata_obs      =  filter_data
 p11 = compare_dataset(countdata_sim_list,countdata_obs,method = "mean")
 p12 = compare_dataset(countdata_sim_list,countdata_obs,method = "var")
+
 (p11|p12) + plot_layout(guides = "collect")
 
 dim(countdata_obs)
@@ -406,19 +366,23 @@ dim(countdata_obs)
 
 # Estimating Statistical Power for Individual Taxa
 
-We estimate statistical power for a given taxon as the probability of rejecting the null hypothesis that the mean abundance in the control and treatment groups are the same for  that given taxon. To estimate statistical power for various combinations of log mean abundance and log fold change, we fitted a shape-constrained generalized additive model (GAM) [@pya2015shape]. The event that a given taxon is significantly different between groups is treated as a Bernoulli trial. The model predicting statistical power as a function of log fold change and log mean abundance is given by:
+We estimate statistical power for a given taxon as the probability of rejecting the null hypothesis that the mean abundance in the control and treatment groups are the same for  that given taxon. To estimate statistical power for various combinations of log mean abundance and log fold change, we fitted a shape-constrained generalized additive model (GAM) [@pya2015shape]. The event that a given taxon is significantly different between groups is treated as a Bernoulli trial. 
+
+Define the logistic function as $$\text{Logist}(x) = \left(1 + \exp(-x)\right)^{-1}$$.
+
+The model predicting statistical power as a function of log fold change and log mean abundance is given by:
 
 $$\begin{align}
 y &\sim \text{Bernoulli}(p_i) \\
-p_i &= \frac{1}{1 + e^{-\eta}} \\
-\eta &= \beta_0 + f_1(x_1, x_2) + \epsilon,
+p_i &= \text{Logist}(x) \\
+\eta &= \beta_0 + f_1(x_1, x_2),
 \end{align}$$
 
 where:
 
 - $y$ is a binary value (1 if the p-value was below the critical threshold, and 0 otherwise);
 - $p_i$ is the estimated statistical power for taxon $i$;
-- $\beta_0$ and $\epsilon$ are the intercept and error terms, respectively;
+- $\beta_0$ is the intercept;
 - The predictors $x_1$ and $x_2$ represent log mean abundance and log fold change, respectively;
 - $f_1(\cdot)$ is a two-dimensional smoothing surface, generated using a tensor product smooth of log mean abundance and log fold change. 
 
@@ -433,6 +397,7 @@ The follow steps outlines the power estimation procedure:
 
 To train the GAM on a sufficiently large sample size, we generate multiple microbiome count datasets following the procedure described in the section [Simulate count microbiome data](#simulate-count-microbiome-data). We then estimate p-values associated with the simulated fold changes using the `DESeq2` package. 
 
+
 ```{r est-p-values, cache = FALSE}
 
 countdata_list  =   countdata_sims$countdata_list
@@ -442,7 +407,7 @@ desq_est   =   quiet(deseq_fun_est(metadata_list =  metadata_list,
                             alpha_level    =  0.1,
                             group_colname  = "Groups",
                             sample_colname = "Samples",
-                            num_cores      =  2,
+                            num_cores      =  1,
                             ref_name       = "control"))
 
 deseq_est_list     =    lapply(desq_est, function(x){x$deseq_estimate})
@@ -452,7 +417,7 @@ names(desq_est$sim_1)
 ## Fitting the Generalized Additive Model (GAM) 
 
 We now fit the GAM for predicting statistical power for individual taxon.
-```{r gam-fit, cache = FALSE}
+```{r gam-fit, cache = FALSE, warning = FALSE}
 true_lmean_list       =    countdata_sims$logmean_list
 true_lfoldchange_list =    countdata_sims$logfoldchange_list
 
@@ -464,16 +429,14 @@ gamFit <- gam_fit(deseq_est_list,
 
 range(true_lfoldchange_list)
 range(true_lmean_list)
-#plot(gamFit$fit_2d)
 ```
 
 
 ## Contour plot showing power for various combinations of mean abundance and fold change
 
 
-```{r contour-plot, eval=TRUE, cache = FALSE}
-
-cont_breaks     =  seq(0,1,0.01)
+```{r contour-plot, cache = FALSE}
+cont_breaks     =  seq(0,1,0.1)
 combined_data   =  gamFit$combined_data
 power_estimate  =  gamFit$power_estimate
 
@@ -491,9 +454,9 @@ contour_plot
 
 ## Simulate count data for various sample sizes
 
-```{r sim_multi_ss, eval = TRUE, cache = FALSE}
+```{r sim_multi_ss}
 nsim = 4
-nsample_vec = seq(10, 100, 10)
+nsample_vec = seq(10, 100, 20)
 countdata_sims_list  =  list()
 for(j in 1:length(nsample_vec)){
   countdata_sims_list[[j]]  =  countdata_sim_fun(logmean_param,
@@ -515,10 +478,11 @@ names(countdata_sims_list) = paste0("sample_",nsample_vec)
 
 ## Estimate p-values associated to fold changes for each taxa for simulated data per sample size
 
-```{r deseq_multi_ss, eval = TRUE, cache = FALSE}
+```{r deseq_multi_ss, cache = FALSE, message=FALSE}
+
 desq_est_list  =  list()
 for(i in 1:length(countdata_sims_list)){
-  
+
   countdata_list       =   countdata_sims_list[[i]]$countdata_list
   metadata_list        =   countdata_sims_list[[i]]$metadata_list
   desq_est_list[[i]]   =   deseq_fun_est(metadata_list =  metadata_list,
@@ -526,39 +490,57 @@ for(i in 1:length(countdata_sims_list)){
                                alpha_level    =  0.1,
                                group_colname  = "Groups",
                                sample_colname = "Samples",
-                               num_cores      =  4,
+                               num_cores      =  1,
                                ref_name       = "control")
-  
+
 }
 names(desq_est_list) = paste0("sample_",nsample_vec)
+
 ```
 
 
 ## Fit Generalized Additive Model (GAM) for power estimation 
 
-We now fit a GAM model to predict statistical power. This time, we predict GAM with covariates as mean count of taxa, fold change of taxa and sample sizes
+We now fit a GAM model to predict statistical power. This time, we predict GAM with covariates as mean count of taxa, fold change of taxa and group sample size. Let $n_k$ for $k=1,2,...,N$ denote the sample size per group corresponding to the $k^{th}$ dataset. For a given dataset, we assume equal sample sizes across all groups. The value of $n_k$ is constant within each dataset but varies across datasets. The GAM model is defined by
 
-```{r gam_multi_ss, eval = FALSE, cache = FALSE}
+\begin{equation}
+\begin{cases}
+y &\sim \text{Bernoulli}(p_i) \\
+p_i &=  \text{Logist}(\eta) \\
+\eta &= \beta_0 + f_1({x}_{1i},{x}_{2i}) + f_2({x}_{1i},n_k) + f_3({x}_{2i},n_k), 
+\end{cases} \label{eqn2}
+\end{equation}
+where the functions $f_1, f_2$ and $f_3$ are two-dimensional smoothing surfaces with basis generated by the tensor product smooth of pairs of $x_{1i},x_{2i}$ and $n_k$  \citep{pya2015shape}. $f_1, f_2$ and $f_3$ are constrained to be monotonically increasing functions.
 
-deseq_list = lapply(desq_est_list, function(x){
-  read_data(x, "deseq_estimate") 
-})
 
-pval_est_list <- lapply(deseq_list, function(sample_list) {
-  lapply(sample_list, function(sim_df) {
-    sim_df$padj
-  })
-})
- 
+```{r gam_multi_ss,  cache = FALSE}
 
-logfoldchange_list  =   read_data(countdata_sims_list,"logfoldchange_list")
-logmean_list        =   read_data(countdata_sims_list,"logmean_list")
+pow_ss  <- readRDS(file.path(extdata_path, "gam_fit_MultiSamples.rds"))
 
-pow_ss <- power_fun_ss(pval_est_list,
-                         logmean_list,
-                         nsample_vec = nsample_vec,
-                         logfoldchange_list,
-                         alpha_level=0.1)
+## The code below was used to generate the precomputed
+## `gam_fit_MultiSamples.rds` object.
+## The saved result is loaded throughout
+## this vignette to reduce vignette build times.
+
+# deseq_list = lapply(desq_est_list, function(x){
+#   read_data(x, "deseq_estimate")
+# })
+# 
+# pval_est_list <- lapply(deseq_list, function(sample_list) {
+#   lapply(sample_list, function(sim_df) {
+#     sim_df$padj
+#   })
+# })
+# 
+# 
+# logfoldchange_list  =   read_data(countdata_sims_list,"logfoldchange_list")
+# logmean_list        =   read_data(countdata_sims_list,"logmean_list")
+# 
+# pow_ss <- power_fun_ss(pval_est_list,
+#                          logmean_list,
+#                          nsample_vec = nsample_vec,
+#                          logfoldchange_list,
+#                          alpha_level=0.1)
   
 ```
 
@@ -566,6 +548,87 @@ pow_ss <- power_fun_ss(pval_est_list,
 
 
 ## Estimate sample size for a given statistical power, fold change and mean abundance
+For a given target power, the sample size required to detect a taxon with a given
+fold change and mean abundance is obtained by  a root-finding technique.
+Let $g(x_{1i}, x_{2i}, n_k)$ denote the estimated linear predictor from the fitted GAM. 
+The predicted power is obtained via the logistic transformation
+
+\begin{align}
+\hat{p}_i = \text{Logist}\big(g(x_{1i}, x_{2i}, n_k)\big). 
+\end{align}
+
+Given ${x}_{1i}, {x}_{2i}$ and a target power $p^\ast$,  the required sample size $n_k$ is estimated by finding the root of the equation:
+\begin{align}
+\text{Logist}\big(g(x_{1i}, x_{2i}, n_k)\big) - p^\ast = 0.
+\end{align}
+
+
+```{r ss_estimation}
+target_power =  0.8; model  =  pow_ss$gam_mod; abs_lfc = 1.2; logmean = 4
+
+ss_estimate = uniroot_ss(target_power, logmean, abs_lfc, model,
+                        xmin = log2(10), xmax = log2(5000),
+                        maxiter = 10000,
+                        max_report = 2000)
+
+ss_estimate
+```
+
+```{r ss_estimation_grid}
+target_power_vec <- seq(0.5, 0.9, 0.05) #c(0.6, 0.7, 0.8, 0.9)
+abs_lfc_vec      <- c(0.5, 1.0, 1.5, 2.0)
+logmean_vec      <- c(2, 4, 6)
+
+param_grid <- expand.grid(
+  target_power = target_power_vec,
+  abs_lfc = abs_lfc_vec,
+  logmean = logmean_vec
+)
+
+param_grid$sample_size_per_group <- apply(
+  param_grid,
+  1,
+  function(x) {
+      uniroot_ss(
+        target_power = as.numeric(x["target_power"]),
+        logmean      = as.numeric(x["logmean"]),
+        abs_lfc      = as.numeric(x["abs_lfc"]),
+        model        = pow_ss$gam_mod,
+        xmin         = log2(10),
+        xmax         = log2(5000),
+        maxiter      = 10000,
+        max_report   = 2000)$sample_size_per_group
+  }
+)
+
+head(param_grid)
+```
+
+```{r ss_grid_plot, fig.width=11, fig.height=8}
+ggplot(param_grid,
+       aes(x = target_power,
+           y = sample_size_per_group,
+           group = 1)) +
+  geom_line() +
+  geom_point() +
+  facet_grid(
+    abs_lfc ~ logmean,
+    labeller = labeller(
+      abs_lfc = function(x) paste0("|log(fold change)| = ", x),
+      logmean = function(x) paste0("log(mean count) = ", x)
+    )
+  ) +
+    labs(
+    x = "Target Power",
+    y = "Estimated Sample Size per Group",
+    title = "Estimated Sample Size by Target Power"
+  ) + 
+  theme_bw() +
+  theme(
+    plot.title = element_text(hjust = 0.5)
+  )
+
+```
 
 
 
@@ -573,41 +636,231 @@ pow_ss <- power_fun_ss(pval_est_list,
 
 ### Data description and parameter estimates from actual microbiome datasets
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+library(knitr)
+library(kableExtra)
 library(knitr)
 library(kableExtra)
 
 df <- data.frame(
-  `$Dataset$` = c("Example row 1", "Example row 2"),
-  `$n_{comp}$` = c(5, 5),
-  `$\\mu_1$` = c("(2,3,4,5,7)", "(2,3,4,5,7)"),
-  `$\\sigma_1$` = c("(2,3,4,5,7)", "(2,3,4,5,7)"),
-  `$p_1$` = c("(2,3,4,5,7)", "(2,3,4,5,7)"),
-  `$n_{comp}$` = c(5, 5),
-  `$\\mu_2$` = c("(2,3,4,5,7)", "(2,3,4,5,7)"),
-  `$\\sigma_2$` = c("(2,3,4,5,7)", "(2,3,4,5,7)"),
-  `p_2` = c("(2,3,4,5,7)", "(2,3,4,5,7)"),
-  `$f(x)$` = c("(2,3,4,5,7)", "(2,3,4,5,7)"),
-  check.names = FALSE   # 
+  `Dataset` <- c("ArcticFireSoils", "Blueberry", "cdi_schubert", "cdi_vincent", 
+                    "Chemerin",  "crc_baxter", "crc_zeller", "edd_singh", "Exercise",
+                   "glass_plastic_oberbeckmann", "GWMC_ASIA_NA", "GWMC_HOT_COLD", "hiv_dinh",
+                   "hiv_lozupone", "hiv_noguerajulian", "ibd_papa", "Ji_WTP_DS", "MALL", "ob_goodrich",
+                   "ob_ross","ob_turnbaugh", "ob_zhu", "ob_zupancic", "par_scheperjans",
+                   "sed_plastic_hoellein",  "sed_plastic_rosato", "sw_plastic_frere", "t1d_alkanani",
+                   " ", "t1d_mejialeon",    "wood_plastic_kesy"),
+  `$n_{comp}$` = c("4", "4", "3", "2", "3", "4", "5", "1", "3", "3",
+  "4", "5", "3", "3", "4", "3", "3", "3", "4", "2",
+  "3", "3", "3", "3", "3", "3", "5", "5"," ",  "2", "3"),
+  `$p_1$`        =  c(
+  "(0.10,0.38,0.37,0.15)",
+  "(0.37,0.22,0.29,0.12)",
+  "(0.54,0.37,0.09)",
+  "(0.56,0.44)",
+  "(0.56,0.02,0.42)",
+  "(0.16,0.33,0.20,0.32)",
+  "(0.13,0.40,0.30,0.13,0.03)",
+  "1",
+  "(0.15,0.48,0.36)",
+  "(0.44,0.50,0.06)",
+  "(0.10,0.35,0.38,0.17)",
+  "(0.14,0.35,0.37,0.00,0.14)",
+  "(0.49,0.45,0.06)",
+  "(0.30,0.28,0.42)",
+  "(0.09,0.46,0.25,0.19)",
+  "(0.06,0.49,0.45)",
+  "(0.33,0.30,0.37)",
+  "(0.39,0.11,0.50)",
+  "(0.15,0.16,0.62,0.06)",
+  "(0.34,0.66)",
+  "(0.55,0.03,0.42)",
+  "(0.57,0.01,0.42)",
+  "(0.45,0.32,0.23)",
+  "(0.39,0.32,0.28)",
+  "(0.41,0.39,0.20)",
+  "(0.40,0.43,0.17)",
+  "(0.06,0.25,0.33,0.27,0.08)",
+  "(0.06,0.30,0.47,0.15,0.02)",
+   " ",
+  "(0.47,0.53)",
+  "(0.29,0.42,0.29)"
+),
+  `$\\mu_1$`   =  c(
+  "(-2.81,-1.56,0.31,3.27)",
+  "(-0.47,-1.45,0.83,2.54)",
+  "(-2.02,0.78,4.17)",
+  "(3.06,-0.03)",
+  "(-0.86,0.74,2.27)",
+  "(-3.13,-2.01,-0.49,2.73)",
+  "(-2.32,-1.33,0.15,2.33,5.75)",
+  "(-0.42)",
+  "(-1.20,0.17,2.39)",
+  "(-0.08,1.91,5.71)",
+  "(-4.72,-3.18,-1.17,1.41)",
+  "(-4.73,-3.16,-1.06,-0.93,1.57)",
+  "(0.42,2.15,5.79)",
+  "(-0.12,1.30,3.80)",
+  "(-2.83,-1.71,0.21,3.64)",
+  "(0.14,1.71,4.69)",
+  "(-0.68,2.61,6.67)",
+  "(-0.65,0.65,3.26)",
+  "(-3.89,-2.39,-0.17,3.31)",
+  "(-0.58,2.34)",
+  "(-0.98,0.14,1.22)",
+  "(-0.12,0.53,2.77)",
+  "(-1.98,-0.56,1.91)",
+  "(-1.71,-0.31,1.34)",
+  "(-0.03,1.46,3.32)",
+  "(-0.25,1.58,4.06)",
+  "(-1.88,-1.04,0.19,1.93,4.08)",
+  "(-3.06,-2.54,-1.91,-0.87,0.82)",
+   " ",
+  "(0.73,3.57)",
+  "(-1.16,1.16,4.65)"),
+  
+  `$\\sigma_1$`  = c(
+  "(0.45,0.80,1.35,2.39)",
+  "(0.71,0.52,1.05,1.66)",
+  "(0.94,1.57,2.04)",
+  "(2.10,0.89)",
+  "(1.14,0.09,2.32)",
+  "(0.55,0.76,2.46,1.21)",
+  "(0.50,0.71,1.09,1.70,2.52)",
+  "(2.39)",
+  "(0.50,1.10,1.97)",
+  "(0.64,1.23,1.18)",
+  "(0.61,0.98,1.50,2.28)",
+  "(0.69,1.55,1.05,0.07,2.28)",
+  "(0.84,1.25,0.70)",
+  "(0.92,0.50,1.83)",
+  "(0.46,0.75,1.33,2.32)",
+  "(0.69,0.57,0.98)",
+  "(0.84,2.69,1.84)",
+  "(0.82,0.40,1.83)",
+  "(0.58,1.61,0.98,2.47)",
+  "(0.75,1.98)",
+  "(0.79,0.08,1.66)",
+  "(0.82,0.04,1.97)",
+  "(0.87,1.42,0.41)",
+  "(0.71,1.02,1.58)",
+  "(0.65,1.05,1.67)",
+  "(0.70,1.23,1.93)",
+  "(0.33,0.52,0.83,1.35,2.21)",
+  "(0.17,0.30,0.46,0.72,1.37)",
+  " ",
+  "(0.92,1.94)",
+  "(0.70,1.43,2.46)"
+),
+  `  `  = c(rep(" ", 31)),
+  `  `  = c(rep(" ", 31)),
+  `  `  = c(rep(" ", 31)),
+  `  `  = c(rep(" ", 31)),
+  `$n_{comp}$`   = c(rep("2", 27), "5", " ", "2", "2"),
+  `$p_2$`        =  c(
+  "(-3.88)", "(4.97)", "(-1.16)", "(4.93)", "(4.52)",
+  "(4.65)", "(3.66)", "(-1.99)", "(-4.83)", "(-3.83)",
+  "(4.08)", "(3.58)", "(-2.29)", "(-4.86)", "(-2.44)",
+  "(-1.31)", "(4.44)", "(4.26)", "(4.90)", "(4.40)",
+  "(1.60)", "(-2.12)", "(-1.90)", "(4.16)", "(-4.73)",
+  "(4.65)", "(2.68)", "(0.23,-2.85,-4.30,4.83)",
+  " ",
+  "(-2.93)", "(3.96)"
+),
+  `$\\mu_2$`     = c(
+  "$0.13 + 0.06x_i,\\;-1.55 - 0.62x_i$",
+  "$0.16 - 4.31x_i,\\;0.01 + 0.01x_i$",
+  "$-1.42 - 0.37x_i,\\;2.61 + 0.77x_i$",
+  "$1.04 - 1.14x_i,\\;-0.21 - 0.09x_i$",
+  "$2.95 + 3.42x_i,\\;-0.02 - 0.00x_i$",
+  "$4.25 + 3.11x_i,\\;-0.09 - 0.03x_i$",
+  "$0.78 + 0.88x_i,\\;-0.16 - 0.02x_i$",
+  "$0.09 + 0.01x_i,\\;-2.20 - 0.72x_i$",
+  "$0.03 - 0.02x_i,\\;2.27 - 2.38x_i$",
+  "$-0.07 - 0.05x_i,\\;2.17 + 0.13x_i$",
+  "$3.69 - 0.21x_i,\\;0.11 + 0.03x_i$",
+  "$1.62 + 0.25x_i,\\;-0.03 - 0.01x_i$",
+  "$0.33 + 0.11x_i,\\;-1.54 - 0.68x_i$",
+  "$0.30 + 0.24x_i,\\;-4.39 + 0.21x_i$",
+  "$0.07 + 0.04x_i,\\;-0.47 - 0.19x_i$",
+  "$-0.32 + 0.11x_i,\\;0.57 + 0.11x_i$",
+  "$2.59 - 1.66x_i,\\;0.10 + 0.00x_i$",
+  "$-0.09 + 1.07x_i,\\;0.08 + 0.05x_i$",
+  "$-0.35 - 2.37x_i,\\;-0.09 - 0.02x_i$",
+  "$0.81 + 0.42x_i,\\;0.02 + 0.01x_i$",
+  "$-1.24 - 0.36x_i,\\;0.28 + 0.10x_i$",
+  "$-0.30 + 0.05x_i,\\;1.03 + 0.47x_i$",
+  "$-0.07 + 0.03x_i,\\;1.26 + 0.18x_i$",
+  "$0.88 + 0.44x_i,\\;-0.10 - 0.02x_i$",
+  "$-0.07 - 0.00x_i,\\;-0.52 + 0.41x_i$",
+  "$-0.25 - 1.49x_i,\\;-0.08 - 0.04x_i$",
+  "$1.82 + 0.35x_i,\\;-0.06 + 0.01x_i$",
+  "$-1.75 + 0.01x_i,\\;-0.36 - 2.61x_i,\\;-0.34 + 2.04x_i$",
+  "$-0.13 - 0.93x_i,\\;-0.03 - 0.02x_i$",
+  "$0.25 + 0.02x_i,\\;-3.32 + 0.13x_i$",
+  "$0.28 + 2.24x_i,\\;-0.00 - 0.01x_i$"
+),
+`${f(x)}_{\\sigma_2}$`  = c(
+"$-0.65 + 0.30x_i,\\;0.44 + 0.46x_i$",
+"$-1.17 + 2.07x_i,\\;-1.07 + 0.13x_i$",
+"$-0.27 + 0.54x_i,\\;-0.17 + 0.23x_i$",
+"$1.05 - 0.49x_i,\\;0.18 + 0.13x_i$",
+"$-1.25 - 2.24x_i,\\;-1.31 + 0.07x_i$",
+"$0.34 + 1.84x_i,\\;-0.39 + 0.43x_i$",
+"$1.53 - 0.39x_i - 1.30x_i^2,\\;-0.31 + 0.35x_i - 0.03x_i^2$",
+"$0.13 + 0.28x_i,\\;-0.54 + 0.16x_i$",
+"$-1.23 + 0.05x_i,\\;-1.55 + 1.39x_i$",
+"$-0.51 + 0.06x_i,\\;-1.39 + 0.51x_i$",
+"$0.26 - 1.68x_i,\\;0.55 + 0.46x_i$",
+"$0.33 + 0.36x_i,\\;0.68 + 0.65x_i$",
+"$-0.36 + 0.14x_i,\\;-0.93 + 0.25x_i$",
+"$-0.04 + 0.17x_i,\\;-0.79 - 0.25x_i$",
+"$-0.72 + 0.19x_i,\\;-0.18 - 0.20x_i$",
+"$0.16 + 0.06x_i,\\;-1.30 + 0.48x_i$",
+"$-1.34 - 1.83x_i,\\;-0.78 + 0.04x_i$",
+"$-0.22 - 1.87x_i + 1.43x_i^2,\\;0.11 + 0.20x_i - 0.03x_i^2$",
+"$-2.92 + 1.76x_i,\\;-0.71 + 0.39x_i$",
+"$-2.19 + 0.27x_i,\\;-0.11 + 0.01x_i$",
+"$-0.38 + 0.46x_i,\\;-0.24 + 0.18x_i$",
+"$0.01 + 0.11x_i,\\;-0.61 + 0.19x_i$",
+"$-0.04 + 0.17x_i,\\;-0.74 - 0.29x_i$",
+"$-0.07 + 0.62x_i,\\;-0.44 + 0.15x_i$",
+"$-0.42 + 0.10x_i,\\;0.23 - 0.99x_i$",
+"$0.70 + 0.67x_i,\\;-1.61 + 0.19x_i$",
+"$0.43 - 0.40x_i,\\;-0.54 + 0.11x_i$",
+"$3.94 + 3.15x_i,\\;-1.28 - 1.36x_i,\\;-3.81 - 3.44x_i$",
+"$-2.31 + 3.62x_i,\\;-1.12 + 0.63x_i$",
+"$-0.04 + 0.06x_i,\\;-0.25 + 0.35x_i$",
+"$0.12 + 0.67x_i,\\;-1.31 + 0.10x_i$"
+),
+  check.names = FALSE
 )
 
-kbl(df,
-    booktabs = TRUE,
-    longtable = TRUE,
-    escape = FALSE) %>%
-  kable_styling(latex_options = c("hold_position", "repeat_header")) %>%
-  add_header_above(c(" " = 1, "Log mean count" = 4, "Log fold change" = 5))
+kbl(
+  df,
+  booktabs = TRUE,
+  longtable = TRUE,
+  escape = FALSE
+) %>%
+  kable_styling(
+    latex_options = c("hold_position", "repeat_header")
+  ) %>%
+  add_header_above(
+    c(" " = 1,
+      "Log mean count" = 8,
+      "Log fold change" = 4)
+  )
 
 ```
+
+ 
 
 # Acknowledgments
 
 We would like to express our sincere gratitude to Dr. Jacob T. Nearing for his generosity in granting us access to the 38 microbiome datasets used in the paper “Microbiome differential abundance methods produce different results across 38 datasets” [@Nearing2022]. These datasets were invaluable in developing, testing, and validating this R package for power and sample size calculation in microbiome studies.
 
-We also sincerely appreciate the following individuals for running the functions in this package on the microbiome datasets published in [@Nearing2022], thereby providing users with plausible parameter values for their research work: Alim Tuguzbay, Arjya Bhattacharjee, Atiyah Sulaiman, George Vinichenko, Josh Effero, Mahdiya Adnan, Mir Akbaar Khaled, Nevin Xu, Nicole Padoun, Riya  Srivastava, and Shaira Habib (University of Alberta: Alim Tuguzbay, Arjya Bhattacharjee, Atiyah Sulaiman, George Vinichenko, Josh Effero, Mahdiya Adnan, Mir Akbaar Khaled, Nevin Xu, and Shaira Habib; McMaster University: Nicole Padoun and Riya  Srivastava).
+We also sincerely appreciate the following individuals for running the functions in this package on the microbiome datasets published in [@Nearing2022], thereby providing users with plausible parameter values for their research work: Alim Tuguzbay, Arjya Bhattacharjee, Atiyah Sulaiman, George Vinichenko, Josh Effero, Mahdiya Adnan, Mir Akbaar Khaled, Nevin Xu, Nicole Padoun, Riya  Srivastava, and Shaira Habib (University of Alberta: Alim Tuguzbay, Arjya Bhattacharjee, Atiyah Sulaiman, George Vinichenko, Josh Effero, Mahdiya Adnan, Mir Akbaar Khaled, Nevin Xu, and Shaira Habib; McMaster University: Nicole Padoun and Riya  Srivastava.
 
-
-<!--We also sincerely appreciate the following people for running the functions in this package on the microbiome datasets published in [@Nearing2022] to provide users with plausible parameter values for thier research work: Alim Tuguzbay, Nevin Nu, Mir Akbaar Khaled, Gosh, logfoldchangeFit, Alim, Akja, etc. and Roda (all from University of Alberta) and mmm (McMaster University)-->
 
 
 

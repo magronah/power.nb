@@ -67,12 +67,13 @@ logmean_sim_fun = function(logmean_param,notu){
 #' @export
 #'
 #' @examples
+#' set.seed(101)
 #' # Define simulated log mean abundance
 #' logmean_sim <- rnorm(100, mean = 0, sd = 1)
 #'
 #' # Define parameters for log fold change simulation
 #' logfoldchange_param <- list(
-#'   par = c(1, -0.5, 0.2), # Example parameters
+#'   par = rnorm(11),       # Example parameters
 #'   np = 2,                # Number of components
 #'   sd_ord = 2             # Order of polynomial for SD
 #' )
@@ -309,7 +310,7 @@ countdata_sim_fun <- function(logmean_param, logfoldchange_param, dispersion_par
 #' provided parameters: mean abundance, asymptotic dispersion, and extra Poisson dispersion.
 #'
 #' The dispersion is calculated using the formula:
-#' \deqn{\text{dispersion} = \text{asymptDisp} + \frac{\text{extraPois}}{\text{mean_abund}}}
+#' \deqn{dispersion = asymptDisp + \frac{extraPois}{meanAbund}}
 #'
 #' @param mean_abund Numeric value representing the mean abundance of the taxa.
 #' @param asymptDisp Numeric value for the asymptotic dispersion (the dispersion at high abundance).

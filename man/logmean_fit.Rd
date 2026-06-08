@@ -26,7 +26,8 @@ variance parameter estimates from the fit
 The optimal number of components to fit is chosen using parametric bootstrap method
 }
 \examples{
+\donttest{
 logmean  = rnorm(100)
 logmean_fit(logmean,sig=0.05,max.comp=4,max.boot=100)
-
+}
 }

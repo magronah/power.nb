@@ -2,7 +2,7 @@
 % Please edit documentation in R/utils.R
 \name{deseq_fun_est}
 \alias{deseq_fun_est}
-\title{Fold change and p-value estimations for a many simulations}
+\title{Fold change and p-value estimations for simulations}
 \usage{
 deseq_fun_est(
   metadata_list,
@@ -10,7 +10,7 @@ deseq_fun_est(
   alpha_level = 0.1,
   group_colname,
   sample_colname,
-  num_cores = 2,
+  num_cores = 1,
   ref_name = NULL
 )
 }
@@ -46,5 +46,5 @@ baseMean,log2FoldChange, lfcSE, pvalue, padj
 normalised_count is the normalised count data
 }
 \description{
-Fold change and p-value estimations for a many simulations
+Fold change and p-value estimations for simulations
 }

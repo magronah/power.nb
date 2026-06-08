@@ -12,8 +12,10 @@
 #' @export
 #'
 #' @examples
+#' \donttest{
 #' logmean  = rnorm(100)
 #' optimal.comp(logmean,sig=0.05,max.comp=4,max.boot=100)
+#' }
 
 optimal.comp <- function(logmean,sig=0.05,max.comp=4,max.boot=100){
   a <- mixtools::boot.comp(y = logmean, max.comp = max.comp, B = max.boot,
@@ -99,10 +101,11 @@ filter_low_count <- function (countdata, metadata, abund_thresh = 5, sample_thre
 #' @export
 #'
 #' @examples
+#' \donttest{
 #' # Example usage
 #' set.seed(101)
-#' nr = 10; nc =50
-#' countdata <- matrix(rpois(500, 3), ncol = nc, nrow = nr)
+#' nr = 10; nc = 35
+#' countdata <- matrix(rpois(350, 3), ncol = nc, nrow = nr)
 #' # Simulated OTU count data with 50 taxa and 10 samples
 #' countdata  <- as.data.frame(countdata)
 #' rownames(countdata)  <- paste("Sample", 1:nr, sep = "_")
@@ -126,7 +129,7 @@ filter_low_count <- function (countdata, metadata, abund_thresh = 5, sample_thre
 #' result$dispersion  # Dispersion estimates
 #' result$deseq_estimate  # DESeq2 results
 #' result$normalised_count  # Normalized count data
-#'
+#'}
 
 deseqfun <- function (countdata, metadata, alpha_level = 0.1,
                       ref_name = NULL,
@@ -183,12 +186,12 @@ deseqfun <- function (countdata, metadata, alpha_level = 0.1,
   disp = DESeq2::dispersions(dds)
   logfoldchange = deseq_est$log2FoldChange
   names(logfoldchange) = rownames(deseq_est)
-  # normalised_count = DESeq2::counts(dds, normalized = TRUE)
+  normalised_count = DESeq2::counts(dds, normalized = TRUE)
 
   list(logfoldchange  =  logfoldchange,
        dispersion     =  disp,
        deseq_estimate =  deseq_est,
-       # normalised_count =  normalised_count,
+       normalised_count =  normalised_count,
        deseq_object   =  dds,
        metadata       =  metadata,
        countdata      =  countdata)
@@ -417,7 +420,7 @@ gen_parnames <- function(np, sd_ord) {
 
 
 #############################################################################
-#' Fold change and p-value estimations for a many simulations
+#' Fold change and p-value estimations for simulations
 #'
 #' @param metadata_list : list of metadata
 #' @param countdata_list : list of otu count data
@@ -447,7 +450,7 @@ deseq_fun_est <-function(metadata_list,  countdata_list,
                          alpha_level = 0.1,
                          group_colname,
                          sample_colname,
-                         num_cores=2, ref_name= NULL){
+                         num_cores=1, ref_name= NULL){
 
   registerDoParallel(cores = num_cores)
   l = length(countdata_list)
@@ -517,25 +520,6 @@ contour_plot_fun <- function(combined_data,
   )
   gg_2dimc
 }
-
-  # if(!is.null(multiple_samples)){
-  #   gg_2dimc <- (ggplot(combined_data)
-  #                + aes(lmean_abund, abs_lfc, color = sample_size_vec)
-  #                + ggrastr::rasterise(geom_point(aes(color = pvalue_reject), alpha = 0.5))
-  #                + xlab(TeX("$\\log_2$(mean counts)"))
-  #                + ylab(TeX("|$\\log_2$(fold change)|"))
-  #                + scale_colour_manual(values = c("black", "red"))
-  #                + geom_contour(data = power_estimate,
-  #                               aes(z=power),lwd=1,
-  #                               breaks = cont_breaks)
-  #                + metR::geom_label_contour(data = power_estimate,
-  #                                           aes(z= power,label = sprintf("%.3f", after_stat(level))),
-  #                                           breaks = cont_breaks)
-  #                + ggplot2::theme_bw()
-  #
-  #   )
-  # }
-
 
 
 #' Extract specified data from a list of datasets

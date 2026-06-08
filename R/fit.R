@@ -15,9 +15,10 @@
 #' @export
 #'
 #' @examples
+#' \donttest{
 #' logmean  = rnorm(100)
 #' logmean_fit(logmean,sig=0.05,max.comp=4,max.boot=100)
-#'
+#'}
 logmean_fit <- function(logmean,sig=0.05,max.comp=4,max.boot=100,verb=FALSE){
 
   ncomp_opt = optimal.comp(logmean,sig,max.comp,max.boot)
@@ -142,10 +143,11 @@ dispersion_fit <- function(dispersion, logmean) {
 #' @importFrom DEoptim DEoptim DEoptim.control
 #' @importFrom parallel makeCluster clusterExport
 #' @examples
+#' \donttest{
 #' logmean        =  rnorm(100)
 #' logfoldchange  =  rnorm(100)
 #' logfoldchange_fit(logmean,logfoldchange)
-#'
+#'}
 logfoldchange_fit = function(logmean,logfoldchange,ncore = 2,
                              max_sd_ord = 2, max_np=5,
                              minval = -5, maxval = 5,

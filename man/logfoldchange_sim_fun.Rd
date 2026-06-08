@@ -36,12 +36,13 @@ This function generates simulated log fold change (LFC) values based on the prov
 The simulation ensures that the generated LFC values remain within a specified maximum range by iterating until convergence or until a maximum iteration limit is reached.
 }
 \examples{
+set.seed(101)
 # Define simulated log mean abundance
 logmean_sim <- rnorm(100, mean = 0, sd = 1)
 
 # Define parameters for log fold change simulation
 logfoldchange_param <- list(
-  par = c(1, -0.5, 0.2), # Example parameters
+  par = rnorm(11),       # Example parameters
   np = 2,                # Number of components
   sd_ord = 2             # Order of polynomial for SD
 )

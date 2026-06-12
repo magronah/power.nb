@@ -1,11 +1,20 @@
-# Sample Size estimation function uisng uniroot
+# Sample Size estimation function using uniroot
 
-Sample Size estimation function uisng uniroot
+Sample Size estimation function using uniroot
 
 ## Usage
 
 ``` r
-uniroot_ss(target_power, logmean, abs_lfc, model, xmin, xmax)
+uniroot_ss(
+  target_power,
+  logmean,
+  abs_lfc,
+  model,
+  xmin = log2(10),
+  xmax = log2(5000),
+  maxiter = 10000,
+  max_report = 2000
+)
 ```
 
 ## Arguments
@@ -33,6 +42,15 @@ uniroot_ss(target_power, logmean, abs_lfc, model, xmin, xmax)
 - xmax:
 
   Numeric value giving the maximum sample size considered in the search.
+
+- maxiter:
+
+  maximum number of iterations
+
+- max_report:
+
+  maximum group sample size to be predicted. Any predicted sample size
+  that exceed max_report will be reported as "\> max_report"
 
 ## Value
 

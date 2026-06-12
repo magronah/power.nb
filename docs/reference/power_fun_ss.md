@@ -79,15 +79,17 @@ A data frame is then constructed with:
 - `logsample_size`: base-2 logarithm of sample size.
 
 The function attempts to fit the following SCAM model: \$\$
-\mathrm{logit}\\P(\text{reject})\\ = s(\text{logmean},
-\text{abs\\lfc}) + s(\text{abs\\lfc}, \text{logsample\\size}) +
-s(\text{logmean}, \text{logsample\\size}) \$\$
+\mathrm{logit}\\P(\text{reject})\\ = s(\text{logmean}, \text{abs\\lfc},
+\text{bs = "tedmi"}) + s(\text{abs\\lfc}, \text{logsample\\size},
+\text{bs = "tedmi"}) + s(\text{logmean}, \text{logsample\\size},
+\text{bs = "tedmi"}) \$\$
 
 using a binomial family.
 
 If the full model fails due to numerical instability, a simpler fallback
 model is fitted instead: \$\$ \mathrm{logit}\\P(\text{reject})\\ =
-s(\text{logmean}, \text{abs\\lfc}) + s(\text{logsample\\size}) \$\$
+s(\text{logmean}, \text{abs\\lfc}, \text{bs = "tedmi"}) +
+s(\text{logsample\\size}, \text{bs = "mpi"}) \$\$
 
 A warning is issued when the fallback model is used.
 
@@ -98,34 +100,55 @@ A warning is issued when the fallback model is used.
 ## Examples
 
 ``` r
-if (FALSE) { # \dontrun{
+#' @examples
+
 # Example structure only
-pval_est_list <- list(
-  c(0.01, 0.20, 0.03),
-  c(0.15, 0.04, 0.08)
-)
-
-logmean_list <- list(
-  c(2, 2, 2),
-  c(3, 3, 3)
-)
-
-logfoldchange_list <- list(
-  c(1, 1, 1),
-  c(2, 2, 2)
-)
-
-nsample_vec <- c(20, 40, 80)
-
+set.seed(101)
+n = 70
+pval_est_list = list(rnorm(n),rnorm(n))
+logmean_list = list(rnorm(n),rnorm(n))
+logfoldchange_list = list(rnorm(n),rnorm(n))
+nsample_vec <- c(20, 40)
 out <- power_fun_ss(
-  pval_est_list = pval_est_list,
-  logmean_list = logmean_list,
-  nsample_vec = nsample_vec,
-  logfoldchange_list = logfoldchange_list,
-  alpha_level = 0.1
+pval_est_list = pval_est_list,
+logmean_list = logmean_list,
+nsample_vec = nsample_vec,
+logfoldchange_list = logfoldchange_list,
+alpha_level = 0.1
 )
-
+#> Warning: Full SCAM model failed to converge due to numerical instability.
+#> The simpler model will be used instead.
+#> Original error: Model has more coefficients than data
+#> Selected model: simpler model (full model did not converge).
 out$combined_data
+#> # A tibble: 140 × 5
+#>    logmean abs_lfc pval_reject sample_size logsample_size
+#>      <dbl>   <dbl>       <dbl>       <dbl>          <dbl>
+#>  1  -0.909   1.17            1          20           4.32
+#>  2  -0.338   2.15            0          20           4.32
+#>  3  -1.41    0.342           1          20           4.32
+#>  4   0.218   0.905           0          20           4.32
+#>  5   0.670   1.10            0          20           4.32
+#>  6  -0.288   1.47            0          20           4.32
+#>  7   0.469   0.281           0          20           4.32
+#>  8  -0.470   0.846           1          20           4.32
+#>  9  -0.239   1.29            0          20           4.32
+#> 10  -0.447   0.312           1          20           4.32
+#> # ℹ 130 more rows
 out$gam_mod
-} # }
+#> 
+#> Family: binomial 
+#> Link function: logit 
+#> 
+#> Formula:
+#> pval_reject ~ s(logmean, abs_lfc, bs = "tedmi") + s(logsample_size, 
+#>     bs = "mpi")
+#> <environment: 0x55959ad70c00>
+#> 
+#> Estimated degrees of freedom:
+#> 1 1  total = 3 
+#> 
+#> UBRE score: 0.41649
+#> rank: 57/58
+
 ```

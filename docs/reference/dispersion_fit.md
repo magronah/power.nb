@@ -31,11 +31,11 @@ A list containing estimates for `a` and `b` and confidence intervals
 logmean    =  rnorm(100)
 dispersion =  abs(rnorm(100))
 dispersion_fit(dispersion,logmean)
-#> Warning: singular gradient
 #> Waiting for profiling to be done...
+#> Warning: singular gradient
 #> $param
-#>   asymptDisp extraPois
-#> 1   1.035139         0
+#>   asymptDisp  extraPois
+#> 1  0.7202373 0.09748546
 #> 
 #> $confint
 #>            2.5 % 97.5 %

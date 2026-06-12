@@ -80,6 +80,7 @@ A list.
 ## Examples
 
 ``` r
+# \donttest{
 logmean        =  rnorm(100)
 logfoldchange  =  rnorm(100)
 logfoldchange_fit(logmean,logfoldchange)
@@ -898,4 +899,5 @@ logfoldchange_fit(logmean,logfoldchange)
 #> $aic
 #> [1] 280.2005
 #> 
+# }
 ```

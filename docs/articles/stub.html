@@ -7,8 +7,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>Power and Sample Size Estimation for Microbiome Analysis • power.nb</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Power and Sample Size Estimation for Microbiome Analysis">
 </head>
@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">power.nb</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -42,6 +42,7 @@
 <li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json">
 </form></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/magronah/power.nb/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
       </ul>
 </div>
 
@@ -59,9 +60,9 @@
                         <h4 data-toc-skip class="author">Michael Agronah
 and Benjamin Bolker</h4>
             
-            <h4 data-toc-skip class="date">2026-03-14</h4>
+            <h4 data-toc-skip class="date">2026-06-12</h4>
       
-
+      <small class="dont-index">Source: <a href="https://github.com/magronah/power.nb/blob/main/vignettes/stub.rmd" class="external-link"><code>vignettes/stub.rmd</code></a></small>
       <div class="d-none name"><code>stub.rmd</code></div>
     </div>
 
@@ -71,33 +72,32 @@ and Benjamin Bolker</h4>
 <h2 id="package-description-and-functionalities">Package Description and Functionalities<a class="anchor" aria-label="anchor" href="#package-description-and-functionalities"></a>
 </h2>
 <p><code>power.nb</code> is a package developed for estimating
-statistical power and sample sizes in differential abundance microbiome
-studies. The package presents novel methods for estimating statistical
-power for individual taxa (feature, OTU/ASV, or species) and for sample
-size calculation accounting for effect sizes and mean abundance of
-taxa.</p>
-<p><code>power.nb</code> also presents two novel microbiome data
-simulations frameworks: <code>Cask's</code> and <code>RRSim</code>. The
-method implemented in <code>MixGaussSim</code> models the distribution
-of mean abundance of taxa and the distribution of fold change (as a
+statistical power and required sample size in differential abundance
+microbiome studies using negative binomial models. The package includes
+tools for simulation-based power analysis and sample size estimation
+using generalized additive models (GAMs), and visualization utilities
+for exploring the relationship between power, effect size, abundance,
+and sample size.</p>
+<p><code>power.nb</code> presents two novel microbiome data simulations
+frameworks: the Mixture of Gaussians (MixGaussSim) and the Reduced Rank
+(RRSim) simulation approaches. MixGaussSim models the distribution of
+mean abundance of taxa and the distribution of fold change (as a
 function of mean abundance of taxa) by finite Mixture of Gaussian
 distributions. Microbiome count data is then simulated from a negative
-binomial distribution. Detailed description of the
-<code>MixGaussSim</code> method is presented in the paper <a href="https://doi.org/10.1371/journal.pone.0318820" class="external-link">“Investigating
+binomial distribution. Detailed description of the MixGaussSim method is
+presented in the paper <a href="https://doi.org/10.1371/journal.pone.0318820" class="external-link">“Investigating
 statistical power of differential abundance studies”</a> <span class="citation">(Agronah and Bolker 2025)</span>.</p>
-<p><code>RRSim</code> (this simulation method is still under development
-and some functions in <code>RRSim</code> are yet to tested), on the
-other hand models the mean abundance of all taxa jointly with a
-mixed-effects model while accounting for correlations among taxa within
-subjects and zero inflation in microbiome data. Given the high
-dimensionality of microbiome data (usually having hundreds or thousands
-of taxa), modelling correlations between taxa requires estimating
-thousands or even millions of parameters for the correlation matrix.
-<code>RRSim</code> uses the reduced rank functionality implemented in
-the <code>glmmTMB</code> <span class="citation">(Magnusson et al.
-2017)</span> packages to reduce the number of parameter estimates
-required of the variance-correlation matrix. Details of this method is
-presented in the thesis <a href="https://macsphere.mcmaster.ca/handle/11375/31784" class="external-link">“A Novel
+<p>RRSim (this simulation method is still under development and some
+functions in RRSim are yet to tested), on the other hand models the mean
+abundance of all taxa jointly with a mixed-effects model while
+accounting for correlations among taxa within subjects and zero
+inflation in microbiome data. Given the high dimensionality of
+microbiome data (usually having hundreds or thousands of taxa),
+modelling correlations between taxa requires estimating thousands or
+even millions of parameters for the correlation matrix. RRSim uses the
+reduced rank functionality implemented in the <code>glmmTMB</code> <span class="citation">(Magnusson et al. 2017)</span> packages to reduce the
+number of parameter estimates required of the variance-correlation
+matrix. Details of this method is presented in the thesis <a href="https://macsphere.mcmaster.ca/handle/11375/31784" class="external-link">“A Novel
 Approach for Simulation-Based Power Estimation and Joint Modeling of
 Microbiome Counts”</a> <span class="citation">(Agronah 2025)</span></p>
 </div>
@@ -126,29 +126,29 @@ abundance and effect size (defined in this package as fold changes)
 <span class="citation">(Agronah and Bolker 2025)</span>. Thus,
 estimating the distributions of mean abundance and fold change of taxa
 explicitly will offer great benefit for estimation of statistical power
-for individual taxon. We use the <code>MixGaussSim</code> simulation
-approach to simulate microbiome data for power calculation due to its
-flexibility in modelling the distributions of taxa mean abundances and
-effect sizes explicitly as as well as their relationship.</p>
+for individual taxon. We use the MixGaussSim simulation approach to
+simulate microbiome data for power calculation due to its flexibility in
+modelling the distributions of taxa mean abundances and effect sizes
+explicitly as as well as their relationship.</p>
 <div class="section level3">
 <h3 id="two-ways-to-obtain-parameters-for-data-simulation-using-mixgausssim">Two ways to obtain parameters for data simulation using
 MixGaussSim<a class="anchor" aria-label="anchor" href="#two-ways-to-obtain-parameters-for-data-simulation-using-mixgausssim"></a>
 </h3>
-<p>There are one of two ways to obtain the parameters of the
-<code>MixGaussSim</code> method for data simulation. Users can:</p>
+<p>There are one of two ways to obtain the parameters of the MixGaussSim
+method for data simulation. Users can:</p>
 <p><strong>1. pre-specify a set of parameters:</strong> To help users
-decide on plausible parameter values, we have run
-<code>MixGaussSim</code> on some of the microbiome datasets used in the
-paper <a href="10.1038/s41467-022-28034-z">“Microbiome differential
-abundance methods produce different results across 38 datasets”</a>
-<span class="citation">(Nearing et al. 2022)</span> and presented the
-parameter estimates obtained from each of these datasets (<a href="#appendix">see Appendix for the parameter estimates from these
+decide on plausible parameter values, we have run MixGaussSim on some of
+the microbiome datasets used in the paper <a href="https://doi.org/10.1038/s41467-022-28034-z" class="external-link">“Microbiome
+differential abundance methods produce different results across 38
+datasets”</a> <span class="citation">(Nearing et al. 2022)</span> and
+presented the parameter estimates obtained from each of these datasets
+(<a href="#appendix">see Appendix for the parameter estimates from these
 datasets</a> ).</p>
 <p><strong>2. estimate parameters from an existing dataset:</strong>
 Secondly, users can also obtain estimates directly from fitting the
-model implemented in <code>MixGaussSim</code> to existing datasets. The
-following steps outlines the process for estimating parameters from an
-existing dataset.</p>
+model implemented in MixGaussSim to existing datasets. The following
+steps outlines the process for estimating parameters from an existing
+dataset.</p>
 </div>
 <div class="section level3">
 <h3 id="dataset">Dataset<a class="anchor" aria-label="anchor" href="#dataset"></a>
@@ -160,8 +160,10 @@ contains 52 samples and 1203 taxa.</p>
 <code class="sourceCode R"><span><span class="co">##Load libraries</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyverse.tidyverse.org" class="external-link">tidyverse</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://michaelagronah.com/power.nb">power.nb</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://michaelagronah.com/power.nb/">power.nb</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://patchwork.data-imaginist.com" class="external-link">patchwork</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://renkun-ken.github.io/rlist/" class="external-link">rlist</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://www.stefanom.io/latex2exp/" class="external-link">latex2exp</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">data_path</span> <span class="op">=</span>  <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"pkgdata"</span>, package <span class="op">=</span> <span class="st">"power.nb"</span><span class="op">)</span></span>
 <span><span class="co">##Read count data and metadata</span></span>
@@ -185,108 +187,71 @@ contains 52 samples and 1203 taxa.</p>
 <pre><code><span><span class="co">## [1] 1203   52</span></span></code></pre>
 <pre><code><span><span class="co">## [1] 52  2</span></span></code></pre>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span>; <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">metadata</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">data</span>,<span class="fl">2</span><span class="op">)</span>; <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">metadata</span>,<span class="fl">2</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##           BD0017v13 BD0027v13 BD0022v13 BD0040v13 BD0044v13 BD0057v13 BD0115v13</span></span>
 <span><span class="co">## denovo619         0         0         0         0         0         0         0</span></span>
 <span><span class="co">## denovo618         0         0         0         0         0         0         0</span></span>
-<span><span class="co">## denovo617         0         0         0         0         9         0         0</span></span>
-<span><span class="co">## denovo616         0         0         0         0         0         0         0</span></span>
-<span><span class="co">## denovo615         0         0         0         0         0         0         0</span></span>
-<span><span class="co">## denovo614         0         0         0         0         0         0         0</span></span>
 <span><span class="co">##           BD0190v13 BD0072v13 BD0112v13 BD0246v13 BD0247v13 BD0266v13 BD0235v13</span></span>
 <span><span class="co">## denovo619         8         0         0         0         0         0         0</span></span>
 <span><span class="co">## denovo618         0         0         0         0         0         0         0</span></span>
-<span><span class="co">## denovo617         0         0         0         1         3         0         0</span></span>
-<span><span class="co">## denovo616         0         0         0         0         0         0         0</span></span>
-<span><span class="co">## denovo615         0         0         0         0         0         0         0</span></span>
-<span><span class="co">## denovo614         0         0         0         1         1         8         0</span></span>
 <span><span class="co">##           BD0295v13 BD0255v13 BD0300v13 BD0331v13 BD0321v13 BD0351v13 BD0409v13</span></span>
 <span><span class="co">## denovo619         1         0         0         0         0         0         8</span></span>
 <span><span class="co">## denovo618         0         0         0         0         0         0         0</span></span>
-<span><span class="co">## denovo617         0         0         0         0         0         2         0</span></span>
-<span><span class="co">## denovo616         0         0         0         0        27         0         0</span></span>
-<span><span class="co">## denovo615         0         0         0         0         0         0         0</span></span>
-<span><span class="co">## denovo614         0         0         1         0         3         1         1</span></span>
 <span><span class="co">##           BD0410v13 BD0375v13 BD0414v13 BD0422v13 BD0464v13 BD0571v13 BD0578v13</span></span>
 <span><span class="co">## denovo619         0         0         0         0         0         0         0</span></span>
 <span><span class="co">## denovo618         0         0         0         0         0         0         1</span></span>
-<span><span class="co">## denovo617         0         0         1         0         0         0         0</span></span>
-<span><span class="co">## denovo616         0         0         0         0         0         0         0</span></span>
-<span><span class="co">## denovo615         0         0         0         0         3         0         0</span></span>
-<span><span class="co">## denovo614         1         0         1         0         0         0         0</span></span>
 <span><span class="co">##           BD0587v13 BD0592v13 BD0594v13 BD0610v13 BD0611v13 BD0613v13 BD0636v13</span></span>
 <span><span class="co">## denovo619         0         0         0         1         0         0         0</span></span>
 <span><span class="co">## denovo618         2         0         0         0         0        18         0</span></span>
-<span><span class="co">## denovo617         1         0         1         0         0         0         0</span></span>
-<span><span class="co">## denovo616         0         0         0         0         0         0         0</span></span>
-<span><span class="co">## denovo615         0         0         0         0         0         0         4</span></span>
-<span><span class="co">## denovo614         1         0         0         0         0         2         0</span></span>
 <span><span class="co">##           BD0616v13 BD0653v13 BD0643v13 BD0654v13 BD0673v13 BD0735v13 BD0760v13</span></span>
 <span><span class="co">## denovo619         0         0         0         1         0         0         0</span></span>
 <span><span class="co">## denovo618         0         0         0         0         0         0         0</span></span>
-<span><span class="co">## denovo617         0         4         0         0         0         5         0</span></span>
-<span><span class="co">## denovo616         0         0         0         0         0         0         0</span></span>
-<span><span class="co">## denovo615         0         0         0         0         0         0         0</span></span>
-<span><span class="co">## denovo614         0         2         0         1         0         0         0</span></span>
 <span><span class="co">##           BD0777v13 BD0758v13 BD0789v13 BD0791v13 BD0821v13 BD0786v13 BD0790v13</span></span>
 <span><span class="co">## denovo619         0         0         0         0         7         0         0</span></span>
 <span><span class="co">## denovo618         0         0         0         0         6         0         0</span></span>
-<span><span class="co">## denovo617         0         0         0         0         0         0         0</span></span>
-<span><span class="co">## denovo616         0         0         0         0         0         0         0</span></span>
-<span><span class="co">## denovo615         0        20         0         0         0         0         0</span></span>
-<span><span class="co">## denovo614         0         0         0         0         0         0         0</span></span>
 <span><span class="co">##           BD0913v13 BD0954v13 BD0981v13</span></span>
 <span><span class="co">## denovo619         0         0         0</span></span>
-<span><span class="co">## denovo618         0         0         0</span></span>
-<span><span class="co">## denovo617         0         0         0</span></span>
-<span><span class="co">## denovo616         0         0         0</span></span>
-<span><span class="co">## denovo615         0         0         0</span></span>
-<span><span class="co">## denovo614         0         1         0</span></span></code></pre>
+<span><span class="co">## denovo618         0         0         0</span></span></code></pre>
 <pre><code><span><span class="co">##    SampleID Groups</span></span>
 <span><span class="co">## 1 BD0017v13     OB</span></span>
-<span><span class="co">## 2 BD0027v13      H</span></span>
-<span><span class="co">## 3 BD0022v13      H</span></span>
-<span><span class="co">## 4 BD0040v13     OB</span></span>
-<span><span class="co">## 5 BD0044v13     OB</span></span>
-<span><span class="co">## 6 BD0057v13      H</span></span></code></pre>
+<span><span class="co">## 2 BD0027v13      H</span></span></code></pre>
 </div>
 <div class="section level3">
 <h3 id="pre-filtering-low-abundant-taxa">Pre-filtering low abundant taxa<a class="anchor" aria-label="anchor" href="#pre-filtering-low-abundant-taxa"></a>
 </h3>
 <p>Low abundant tax exhibit high variability, posing challenges in
-detecting significant differences between groups <span class="citation">(Love, Huber, and Anders 2014)</span>. Pre-filtering
-steps, as is routinely done in differential abundance analysis, is used
-to filter out these low abundant taxa. We filter out taxa with less that
-10 count in less that 5 samples.</p>
+detecting significant differences between groups <span class="citation">(Love et al. 2014)</span>. Pre-filtering steps, as is
+routinely done in differential abundance analysis, is used to filter out
+these low abundant taxa. We filter out taxa with less that 10 count in
+less that 5 samples.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">filter_data</span>  <span class="op">=</span>  <span class="fu"><a href="../reference/filter_low_count.html">filter_low_count</a></span><span class="op">(</span>countdata     <span class="op">=</span>  <span class="va">data</span>,</span>
 <span>                                metadata       <span class="op">=</span>  <span class="va">metadata</span>,</span>
-<span>                                abund_thresh   <span class="op">=</span>  <span class="fl">2</span>,</span>
+<span>                                abund_thresh   <span class="op">=</span>  <span class="fl">3</span>,</span>
 <span>                                sample_thresh  <span class="op">=</span>  <span class="fl">2</span>,</span>
 <span>                                sample_colname <span class="op">=</span>  <span class="st">"SampleID"</span>,</span>
 <span>                                group_colname  <span class="op">=</span>  <span class="st">"Groups"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/dim.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">filter_data</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## [1] 903  52</span></span></code></pre>
+<pre><code><span><span class="co">## [1] 707  52</span></span></code></pre>
 </div>
 <div class="section level3">
 <h3 id="fold-change-and-dispersion-estimation">Fold change and Dispersion Estimation<a class="anchor" aria-label="anchor" href="#fold-change-and-dispersion-estimation"></a>
 </h3>
 <p>We estimate fold change for each taxon and dispersion parameters
 using the negative binomial model implemented in the <code>DESeq2</code>
-package <span class="citation">(Love, Huber, and Anders 2014)</span>.
-The negative binomial model is widely used in both microbiome and
-RNA-seq analyses and is implemented in the <code>NBZIMM</code> <span class="citation">(Yi 2020)</span> and <code>edgeR</code> R packages
-<span class="citation">(Robinson, McCarthy, and Smyth 2010)</span>. The
-model implemented in the <code>DESeq2</code> package is described as
-follows:</p>
+package <span class="citation">(Love et al. 2014)</span>. The negative
+binomial model is widely used in both microbiome and RNA-seq analyses
+and is implemented in the <code>NBZIMM</code> <span class="citation">(Yi
+2020)</span> and <code>edgeR</code> R packages <span class="citation">(Robinson et al. 2010)</span>. The model implemented in
+the <code>DESeq2</code> package is described as follows:</p>
 <p>Let
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>K</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><annotation encoding="application/x-tex">K_{ij}</annotation></semantics></math>
 represent the observed count for the
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>i</mi><mtext mathvariant="normal">th</mtext></msup><annotation encoding="application/x-tex">i^{\text{th}}</annotation></semantics></math>
 taxon in the
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>j</mi><mtext mathvariant="normal">th</mtext></msup><annotation encoding="application/x-tex">j^{\text{th}}</annotation></semantics></math>
-sample. The model assumes that<br><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>K</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><mo>∼</mo><mtext mathvariant="normal">NB</mtext><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>μ</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><mo>,</mo><msub><mi>α</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo></mrow><annotation encoding="application/x-tex">K_{ij} \sim \text{NB}(\mu_{ij}, \alpha_{ij}),</annotation></semantics></math>
+sample. The model assumes that<br><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>K</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><mo>∼</mo><mtext mathvariant="normal">NB</mtext><mo stretchy="false" form="prefix">(</mo><msub><mi>μ</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><mo>,</mo><msub><mi>α</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><mo stretchy="false" form="postfix">)</mo><mo>,</mo></mrow><annotation encoding="application/x-tex">K_{ij} \sim \text{NB}(\mu_{ij}, \alpha_{ij}),</annotation></semantics></math>
 where the mean is defined as
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>μ</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><mo>=</mo><msub><mi>s</mi><mi>j</mi></msub><msub><mi>q</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub></mrow><annotation encoding="application/x-tex">\mu_{ij} = s_j q_{ij}</annotation></semantics></math>,
 and
@@ -295,7 +260,7 @@ is the normalization factor for sample
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>j</mi><annotation encoding="application/x-tex">j</annotation></semantics></math>.
 The expected abundance prior to normalization,
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>q</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><annotation encoding="application/x-tex">q_{ij}</annotation></semantics></math>,
-is modeled as<br><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>log</mo><msub><mi>q</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><mo>=</mo><munder><mo>∑</mo><mi>r</mi></munder><msub><mi>x</mi><mrow><mi>j</mi><mi>r</mi></mrow></msub><msub><mi>β</mi><mrow><mi>i</mi><mi>r</mi></mrow></msub><mo>,</mo></mrow><annotation encoding="application/x-tex">\log q_{ij} = \sum_r x_{jr} \beta_{ir},</annotation></semantics></math>
+is modeled as<br><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">log</mi><mo>⁡</mo></mrow><msub><mi>q</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><mo>=</mo><munder><mo>∑</mo><mi>r</mi></munder><msub><mi>x</mi><mrow><mi>j</mi><mi>r</mi></mrow></msub><msub><mi>β</mi><mrow><mi>i</mi><mi>r</mi></mrow></msub><mo>,</mo></mrow><annotation encoding="application/x-tex">\log q_{ij} = \sum_r x_{jr} \beta_{ir},</annotation></semantics></math>
 with
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>x</mi><mrow><mi>j</mi><mi>r</mi></mrow></msub><annotation encoding="application/x-tex">x_{jr}</annotation></semantics></math>
 denoting the covariates and
@@ -303,13 +268,14 @@ denoting the covariates and
 the associated coefficients. The dispersion parameter is assumed
 constant across samples for each taxon, such that
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>α</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><mo>=</mo><msub><mi>α</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">\alpha_{ij} = \alpha_i</annotation></semantics></math>.
-This formulation links the variance and mean through<br><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">V</mi><mi mathvariant="normal">a</mi><mi mathvariant="normal">r</mi></mrow><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>K</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><msub><mi>μ</mi><mi>i</mi></msub><mo>+</mo><msub><mi>α</mi><mi>i</mi></msub><msubsup><mi>μ</mi><mi>i</mi><mn>2</mn></msubsup><mi>.</mi></mrow><annotation encoding="application/x-tex">\mathrm{Var}(K_{ij}) = \mu_i + \alpha_i \mu_i^2.</annotation></semantics></math></p>
+This formulation links the variance and mean through<br><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">V</mi><mi mathvariant="normal">a</mi><mi mathvariant="normal">r</mi></mrow><mo stretchy="false" form="prefix">(</mo><msub><mi>K</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><mo stretchy="false" form="postfix">)</mo><mo>=</mo><msub><mi>μ</mi><mi>i</mi></msub><mo>+</mo><msub><mi>α</mi><mi>i</mi></msub><msubsup><mi>μ</mi><mi>i</mi><mn>2</mn></msubsup><mi>.</mi></mrow><annotation encoding="application/x-tex">\mathrm{Var}(K_{ij}) = \mu_i + \alpha_i \mu_i^2.</annotation></semantics></math></p>
 <p>Estimation of the regression coefficients
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mover><mi>β</mi><mo accent="true">̂</mo></mover><mrow><mi>i</mi><mi>r</mi></mrow></msub><annotation encoding="application/x-tex">\hat{\beta}_{ir}</annotation></semantics></math>
 and dispersion parameters
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mover><mi>α</mi><mo accent="true">̂</mo></mover><mi>i</mi></msub><annotation encoding="application/x-tex">\hat{\alpha}_i</annotation></semantics></math>
 was carried out using the empirical Bayes shrinkage procedures
 implemented in the <code>DESeq2</code> package <span class="citation">Anders and Huber (2010)</span>.</p>
+<!--- This chunk unsed to have cache = FALSE as well --->
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">metadata</span><span class="op">$</span><span class="va">Groups</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] "OB" "H"</span></span></code></pre>
@@ -324,7 +290,8 @@ implemented in the <code>DESeq2</code> package <span class="citation">Anders and
 <span><span class="va">logfoldchange</span> <span class="op">=</span>  <span class="va">foldchange_est</span><span class="op">$</span><span class="va">deseq_estimate</span><span class="op">$</span><span class="va">log2FoldChange</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">logfoldchange</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## [1]  0.32958211 -0.90669149  0.23052500 -0.51398232 -0.02770075 -0.82149821</span></span></code></pre>
+<pre><code><span><span class="co">## [1]  0.3472147294 -0.8840585417  0.2167456449 -0.5366652659  0.0008622315</span></span>
+<span><span class="co">## [6] -0.8221867027</span></span></code></pre>
 </div>
 <div class="section level3">
 <h3 id="modeling-the-distribution-of-log-mean-counts">Modeling the distribution of log mean counts<a class="anchor" aria-label="anchor" href="#modeling-the-distribution-of-log-mean-counts"></a>
@@ -341,7 +308,7 @@ and
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>k</mi><mo>+</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">k+1</annotation></semantics></math>
 components.</p>
 <p>Let the observed data be denoted by
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>𝐲</mi><mo>=</mo><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>y</mi><mn>1</mn></msub><mo>,</mo><msub><mi>y</mi><mn>2</mn></msub><mo>,</mo><mi>…</mi><mo>,</mo><msub><mi>y</mi><mi>n</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\mathbf{y} = (y_1, y_2, \dots, y_n)</annotation></semantics></math>,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>𝐲</mi><mo>=</mo><mo stretchy="false" form="prefix">(</mo><msub><mi>y</mi><mn>1</mn></msub><mo>,</mo><msub><mi>y</mi><mn>2</mn></msub><mo>,</mo><mi>…</mi><mo>,</mo><msub><mi>y</mi><mi>n</mi></msub><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\mathbf{y} = (y_1, y_2, \dots, y_n)</annotation></semantics></math>,
 where each
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>y</mi><mi>i</mi></msub><annotation encoding="application/x-tex">y_i</annotation></semantics></math>
 represents the log mean abundance for the
@@ -349,13 +316,13 @@ represents the log mean abundance for the
 taxon. The mixture model with
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>k</mi><annotation encoding="application/x-tex">k</annotation></semantics></math>
 components is given by</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>f</mi><mi>k</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>y</mi><mi>i</mi></msub><mo>∣</mo><msub><mi>𝛉</mi><mi>k</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><munderover><mo>∑</mo><mrow><mi>j</mi><mo>=</mo><mn>1</mn></mrow><mi>k</mi></munderover><msub><mi>π</mi><mrow><mi>j</mi><mo>,</mo><mi>k</mi></mrow></msub><mspace width="0.167em"></mspace><mi>ϕ</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>y</mi><mi>i</mi></msub><mo>∣</mo><msub><mi>μ</mi><mrow><mi>j</mi><mo>,</mo><mi>k</mi></mrow></msub><mo>,</mo><msubsup><mi>σ</mi><mrow><mi>j</mi><mo>,</mo><mi>k</mi></mrow><mn>2</mn></msubsup><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo></mrow><annotation encoding="application/x-tex">f_k(y_i \mid \boldsymbol{\theta}_k) = \sum_{j=1}^{k} \pi_{j,k} \, \phi(y_i \mid \mu_{j,k}, \sigma_{j,k}^2),</annotation></semantics></math></p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>f</mi><mi>k</mi></msub><mo stretchy="false" form="prefix">(</mo><msub><mi>y</mi><mi>i</mi></msub><mo>∣</mo><msub><mi>𝛉</mi><mi>k</mi></msub><mo stretchy="false" form="postfix">)</mo><mo>=</mo><munderover><mo>∑</mo><mrow><mi>j</mi><mo>=</mo><mn>1</mn></mrow><mi>k</mi></munderover><msub><mi>π</mi><mrow><mi>j</mi><mo>,</mo><mi>k</mi></mrow></msub><mspace width="0.167em"></mspace><mi>ϕ</mi><mo stretchy="false" form="prefix">(</mo><msub><mi>y</mi><mi>i</mi></msub><mo>∣</mo><msub><mi>μ</mi><mrow><mi>j</mi><mo>,</mo><mi>k</mi></mrow></msub><mo>,</mo><msubsup><mi>σ</mi><mrow><mi>j</mi><mo>,</mo><mi>k</mi></mrow><mn>2</mn></msubsup><mo stretchy="false" form="postfix">)</mo><mo>,</mo></mrow><annotation encoding="application/x-tex">f_k(y_i \mid \boldsymbol{\theta}_k) = \sum_{j=1}^{k} \pi_{j,k} \, \phi(y_i \mid \mu_{j,k}, \sigma_{j,k}^2),</annotation></semantics></math></p>
 <p>where
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>π</mi><mrow><mi>j</mi><mo>,</mo><mi>k</mi></mrow></msub><annotation encoding="application/x-tex">\pi_{j,k}</annotation></semantics></math>
 are the mixing proportions satisfying
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mo>∑</mo><mrow><mi>j</mi><mo>=</mo><mn>1</mn></mrow><mi>k</mi></msubsup><msub><mi>π</mi><mrow><mi>j</mi><mo>,</mo><mi>k</mi></mrow></msub><mo>=</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">\sum_{j=1}^{k} \pi_{j,k} = 1</annotation></semantics></math>,
 and
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>ϕ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mo>⋅</mo><mo>∣</mo><mi>μ</mi><mo>,</mo><msup><mi>σ</mi><mn>2</mn></msup><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\phi(\cdot \mid \mu, \sigma^2)</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>ϕ</mi><mo stretchy="false" form="prefix">(</mo><mi>⋅</mi><mo>∣</mo><mi>μ</mi><mo>,</mo><msup><mi>σ</mi><mn>2</mn></msup><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\phi(\cdot \mid \mu, \sigma^2)</annotation></semantics></math>
 denotes the normal density with mean
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>μ</mi><annotation encoding="application/x-tex">\mu</annotation></semantics></math>
 and variance
@@ -364,27 +331,25 @@ and variance
 formulated the hypotheses as:</p>
 <!-- try to protect LaTeX: https://github.com/jgm/pandoc/issues/6259 ;
 https://github.com/jekyll/jekyll/issues/9487 -->
-<!-- {% raw %} -->
-<p>’
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="true" form="prefix">{</mo><mtable><mtr><mtd columnalign="left" style="text-align: left"><msub><mi>H</mi><mn>0</mn></msub><mo>:</mo><mi>𝐲</mi><mo>∼</mo><msub><mi>f</mi><mi>k</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>y</mi><mi>i</mi></msub><mo>∣</mo><msub><mi>𝛉</mi><mi>k</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow></mtd><mtd columnalign="left" style="text-align: left"><mrow><mtext mathvariant="normal">(the data follow a </mtext><mspace width="0.333em"></mspace></mrow><mi>k</mi><mtext mathvariant="normal">-component mixture model)</mtext></mtd></mtr><mtr><mtd columnalign="left" style="text-align: left"><msub><mi>H</mi><mi>a</mi></msub><mo>:</mo><mi>𝐲</mi><mo>∼</mo><msub><mi>f</mi><mrow><mi>k</mi><mo>+</mo><mn>1</mn></mrow></msub><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>y</mi><mi>i</mi></msub><mo>∣</mo><msub><mi>𝛉</mi><mrow><mi>k</mi><mo>+</mo><mn>1</mn></mrow></msub><mo stretchy="true" form="postfix">)</mo></mrow></mtd><mtd columnalign="left" style="text-align: left"><mrow><mtext mathvariant="normal">(the data follow a </mtext><mspace width="0.333em"></mspace></mrow><mrow><mo stretchy="true" form="prefix">(</mo><mi>k</mi><mo>+</mo><mn>1</mn><mo stretchy="true" form="postfix">)</mo></mrow><mtext mathvariant="normal">-component mixture model)</mtext></mtd></mtr></mtable></mrow><annotation encoding="application/x-tex">
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="true" form="prefix">{</mo><mtable><mtr><mtd columnalign="left" style="text-align: left"><msub><mi>H</mi><mn>0</mn></msub><mo>:</mo><mi>𝐲</mi><mo>∼</mo><msub><mi>f</mi><mi>k</mi></msub><mo stretchy="false" form="prefix">(</mo><msub><mi>y</mi><mi>i</mi></msub><mo>∣</mo><msub><mi>𝛉</mi><mi>k</mi></msub><mo stretchy="false" form="postfix">)</mo></mtd><mtd columnalign="left" style="text-align: left"><mrow><mtext mathvariant="normal">(the data follow a </mtext><mspace width="0.333em"></mspace></mrow><mi>k</mi><mtext mathvariant="normal">-component mixture model)</mtext></mtd></mtr><mtr><mtd columnalign="left" style="text-align: left"><msub><mi>H</mi><mi>a</mi></msub><mo>:</mo><mi>𝐲</mi><mo>∼</mo><msub><mi>f</mi><mrow><mi>k</mi><mo>+</mo><mn>1</mn></mrow></msub><mo stretchy="false" form="prefix">(</mo><msub><mi>y</mi><mi>i</mi></msub><mo>∣</mo><msub><mi>𝛉</mi><mrow><mi>k</mi><mo>+</mo><mn>1</mn></mrow></msub><mo stretchy="false" form="postfix">)</mo></mtd><mtd columnalign="left" style="text-align: left"><mrow><mtext mathvariant="normal">(the data follow a </mtext><mspace width="0.333em"></mspace></mrow><mrow><mo stretchy="false" form="prefix">(</mo><mi>k</mi><mo>+</mo><mn>1</mn><mo stretchy="false" form="postfix">)</mo></mrow><mtext mathvariant="normal">-component mixture model)</mtext></mtd></mtr></mtable></mrow><annotation encoding="application/x-tex">
 \begin{cases} 
 H_0: \mathbf{y} \sim f_k(y_i \mid \boldsymbol{\theta}_k) &amp; \textrm{(the data follow a $k$-component mixture model)} \\
 H_a: \mathbf{y} \sim f_{k+1}(y_i \mid \boldsymbol{\theta}_{k+1}) &amp; \textrm{(the data follow a $(k+1)$-component mixture model)} \end{cases}</annotation></semantics></math>
 {=latex}’ <!-- {% endraw %} --></p>
 <p>The test statistic is the likelihood ratio statistic:</p>
 <p>’
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Λ</mi><mo>=</mo><mn>2</mn><mrow><mo stretchy="true" form="prefix">[</mo><msub><mo>ℓ</mo><mrow><mi>k</mi><mo>+</mo><mn>1</mn></mrow></msub><mrow><mo stretchy="true" form="prefix">(</mo><msub><mover><mi>𝛉</mi><mo accent="true">̂</mo></mover><mrow><mi>k</mi><mo>+</mo><mn>1</mn></mrow></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>−</mo><msub><mo>ℓ</mo><mi>k</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><msub><mover><mi>𝛉</mi><mo accent="true">̂</mo></mover><mi>k</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">]</mo></mrow><mo>,</mo></mrow><annotation encoding="application/x-tex">\Lambda = 2 \left[ \ell_{k+1}(\widehat{\boldsymbol{\theta}}_{k+1}) - \ell_{k}(\widehat{\boldsymbol{\theta}}_{k}) \right],</annotation></semantics></math>
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">Λ</mi><mo>=</mo><mn>2</mn><mrow><mo stretchy="true" form="prefix">[</mo><msub><mi>ℓ</mi><mrow><mi>k</mi><mo>+</mo><mn>1</mn></mrow></msub><mo stretchy="false" form="prefix">(</mo><msub><mover><mi>𝛉</mi><mo accent="true">̂</mo></mover><mrow><mi>k</mi><mo>+</mo><mn>1</mn></mrow></msub><mo stretchy="false" form="postfix">)</mo><mo>−</mo><msub><mi>ℓ</mi><mi>k</mi></msub><mo stretchy="false" form="prefix">(</mo><msub><mover><mi>𝛉</mi><mo accent="true">̂</mo></mover><mi>k</mi></msub><mo stretchy="false" form="postfix">)</mo><mo stretchy="true" form="postfix">]</mo></mrow><mo>,</mo></mrow><annotation encoding="application/x-tex">\Lambda = 2 \left[ \ell_{k+1}(\widehat{\boldsymbol{\theta}}_{k+1}) - \ell_{k}(\widehat{\boldsymbol{\theta}}_{k}) \right],</annotation></semantics></math>
 where
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mo>ℓ</mo><mi>k</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><msub><mover><mi>𝛉</mi><mo accent="true">̂</mo></mover><mi>k</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\ell_{k}(\widehat{\boldsymbol{\theta}}_{k})</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>ℓ</mi><mi>k</mi></msub><mo stretchy="false" form="prefix">(</mo><msub><mover><mi>𝛉</mi><mo accent="true">̂</mo></mover><mi>k</mi></msub><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\ell_{k}(\widehat{\boldsymbol{\theta}}_{k})</annotation></semantics></math>
 and
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mo>ℓ</mo><mrow><mi>k</mi><mo>+</mo><mn>1</mn></mrow></msub><mrow><mo stretchy="true" form="prefix">(</mo><msub><mover><mi>𝛉</mi><mo accent="true">̂</mo></mover><mrow><mi>k</mi><mo>+</mo><mn>1</mn></mrow></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\ell_{k+1}(\widehat{\boldsymbol{\theta}}_{k+1})</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>ℓ</mi><mrow><mi>k</mi><mo>+</mo><mn>1</mn></mrow></msub><mo stretchy="false" form="prefix">(</mo><msub><mover><mi>𝛉</mi><mo accent="true">̂</mo></mover><mrow><mi>k</mi><mo>+</mo><mn>1</mn></mrow></msub><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\ell_{k+1}(\widehat{\boldsymbol{\theta}}_{k+1})</annotation></semantics></math>
 are the maximized log-likelihoods under the
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>k</mi><annotation encoding="application/x-tex">k</annotation></semantics></math>-
 and
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="true" form="prefix">(</mo><mi>k</mi><mo>+</mo><mn>1</mn><mo stretchy="true" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">(k+1)</annotation></semantics></math>-component
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">(</mo><mi>k</mi><mo>+</mo><mn>1</mn><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">(k+1)</annotation></semantics></math>-component
 models, respectively. {=latex}’</p>
 <p>To approximate the null distribution of
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>Λ</mi><annotation encoding="application/x-tex">\Lambda</annotation></semantics></math>,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi mathvariant="normal">Λ</mi><annotation encoding="application/x-tex">\Lambda</annotation></semantics></math>,
 we performed a parametric bootstrap using
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>B</mi><mo>=</mo><mn>100</mn></mrow><annotation encoding="application/x-tex">B = 100</annotation></semantics></math>
 bootstrap samples generated under
@@ -394,20 +359,20 @@ For each bootstrap replicate
 data were simulated from the fitted
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>k</mi><annotation encoding="application/x-tex">k</annotation></semantics></math>-component
 model, and both the null and alternative models were re-fitted to obtain
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>Λ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>b</mi><mo stretchy="true" form="postfix">)</mo></mrow></msup><annotation encoding="application/x-tex">\Lambda^{(b)}</annotation></semantics></math>.
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi mathvariant="normal">Λ</mi><mrow><mo stretchy="false" form="prefix">(</mo><mi>b</mi><mo stretchy="false" form="postfix">)</mo></mrow></msup><annotation encoding="application/x-tex">\Lambda^{(b)}</annotation></semantics></math>.
 The empirical
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>p</mi><annotation encoding="application/x-tex">p</annotation></semantics></math>-value
 is computed as</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mo>=</mo><mfrac><mn>1</mn><mi>B</mi></mfrac><munderover><mo>∑</mo><mrow><mi>b</mi><mo>=</mo><mn>1</mn></mrow><mi>B</mi></munderover><mi>I</mi><mrow><mo stretchy="true" form="prefix">(</mo><msup><mi>Λ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>b</mi><mo stretchy="true" form="postfix">)</mo></mrow></msup><mo>≥</mo><msub><mi>Λ</mi><mtext mathvariant="normal">obs</mtext></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo></mrow><annotation encoding="application/x-tex">p = \frac{1}{B} \sum_{b=1}^{B} I\left( \Lambda^{(b)} \ge \Lambda_{\text{obs}} \right),</annotation></semantics></math>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mo>=</mo><mfrac><mn>1</mn><mi>B</mi></mfrac><munderover><mo>∑</mo><mrow><mi>b</mi><mo>=</mo><mn>1</mn></mrow><mi>B</mi></munderover><mi>I</mi><mrow><mo stretchy="true" form="prefix">(</mo><msup><mi mathvariant="normal">Λ</mi><mrow><mo stretchy="false" form="prefix">(</mo><mi>b</mi><mo stretchy="false" form="postfix">)</mo></mrow></msup><mo>≥</mo><msub><mi mathvariant="normal">Λ</mi><mtext mathvariant="normal">obs</mtext></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo></mrow><annotation encoding="application/x-tex">p = \frac{1}{B} \sum_{b=1}^{B} I\left( \Lambda^{(b)} \ge \Lambda_{\text{obs}} \right),</annotation></semantics></math>
 where
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>Λ</mi><mtext mathvariant="normal">obs</mtext></msub><annotation encoding="application/x-tex">\Lambda_{\text{obs}}</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi mathvariant="normal">Λ</mi><mtext mathvariant="normal">obs</mtext></msub><annotation encoding="application/x-tex">\Lambda_{\text{obs}}</annotation></semantics></math>
 is the observed likelihood ratio statistic.</p>
 <p>If
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mo>&lt;</mo><mn>0.05</mn></mrow><annotation encoding="application/x-tex">p &lt; 0.05</annotation></semantics></math>,
 the null hypothesis
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>H</mi><mn>0</mn></msub><annotation encoding="application/x-tex">H_0</annotation></semantics></math>
 is rejected in favor of the
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="true" form="prefix">(</mo><mi>k</mi><mo>+</mo><mn>1</mn><mo stretchy="true" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">(k+1)</annotation></semantics></math>-component
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">(</mo><mi>k</mi><mo>+</mo><mn>1</mn><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">(k+1)</annotation></semantics></math>-component
 model. Testing proceeds sequentially for
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>k</mi><mo>=</mo><mn>1</mn><mo>,</mo><mn>2</mn><mo>,</mo><mi>…</mi><mo>,</mo><mn>5</mn></mrow><annotation encoding="application/x-tex">k = 1, 2, \dots, 5</annotation></semantics></math>
 until the
@@ -419,68 +384,72 @@ significance threshold, at which point the
 model from the last accepted test is selected as the optimal mixture
 size <span class="citation">(Benaglia et al. 2010)</span>.</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">logmean</span>    <span class="op">=</span>  <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">rowMeans</a></span><span class="op">(</span><span class="va">filter_data</span><span class="op">)</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co">### function to mute printing out messages about</span></span>
+<code class="sourceCode R"><span><span class="co">### function to mute printing out messages about</span></span>
 <span><span class="co">### update on the number of iterations </span></span>
+<span></span>
 <span><span class="va">quiet</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">expr</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">out</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/warning.html" class="external-link">suppressWarnings</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressMessages</a></span><span class="op">(</span></span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/utils/capture.output.html" class="external-link">capture.output</a></span><span class="op">(</span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/eval.html" class="external-link">eval.parent</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/substitute.html" class="external-link">substitute</a></span><span class="op">(</span><span class="va">expr</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span>  <span class="op">)</span><span class="op">)</span></span>
 <span>  <span class="va">res</span><span class="op">}</span></span>
 <span></span>
-<span><span class="va">logmeanFit</span> <span class="op">=</span>   <span class="fu">quiet</span><span class="op">(</span><span class="fu"><a href="../reference/logmean_fit.html">logmean_fit</a></span><span class="op">(</span><span class="va">logmean</span>, sig <span class="op">=</span> <span class="fl">0.05</span>,</span>
-<span>                                 max.comp <span class="op">=</span> <span class="fl">4</span>, max.boot <span class="op">=</span> <span class="fl">100</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">### Path to other files used in this vignette</span></span>
+<span><span class="va">extdata_path</span> <span class="op">=</span>  <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, package <span class="op">=</span> <span class="st">"power.nb"</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span> <span class="va">logmean</span>    <span class="op">=</span>  <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">rowMeans</a></span><span class="op">(</span><span class="va">filter_data</span><span class="op">)</span><span class="op">)</span></span>
+<span> <span class="va">logmeanFit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">extdata_path</span>, <span class="st">"logmeanFit.rds"</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">logmeanFit</span></span></code></pre></div>
-<pre><code><span><span class="co">## $param</span></span>
-<span><span class="co">##      lambda     sigma         mu</span></span>
-<span><span class="co">## 1 0.1982037 0.1841083 -1.4702824</span></span>
-<span><span class="co">## 2 0.3594970 0.4703611 -0.7892082</span></span>
-<span><span class="co">## 3 0.4422992 1.4529581  1.3381490</span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## $components</span></span>
-<span><span class="co">## [1] 3</span></span></code></pre>
-<p><img src="stub_files/figure-html/logmean-1.png" class="r-plt" alt="" width="700"></p>
+<span><span class="co">## The code below was used to generate the precomputed</span></span>
+<span><span class="co">## `logmeanFit.rds` object. The saved result is loaded</span></span>
+<span><span class="co">## throughout this vignette to reduce vignette build times.</span></span>
+<span></span>
+<span><span class="co"># logmeanFit =   quiet(logmean_fit(logmean, sig = 0.05,</span></span>
+<span><span class="co">#                                  max.comp = 4, max.boot = 100))</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="modelling-the-distribution-of-log-fold-change-estimates">Modelling the distribution of log fold change estimates<a class="anchor" aria-label="anchor" href="#modelling-the-distribution-of-log-fold-change-estimates"></a>
 </h3>
 <p>We also modelled log fold change of taxa as a finite mixture of
 Gaussian distributions. Fold change is typically related to mean
-abundance <span class="citation">(Love, Huber, and Anders 2014)</span>;
-therefore, we expressed the mean and standard deviation parameters of
-the individual Gaussian components as functions of log mean abundance.
+abundance <span class="citation">(Love et al. 2014)</span>; therefore,
+we expressed the mean and standard deviation parameters of the
+individual Gaussian components as functions of log mean abundance.
 Detailed description of the model fitted to log fold changes is
 presented in the paper <a href="https://doi.org/10.1371/journal.pone.0318820" class="external-link">“Investigating
 statistical power of differential abundance studies”</a> <span class="citation">(Agronah and Bolker 2025)</span>.</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">logfoldchangeFit</span> <span class="op">&lt;-</span> <span class="fu">quiet</span><span class="op">(</span><span class="fu"><a href="../reference/logfoldchange_fit.html">logfoldchange_fit</a></span><span class="op">(</span><span class="va">logmean</span>,</span>
-<span>                                            <span class="va">logfoldchange</span>,</span>
-<span>                                            ncore <span class="op">=</span> <span class="fl">3</span>,</span>
-<span>                                            max_sd_ord <span class="op">=</span> <span class="fl">2</span>,</span>
-<span>                                            max_np <span class="op">=</span> <span class="fl">5</span>,</span>
-<span>                                            minval <span class="op">=</span> <span class="op">-</span><span class="fl">5</span>,</span>
-<span>                                            maxval <span class="op">=</span> <span class="fl">5</span>,</span>
-<span>                                            itermax <span class="op">=</span> <span class="fl">100</span>,</span>
-<span>                                            NP <span class="op">=</span> <span class="fl">800</span>,</span>
-<span>                                            seed <span class="op">=</span> <span class="fl">100</span><span class="op">)</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">logfoldchangeFit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">extdata_path</span>, <span class="st">"logfoldchangeFit.rds"</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">logfoldchangeFit</span></span></code></pre></div>
 <pre><code><span><span class="co">## $par</span></span>
-<span><span class="co">## logitprob_1    mu_int_1    mu_int_2  mu_slope_1  mu_slope_2  logsd_.1_1 </span></span>
-<span><span class="co">## -4.55703267  0.03677531 -1.42836719  0.06345551 -0.81207193 -0.33404343 </span></span>
-<span><span class="co">##  logsd_.1_2  logsd_.L_1  logsd_.L_2  logsd_.Q_1  logsd_.Q_2 </span></span>
-<span><span class="co">##  1.45264954  0.38750859  2.81470432 -0.11822723  0.45802656 </span></span>
+<span><span class="co">##  logitprob_1     mu_int_1     mu_int_2   mu_slope_1   mu_slope_2   logsd_.1_1 </span></span>
+<span><span class="co">##  1.688126642 -1.054068569  0.115132772 -0.611302399  0.007166436 -0.554719649 </span></span>
+<span><span class="co">##   logsd_.1_2   logsd_.L_1   logsd_.L_2 </span></span>
+<span><span class="co">## -0.512670667  0.415862601  0.233292472 </span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## $np</span></span>
 <span><span class="co">## [1] 2</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## $sd_ord</span></span>
-<span><span class="co">## [1] 2</span></span>
+<span><span class="co">## [1] 1</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## $aic</span></span>
-<span><span class="co">## [1] 1779.056</span></span></code></pre>
+<span><span class="co">## [1] 1609.076</span></span></code></pre>
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co">## The code below was used to generate the precomputed</span></span>
+<span><span class="co">## `logfoldchangeFit.rds` object. The saved result is loaded</span></span>
+<span><span class="co">## throughout this vignette to reduce vignette build times.</span></span>
+<span></span>
+<span><span class="co"># logfoldchangeFit &lt;- quiet(logfoldchange_fit(logmean,</span></span>
+<span><span class="co">#                                             logfoldchange,</span></span>
+<span><span class="co">#                                             ncore = 1,</span></span>
+<span><span class="co">#                                             max_sd_ord = 2,</span></span>
+<span><span class="co">#                                             max_np = 5,</span></span>
+<span><span class="co">#                                             minval = -5,</span></span>
+<span><span class="co">#                                             maxval = 5,</span></span>
+<span><span class="co">#                                             itermax = 100,</span></span>
+<span><span class="co">#                                             NP = 800,</span></span>
+<span><span class="co">#                                             seed = 100))</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="modelling-the-dispersion-estimates">Modelling the dispersion estimates<a class="anchor" aria-label="anchor" href="#modelling-the-dispersion-estimates"></a>
@@ -504,12 +473,12 @@ represents the asymptotic dispersion level for high abundance taxa, and
 captures additional dispersion variability. This procedure enables
 estimation of dispersion values corresponding to given mean counts,
 facilitating their use in downstream simulations and power analyses.</p>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">dispersion</span>    <span class="op">=</span>  <span class="va">foldchange_est</span><span class="op">$</span><span class="va">dispersion</span></span>
 <span><span class="va">dispersionFit</span> <span class="op">=</span>  <span class="fu"><a href="../reference/dispersion_fit.html">dispersion_fit</a></span><span class="op">(</span><span class="va">dispersion</span>, <span class="va">logmean</span><span class="op">)</span></span>
 <span><span class="va">dispersionFit</span><span class="op">$</span><span class="va">param</span></span></code></pre></div>
 <pre><code><span><span class="co">##   asymptDisp extraPois</span></span>
-<span><span class="co">## 1   18.12243  2.597064</span></span></code></pre>
+<span><span class="co">## 1   15.43238  6.246524</span></span></code></pre>
 </div>
 <div class="section level3">
 <h3 id="simulate-count-microbiome-data">Simulate count microbiome data<a class="anchor" aria-label="anchor" href="#simulate-count-microbiome-data"></a>
@@ -529,7 +498,7 @@ and the estimated dispersion values.</p>
 <div class="section level4">
 <h4 id="simulate-log-mean-count-and-log-fold-change">Simulate log mean count and log fold change<a class="anchor" aria-label="anchor" href="#simulate-log-mean-count-and-log-fold-change"></a>
 </h4>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">### Simulated log mean count and log foldchange from the fitted </span></span>
 <span><span class="co">### log mean count and log foldchange models</span></span>
 <span></span>
@@ -538,8 +507,8 @@ and the estimated dispersion values.</p>
 <span></span>
 <span><span class="va">notu</span>  <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/dim.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">filter_data</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span></span>
 <span><span class="va">notu</span></span></code></pre></div>
-<pre><code><span><span class="co">## [1] 903</span></span></code></pre>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<pre><code><span><span class="co">## [1] 707</span></span></code></pre>
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">logmean_sim</span>  <span class="op">=</span>  <span class="fu"><a href="../reference/logmean_sim_fun.html">logmean_sim_fun</a></span><span class="op">(</span><span class="va">logmean_param</span>, <span class="va">notu</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">logfoldchange_sim</span>  <span class="op">=</span>  <span class="fu"><a href="../reference/logfoldchange_sim_fun.html">logfoldchange_sim_fun</a></span><span class="op">(</span>logmean_sim <span class="op">=</span> <span class="va">logmean_sim</span>,</span>
@@ -549,14 +518,14 @@ and the estimated dispersion values.</p>
 <span>                                            max_iter <span class="op">=</span> <span class="fl">30000</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">logfoldchange_sim</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## [1]  1.67394732 -0.72483152  0.09834296  0.73556137 -0.13028789 -0.51072261</span></span></code></pre>
+<pre><code><span><span class="co">## [1]  0.1310574 -0.3036162 -0.2573167  0.2145373  0.1906037  1.1280157</span></span></code></pre>
 </div>
 <div class="section level4">
 <h4 id="simulate-counts-from-the-negative-binomial-distribution">Simulate counts from the negative binomial distribution<a class="anchor" aria-label="anchor" href="#simulate-counts-from-the-negative-binomial-distribution"></a>
 </h4>
 <p>Estimating the dispersion values is done internally within the
 <code>countdata_sim_fun</code> function.</p>
-<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">nsim</span> <span class="op">=</span> <span class="fl">4</span></span>
 <span><span class="va">ntreat</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">metadata</span><span class="op">$</span><span class="va">Groups</span> <span class="op">==</span> <span class="st">"OB"</span><span class="op">)</span></span>
 <span><span class="va">ncont</span>  <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">metadata</span><span class="op">$</span><span class="va">Groups</span> <span class="op">==</span> <span class="st">"H"</span><span class="op">)</span></span>
@@ -576,24 +545,18 @@ and the estimated dispersion values.</p>
 <span>                                   seed <span class="op">=</span> <span class="fl">121</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## mixtools package, version 2.0.0.1, Released 2022-12-04</span></span>
 <span><span class="co">## This package is based upon work supported by the National Science Foundation under Grant No. SES-0518772 and the Chan Zuckerberg Initiative: Essential Open Source Software for Science (Grant No. 2020-255193).</span></span></code></pre>
-<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/dim.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">countdata_sims</span><span class="op">$</span><span class="va">treat_countdata_list</span><span class="op">$</span><span class="va">sim_1</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## [1] 903  31</span></span></code></pre>
-<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
+<pre><code><span><span class="co">## [1] 707  31</span></span></code></pre>
+<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/dim.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">countdata_sims</span><span class="op">$</span><span class="va">control_countdata_list</span><span class="op">$</span><span class="va">sim_1</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## [1] 903  21</span></span></code></pre>
-<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
+<pre><code><span><span class="co">## [1] 707  21</span></span></code></pre>
+<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/dim.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">countdata_sims</span><span class="op">$</span><span class="va">countdata_list</span><span class="op">$</span><span class="va">sim_1</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## [1] 903  52</span></span></code></pre>
-<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
+<pre><code><span><span class="co">## [1] 707  52</span></span></code></pre>
+<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/dim.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">countdata_sims</span><span class="op">$</span><span class="va">metadata_list</span><span class="op">$</span><span class="va">sim_1</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] 52  2</span></span></code></pre>
-<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">countdata_sims</span><span class="op">$</span><span class="va">logfoldchange_list</span><span class="op">$</span><span class="va">sim_1</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## [1] 903</span></span></code></pre>
-<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">countdata_sims</span><span class="op">$</span><span class="va">logmean_list</span><span class="op">$</span><span class="va">sim_1</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## [1] 903</span></span></code></pre>
 </div>
 <div class="section level4">
 <h4 id="comparing-the-distributions-between-simulated-count-d-of-mean-count-and-fold-change-from-simulation-with-actual-data">Comparing the distributions between simulated count d of mean count
@@ -606,68 +569,7 @@ actual dataset</p>
 <li><p>the means of taxa from out simulation with those of the actual
 dataset</p></li>
 </ul>
-<div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://renkun-ken.github.io/rlist/" class="external-link">rlist</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://www.stefanom.io/latex2exp/" class="external-link">latex2exp</a></span><span class="op">)</span></span>
-<span></span>
-<span></span>
-<span><span class="co"># means</span></span>
-<span><span class="va">dd_mean</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>value <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/apply.html" class="external-link">apply</a></span><span class="op">(</span><span class="va">countdata_sims</span><span class="op">$</span><span class="va">countdata_list</span><span class="op">$</span><span class="va">sim_1</span>, <span class="fl">1</span>, <span class="va">mean</span><span class="op">)</span>,</span>
-<span>             type <span class="op">=</span> <span class="st">"simulation"</span><span class="op">)</span>,</span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>value <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/apply.html" class="external-link">apply</a></span><span class="op">(</span><span class="va">filter_data</span>, <span class="fl">1</span>, <span class="va">mean</span><span class="op">)</span>,</span>
-<span>             type <span class="op">=</span> <span class="st">"observation"</span><span class="op">)</span></span>
-<span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">p1_</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">dd_mean</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">value</span> <span class="op">+</span> <span class="fl">1e-8</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_density.html" class="external-link">geom_density</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>colour <span class="op">=</span> <span class="va">type</span><span class="op">)</span>, linewidth <span class="op">=</span> <span class="fl">1.2</span>,</span>
-<span>               data <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">dd_mean</span>, <span class="va">type</span> <span class="op">==</span> <span class="st">"simulation"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_density.html" class="external-link">geom_density</a></span><span class="op">(</span>linetype <span class="op">=</span> <span class="st">"dashed"</span>, colour <span class="op">=</span> <span class="st">"black"</span>, linewidth <span class="op">=</span> <span class="fl">1.2</span>,</span>
-<span>               data <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">dd_mean</span>, <span class="va">type</span> <span class="op">==</span> <span class="st">"observation"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_bw</a></span><span class="op">(</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># variances</span></span>
-<span><span class="va">dd_var</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>value <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/apply.html" class="external-link">apply</a></span><span class="op">(</span><span class="va">countdata_sims</span><span class="op">$</span><span class="va">countdata_list</span><span class="op">$</span><span class="va">sim_1</span>, <span class="fl">1</span>, <span class="va">var</span><span class="op">)</span>,</span>
-<span>             type <span class="op">=</span> <span class="st">"simulation"</span><span class="op">)</span>,</span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>value <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/apply.html" class="external-link">apply</a></span><span class="op">(</span><span class="va">filter_data</span>, <span class="fl">1</span>, <span class="va">var</span><span class="op">)</span>,</span>
-<span>             type <span class="op">=</span> <span class="st">"observation"</span><span class="op">)</span></span>
-<span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">p2_</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">dd_var</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">value</span> <span class="op">+</span> <span class="fl">1e-8</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_density.html" class="external-link">geom_density</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>colour <span class="op">=</span> <span class="va">type</span><span class="op">)</span>, linewidth <span class="op">=</span> <span class="fl">1.2</span>,</span>
-<span>               data <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">dd_var</span>, <span class="va">type</span> <span class="op">==</span> <span class="st">"simulation"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_density.html" class="external-link">geom_density</a></span><span class="op">(</span>linetype <span class="op">=</span> <span class="st">"dashed"</span>, colour <span class="op">=</span> <span class="st">"black"</span>, linewidth <span class="op">=</span> <span class="fl">1.2</span>,</span>
-<span>               data <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">dd_var</span>, <span class="va">type</span> <span class="op">==</span> <span class="st">"observation"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_bw</a></span><span class="op">(</span><span class="op">)</span></span>
-<span></span>
-<span><span class="op">(</span><span class="va">p1_</span> <span class="op">|</span> <span class="va">p2_</span><span class="op">)</span> <span class="op">+</span> <span class="fu">patchwork</span><span class="fu">::</span><span class="fu"><a href="https://patchwork.data-imaginist.com/reference/plot_layout.html" class="external-link">plot_layout</a></span><span class="op">(</span>guides <span class="op">=</span> <span class="st">"collect"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="stub_files/figure-html/compare-with-sim-1.png" class="r-plt" alt="" width="700"></p>
-<div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">pp1</span><span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/apply.html" class="external-link">apply</a></span><span class="op">(</span><span class="va">countdata_sims</span><span class="op">$</span><span class="va">countdata_list</span><span class="op">$</span><span class="va">sim_1</span>, <span class="fl">1</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">{</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">}</span><span class="op">)</span></span>
-<span><span class="va">pp2</span><span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/apply.html" class="external-link">apply</a></span><span class="op">(</span><span class="va">filter_data</span>, <span class="fl">1</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">{</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">}</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">pp11</span><span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/apply.html" class="external-link">apply</a></span><span class="op">(</span><span class="va">countdata_sims</span><span class="op">$</span><span class="va">countdata_list</span><span class="op">$</span><span class="va">sim_1</span>, <span class="fl">1</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">{</span><span class="fu"><a href="https://rdrr.io/r/stats/cor.html" class="external-link">var</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">}</span><span class="op">)</span></span>
-<span><span class="va">pp21</span><span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/apply.html" class="external-link">apply</a></span><span class="op">(</span><span class="va">filter_data</span>, <span class="fl">1</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">{</span><span class="fu"><a href="https://rdrr.io/r/stats/cor.html" class="external-link">var</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">}</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">dd_</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>mean <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">pp2</span><span class="op">)</span>,<span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">pp1</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>                 var <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">pp21</span><span class="op">)</span>,<span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">pp11</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>                type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"observation"</span>,<span class="st">"simulation"</span><span class="op">)</span>, each <span class="op">=</span> <span class="va">notu</span><span class="op">)</span><span class="op">)</span></span>
-<span></span>
-<span></span>
-<span><span class="va">p1_</span> <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">dd_</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">mean</span><span class="op">)</span>, group <span class="op">=</span> <span class="va">type</span>, colour <span class="op">=</span> <span class="va">type</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_density.html" class="external-link">geom_density</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_bw</a></span><span class="op">(</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">p2_</span> <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">dd_</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">var</span><span class="op">)</span>, group <span class="op">=</span> <span class="va">type</span>, colour <span class="op">=</span> <span class="va">type</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_density.html" class="external-link">geom_density</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_bw</a></span><span class="op">(</span><span class="op">)</span></span>
-<span>                 </span>
-<span><span class="op">(</span><span class="va">p1_</span><span class="op">|</span><span class="va">p2_</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://patchwork.data-imaginist.com/reference/plot_layout.html" class="external-link">plot_layout</a></span><span class="op">(</span>guides <span class="op">=</span> <span class="st">"collect"</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Warning: Removed 1 row containing non-finite outside the scale range (`stat_density()`).</span></span>
-<span><span class="co">## Removed 1 row containing non-finite outside the scale range (`stat_density()`).</span></span></code></pre>
-<p><img src="stub_files/figure-html/compare-with-sim-2.png" class="r-plt" alt="" width="700"></p>
-<div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">compare_dataset</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">countdata_sim_list</span>,<span class="va">countdata_obs</span>,<span class="va">method</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"var"</span>, <span class="st">"mean"</span><span class="op">)</span><span class="op">)</span><span class="op">{</span></span>
 <span>  </span>
 <span>  <span class="co"># Check if method is either "var" or "mean"</span></span>
@@ -709,13 +611,12 @@ dataset</p></li>
 <span><span class="va">countdata_obs</span>      <span class="op">=</span>  <span class="va">filter_data</span></span>
 <span><span class="va">p11</span> <span class="op">=</span> <span class="fu">compare_dataset</span><span class="op">(</span><span class="va">countdata_sim_list</span>,<span class="va">countdata_obs</span>,method <span class="op">=</span> <span class="st">"mean"</span><span class="op">)</span></span>
 <span><span class="va">p12</span> <span class="op">=</span> <span class="fu">compare_dataset</span><span class="op">(</span><span class="va">countdata_sim_list</span>,<span class="va">countdata_obs</span>,method <span class="op">=</span> <span class="st">"var"</span><span class="op">)</span></span>
+<span></span>
 <span><span class="op">(</span><span class="va">p11</span><span class="op">|</span><span class="va">p12</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://patchwork.data-imaginist.com/reference/plot_layout.html" class="external-link">plot_layout</a></span><span class="op">(</span>guides <span class="op">=</span> <span class="st">"collect"</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Warning: Removed 1 row containing non-finite outside the scale range (`stat_density()`).</span></span>
-<span><span class="co">## Removed 1 row containing non-finite outside the scale range (`stat_density()`).</span></span></code></pre>
-<p><img src="stub_files/figure-html/compare-with-sim-3.png" class="r-plt" alt="" width="700"></p>
-<div class="sourceCode" id="cb43"><pre class="downlit sourceCode r">
+<p><img src="stub_files/figure-html/compare-with-sim-1.png" class="r-plt" alt="" width="700"></p>
+<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/dim.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">countdata_obs</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## [1] 903  52</span></span></code></pre>
+<pre><code><span><span class="co">## [1] 707  52</span></span></code></pre>
 </div>
 </div>
 </div>
@@ -729,12 +630,15 @@ statistical power for various combinations of log mean abundance and log
 fold change, we fitted a shape-constrained generalized additive model
 (GAM) <span class="citation">(Pya and Wood 2015)</span>. The event that
 a given taxon is significantly different between groups is treated as a
-Bernoulli trial. The model predicting statistical power as a function of
-log fold change and log mean abundance is given by:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable><mtr><mtd columnalign="right" style="text-align: right"><mi>y</mi></mtd><mtd columnalign="left" style="text-align: left"><mo>∼</mo><mtext mathvariant="normal">Bernoulli</mtext><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>p</mi><mi>i</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right"><msub><mi>p</mi><mi>i</mi></msub></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><mfrac><mn>1</mn><mrow><mn>1</mn><mo>+</mo><msup><mi>e</mi><mrow><mo>−</mo><mi>η</mi></mrow></msup></mrow></mfrac></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right"><mi>η</mi></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><msub><mi>β</mi><mn>0</mn></msub><mo>+</mo><msub><mi>f</mi><mn>1</mn></msub><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>x</mi><mn>1</mn></msub><mo>,</mo><msub><mi>x</mi><mn>2</mn></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>+</mo><mi>ϵ</mi><mo>,</mo></mtd></mtr></mtable><annotation encoding="application/x-tex">\begin{align}
+Bernoulli trial.</p>
+<p>Define the logistic function as
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">Logist</mtext><mo stretchy="false" form="prefix">(</mo><mi>x</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><msup><mrow><mo stretchy="true" form="prefix">(</mo><mn>1</mn><mo>+</mo><mi mathvariant="normal">exp</mi><mo stretchy="false" form="prefix">(</mo><mi>−</mi><mi>x</mi><mo stretchy="false" form="postfix">)</mo><mo stretchy="true" form="postfix">)</mo></mrow><mrow><mi>−</mi><mn>1</mn></mrow></msup></mrow><annotation encoding="application/x-tex">\text{Logist}(x) = \left(1 + \exp(-x)\right)^{-1}</annotation></semantics></math>.</p>
+<p>The model predicting statistical power as a function of log fold
+change and log mean abundance is given by:</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable><mtr><mtd columnalign="right" style="text-align: right; padding-right: 0"><mi>y</mi></mtd><mtd columnalign="left" style="text-align: left; padding-left: 0"><mo>∼</mo><mtext mathvariant="normal">Bernoulli</mtext><mo stretchy="false" form="prefix">(</mo><msub><mi>p</mi><mi>i</mi></msub><mo stretchy="false" form="postfix">)</mo></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right; padding-right: 0"><msub><mi>p</mi><mi>i</mi></msub></mtd><mtd columnalign="left" style="text-align: left; padding-left: 0"><mo>=</mo><mtext mathvariant="normal">Logist</mtext><mo stretchy="false" form="prefix">(</mo><mi>x</mi><mo stretchy="false" form="postfix">)</mo></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right; padding-right: 0"><mi>η</mi></mtd><mtd columnalign="left" style="text-align: left; padding-left: 0"><mo>=</mo><msub><mi>β</mi><mn>0</mn></msub><mo>+</mo><msub><mi>f</mi><mn>1</mn></msub><mo stretchy="false" form="prefix">(</mo><msub><mi>x</mi><mn>1</mn></msub><mo>,</mo><msub><mi>x</mi><mn>2</mn></msub><mo stretchy="false" form="postfix">)</mo><mo>,</mo></mtd></mtr></mtable><annotation encoding="application/x-tex">\begin{align}
 y &amp;\sim \text{Bernoulli}(p_i) \\
-p_i &amp;= \frac{1}{1 + e^{-\eta}} \\
-\eta &amp;= \beta_0 + f_1(x_1, x_2) + \epsilon,
+p_i &amp;= \text{Logist}(x) \\
+\eta &amp;= \beta_0 + f_1(x_1, x_2),
 \end{align}</annotation></semantics></math></p>
 <p>where:</p>
 <ul>
@@ -748,16 +652,14 @@ is the estimated statistical power for taxon
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>;</li>
 <li>
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>β</mi><mn>0</mn></msub><annotation encoding="application/x-tex">\beta_0</annotation></semantics></math>
-and
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>ϵ</mi><annotation encoding="application/x-tex">\epsilon</annotation></semantics></math>
-are the intercept and error terms, respectively;</li>
+is the intercept;</li>
 <li>The predictors
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>x</mi><mn>1</mn></msub><annotation encoding="application/x-tex">x_1</annotation></semantics></math>
 and
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>x</mi><mn>2</mn></msub><annotation encoding="application/x-tex">x_2</annotation></semantics></math>
 represent log mean abundance and log fold change, respectively;</li>
 <li>
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>f</mi><mn>1</mn></msub><mrow><mo stretchy="true" form="prefix">(</mo><mo>⋅</mo><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">f_1(\cdot)</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>f</mi><mn>1</mn></msub><mo stretchy="false" form="prefix">(</mo><mi>⋅</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">f_1(\cdot)</annotation></semantics></math>
 is a two-dimensional smoothing surface, generated using a tensor product
 smooth of log mean abundance and log fold change.</li>
 </ul>
@@ -781,7 +683,7 @@ multiple microbiome count datasets following the procedure described in
 the section <a href="#simulate-count-microbiome-data">Simulate count
 microbiome data</a>. We then estimate p-values associated with the
 simulated fold changes using the <code>DESeq2</code> package.</p>
-<div class="sourceCode" id="cb45"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">countdata_list</span>  <span class="op">=</span>   <span class="va">countdata_sims</span><span class="op">$</span><span class="va">countdata_list</span></span>
 <span><span class="va">metadata_list</span>   <span class="op">=</span>   <span class="va">countdata_sims</span><span class="op">$</span><span class="va">metadata_list</span></span>
 <span><span class="va">desq_est</span>   <span class="op">=</span>   <span class="fu">quiet</span><span class="op">(</span><span class="fu"><a href="../reference/deseq_fun_est.html">deseq_fun_est</a></span><span class="op">(</span>metadata_list <span class="op">=</span>  <span class="va">metadata_list</span>,</span>
@@ -789,20 +691,20 @@ simulated fold changes using the <code>DESeq2</code> package.</p>
 <span>                            alpha_level    <span class="op">=</span>  <span class="fl">0.1</span>,</span>
 <span>                            group_colname  <span class="op">=</span> <span class="st">"Groups"</span>,</span>
 <span>                            sample_colname <span class="op">=</span> <span class="st">"Samples"</span>,</span>
-<span>                            num_cores      <span class="op">=</span>  <span class="fl">4</span>,</span>
+<span>                            num_cores      <span class="op">=</span>  <span class="fl">1</span>,</span>
 <span>                            ref_name       <span class="op">=</span> <span class="st">"control"</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">deseq_est_list</span>     <span class="op">=</span>    <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">desq_est</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">{</span><span class="va">x</span><span class="op">$</span><span class="va">deseq_estimate</span><span class="op">}</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">desq_est</span><span class="op">$</span><span class="va">sim_1</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## [1] "logfoldchange"  "dispersion"     "deseq_estimate" "deseq_object"  </span></span>
-<span><span class="co">## [5] "metadata"       "countdata"</span></span></code></pre>
+<pre><code><span><span class="co">## [1] "logfoldchange"    "dispersion"       "deseq_estimate"   "normalised_count"</span></span>
+<span><span class="co">## [5] "deseq_object"     "metadata"         "countdata"</span></span></code></pre>
 </div>
 <div class="section level3">
 <h3 id="fitting-the-generalized-additive-model-gam">Fitting the Generalized Additive Model (GAM)<a class="anchor" aria-label="anchor" href="#fitting-the-generalized-additive-model-gam"></a>
 </h3>
 <p>We now fit the GAM for predicting statistical power for individual
 taxon.</p>
-<div class="sourceCode" id="cb47"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">true_lmean_list</span>       <span class="op">=</span>    <span class="va">countdata_sims</span><span class="op">$</span><span class="va">logmean_list</span></span>
 <span><span class="va">true_lfoldchange_list</span> <span class="op">=</span>    <span class="va">countdata_sims</span><span class="op">$</span><span class="va">logfoldchange_list</span></span>
 <span></span>
@@ -813,19 +715,17 @@ taxon.</p>
 <span>                  alpha_level<span class="op">=</span><span class="fl">0.1</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/range.html" class="external-link">range</a></span><span class="op">(</span><span class="va">true_lfoldchange_list</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## [1] -2.773278  3.112099</span></span></code></pre>
-<div class="sourceCode" id="cb49"><pre class="downlit sourceCode r">
+<pre><code><span><span class="co">## [1] -8.952604  7.643726</span></span></code></pre>
+<div class="sourceCode" id="cb42"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/range.html" class="external-link">range</a></span><span class="op">(</span><span class="va">true_lmean_list</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## [1] -3.573524  5.958783</span></span></code></pre>
-<div class="sourceCode" id="cb51"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co">#plot(gamFit$fit_2d)</span></span></code></pre></div>
+<pre><code><span><span class="co">## [1] -2.383209  6.458936</span></span></code></pre>
 </div>
 <div class="section level3">
 <h3 id="contour-plot-showing-power-for-various-combinations-of-mean-abundance-and-fold-change">Contour plot showing power for various combinations of mean
 abundance and fold change<a class="anchor" aria-label="anchor" href="#contour-plot-showing-power-for-various-combinations-of-mean-abundance-and-fold-change"></a>
 </h3>
-<div class="sourceCode" id="cb52"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">cont_breaks</span>     <span class="op">=</span>  <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>,<span class="fl">1</span>,<span class="fl">0.01</span><span class="op">)</span></span>
+<div class="sourceCode" id="cb44"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">cont_breaks</span>     <span class="op">=</span>  <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>,<span class="fl">1</span>,<span class="fl">0.1</span><span class="op">)</span></span>
 <span><span class="va">combined_data</span>   <span class="op">=</span>  <span class="va">gamFit</span><span class="op">$</span><span class="va">combined_data</span></span>
 <span><span class="va">power_estimate</span>  <span class="op">=</span>  <span class="va">gamFit</span><span class="op">$</span><span class="va">power_estimate</span></span>
 <span></span>
@@ -842,9 +742,9 @@ abundance and fold change<a class="anchor" aria-label="anchor" href="#contour-pl
 <div class="section level3">
 <h3 id="simulate-count-data-for-various-sample-sizes">Simulate count data for various sample sizes<a class="anchor" aria-label="anchor" href="#simulate-count-data-for-various-sample-sizes"></a>
 </h3>
-<div class="sourceCode" id="cb53"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb45"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">nsim</span> <span class="op">=</span> <span class="fl">4</span></span>
-<span><span class="va">nsample_vec</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">100</span>, <span class="fl">10</span><span class="op">)</span></span>
+<span><span class="va">nsample_vec</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">100</span>, <span class="fl">20</span><span class="op">)</span></span>
 <span><span class="va">countdata_sims_list</span>  <span class="op">=</span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="kw">for</span><span class="op">(</span><span class="va">j</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">nsample_vec</span><span class="op">)</span><span class="op">)</span><span class="op">{</span></span>
 <span>  <span class="va">countdata_sims_list</span><span class="op">[[</span><span class="va">j</span><span class="op">]</span><span class="op">]</span>  <span class="op">=</span>  <span class="fu"><a href="../reference/countdata_sim_fun.html">countdata_sim_fun</a></span><span class="op">(</span><span class="va">logmean_param</span>,</span>
@@ -867,10 +767,10 @@ abundance and fold change<a class="anchor" aria-label="anchor" href="#contour-pl
 <h3 id="estimate-p-values-associated-to-fold-changes-for-each-taxa-for-simulated-data-per-sample-size">Estimate p-values associated to fold changes for each taxa for
 simulated data per sample size<a class="anchor" aria-label="anchor" href="#estimate-p-values-associated-to-fold-changes-for-each-taxa-for-simulated-data-per-sample-size"></a>
 </h3>
-<div class="sourceCode" id="cb54"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb46"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">desq_est_list</span>  <span class="op">=</span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="kw">for</span><span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">countdata_sims_list</span><span class="op">)</span><span class="op">)</span><span class="op">{</span></span>
-<span>  </span>
+<span></span>
 <span>  <span class="va">countdata_list</span>       <span class="op">=</span>   <span class="va">countdata_sims_list</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">countdata_list</span></span>
 <span>  <span class="va">metadata_list</span>        <span class="op">=</span>   <span class="va">countdata_sims_list</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">metadata_list</span></span>
 <span>  <span class="va">desq_est_list</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span>   <span class="op">=</span>   <span class="fu"><a href="../reference/deseq_fun_est.html">deseq_fun_est</a></span><span class="op">(</span>metadata_list <span class="op">=</span>  <span class="va">metadata_list</span>,</span>
@@ -878,9 +778,9 @@ simulated data per sample size<a class="anchor" aria-label="anchor" href="#estim
 <span>                               alpha_level    <span class="op">=</span>  <span class="fl">0.1</span>,</span>
 <span>                               group_colname  <span class="op">=</span> <span class="st">"Groups"</span>,</span>
 <span>                               sample_colname <span class="op">=</span> <span class="st">"Samples"</span>,</span>
-<span>                               num_cores      <span class="op">=</span>  <span class="fl">4</span>,</span>
+<span>                               num_cores      <span class="op">=</span>  <span class="fl">1</span>,</span>
 <span>                               ref_name       <span class="op">=</span> <span class="st">"control"</span><span class="op">)</span></span>
-<span>  </span>
+<span></span>
 <span><span class="op">}</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">desq_est_list</span><span class="op">)</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"sample_"</span>,<span class="va">nsample_vec</span><span class="op">)</span></span></code></pre></div>
 </div>
@@ -889,32 +789,167 @@ simulated data per sample size<a class="anchor" aria-label="anchor" href="#estim
 </h3>
 <p>We now fit a GAM model to predict statistical power. This time, we
 predict GAM with covariates as mean count of taxa, fold change of taxa
-and sample sizes</p>
-<div class="sourceCode" id="cb55"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">deseq_list</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">desq_est_list</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">{</span></span>
-<span>  <span class="fu"><a href="../reference/read_data.html">read_data</a></span><span class="op">(</span><span class="va">x</span>, <span class="st">"deseq_estimate"</span><span class="op">)</span> </span>
-<span><span class="op">}</span><span class="op">)</span></span>
+and group sample size. Let
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>n</mi><mi>k</mi></msub><annotation encoding="application/x-tex">n_k</annotation></semantics></math>
+for
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>k</mi><mo>=</mo><mn>1</mn><mo>,</mo><mn>2</mn><mo>,</mo><mi>.</mi><mi>.</mi><mi>.</mi><mo>,</mo><mi>N</mi></mrow><annotation encoding="application/x-tex">k=1,2,...,N</annotation></semantics></math>
+denote the sample size per group corresponding to the
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>k</mi><mrow><mi>t</mi><mi>h</mi></mrow></msup><annotation encoding="application/x-tex">k^{th}</annotation></semantics></math>
+dataset. For a given dataset, we assume equal sample sizes across all
+groups. The value of
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>n</mi><mi>k</mi></msub><annotation encoding="application/x-tex">n_k</annotation></semantics></math>
+is constant within each dataset but varies across datasets. The GAM
+model is defined by</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="true" form="prefix">{</mo><mtable><mtr><mtd columnalign="left" style="text-align: left"><mi>y</mi></mtd><mtd columnalign="left" style="text-align: left"><mo>∼</mo><mtext mathvariant="normal">Bernoulli</mtext><mo stretchy="false" form="prefix">(</mo><msub><mi>p</mi><mi>i</mi></msub><mo stretchy="false" form="postfix">)</mo></mtd></mtr><mtr><mtd columnalign="left" style="text-align: left"><msub><mi>p</mi><mi>i</mi></msub></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><mtext mathvariant="normal">Logist</mtext><mo stretchy="false" form="prefix">(</mo><mi>η</mi><mo stretchy="false" form="postfix">)</mo></mtd></mtr><mtr><mtd columnalign="left" style="text-align: left"><mi>η</mi></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><msub><mi>β</mi><mn>0</mn></msub><mo>+</mo><msub><mi>f</mi><mn>1</mn></msub><mo stretchy="false" form="prefix">(</mo><msub><mi>x</mi><mrow><mn>1</mn><mi>i</mi></mrow></msub><mo>,</mo><msub><mi>x</mi><mrow><mn>2</mn><mi>i</mi></mrow></msub><mo stretchy="false" form="postfix">)</mo><mo>+</mo><msub><mi>f</mi><mn>2</mn></msub><mo stretchy="false" form="prefix">(</mo><msub><mi>x</mi><mrow><mn>1</mn><mi>i</mi></mrow></msub><mo>,</mo><msub><mi>n</mi><mi>k</mi></msub><mo stretchy="false" form="postfix">)</mo><mo>+</mo><msub><mi>f</mi><mn>3</mn></msub><mo stretchy="false" form="prefix">(</mo><msub><mi>x</mi><mrow><mn>2</mn><mi>i</mi></mrow></msub><mo>,</mo><msub><mi>n</mi><mi>k</mi></msub><mo stretchy="false" form="postfix">)</mo><mo>,</mo></mtd></mtr></mtable></mrow><annotation encoding="application/x-tex">\begin{equation}
+\begin{cases}
+y &amp;\sim \text{Bernoulli}(p_i) \\
+p_i &amp;=  \text{Logist}(\eta) \\
+\eta &amp;= \beta_0 + f_1({x}_{1i},{x}_{2i}) + f_2({x}_{1i},n_k) + f_3({x}_{2i},n_k), 
+\end{cases} \label{eqn2}
+\end{equation}</annotation></semantics></math> where the functions
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>f</mi><mn>1</mn></msub><mo>,</mo><msub><mi>f</mi><mn>2</mn></msub></mrow><annotation encoding="application/x-tex">f_1, f_2</annotation></semantics></math>
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>f</mi><mn>3</mn></msub><annotation encoding="application/x-tex">f_3</annotation></semantics></math>
+are two-dimensional smoothing surfaces with basis generated by the
+tensor product smooth of pairs of
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>x</mi><mrow><mn>1</mn><mi>i</mi></mrow></msub><mo>,</mo><msub><mi>x</mi><mrow><mn>2</mn><mi>i</mi></mrow></msub></mrow><annotation encoding="application/x-tex">x_{1i},x_{2i}</annotation></semantics></math>
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>n</mi><mi>k</mi></msub><annotation encoding="application/x-tex">n_k</annotation></semantics></math>
+.
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>f</mi><mn>1</mn></msub><mo>,</mo><msub><mi>f</mi><mn>2</mn></msub></mrow><annotation encoding="application/x-tex">f_1, f_2</annotation></semantics></math>
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>f</mi><mn>3</mn></msub><annotation encoding="application/x-tex">f_3</annotation></semantics></math>
+are constrained to be monotonically increasing functions.</p>
+<div class="sourceCode" id="cb47"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">pow_ss</span>  <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">extdata_path</span>, <span class="st">"gam_fit_MultiSamples.rds"</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">pval_est_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">deseq_list</span>, <span class="kw">function</span><span class="op">(</span><span class="va">sample_list</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">sample_list</span>, <span class="kw">function</span><span class="op">(</span><span class="va">sim_df</span><span class="op">)</span> <span class="op">{</span></span>
-<span>    <span class="va">sim_df</span><span class="op">$</span><span class="va">padj</span></span>
-<span>  <span class="op">}</span><span class="op">)</span></span>
-<span><span class="op">}</span><span class="op">)</span></span>
-<span> </span>
+<span><span class="co">## The code below was used to generate the precomputed</span></span>
+<span><span class="co">## `gam_fit_MultiSamples.rds` object.</span></span>
+<span><span class="co">## The saved result is loaded throughout</span></span>
+<span><span class="co">## this vignette to reduce vignette build times.</span></span>
 <span></span>
-<span><span class="va">logfoldchange_list</span>  <span class="op">=</span>   <span class="fu"><a href="../reference/read_data.html">read_data</a></span><span class="op">(</span><span class="va">countdata_sims_list</span>,<span class="st">"logfoldchange_list"</span><span class="op">)</span></span>
-<span><span class="va">logmean_list</span>        <span class="op">=</span>   <span class="fu"><a href="../reference/read_data.html">read_data</a></span><span class="op">(</span><span class="va">countdata_sims_list</span>,<span class="st">"logmean_list"</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">pow_ss</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/power_fun_ss.html">power_fun_ss</a></span><span class="op">(</span><span class="va">pval_est_list</span>,</span>
-<span>                         <span class="va">logmean_list</span>,</span>
-<span>                         nsample_vec <span class="op">=</span> <span class="va">nsample_vec</span>,</span>
-<span>                         <span class="va">logfoldchange_list</span>,</span>
-<span>                         alpha_level<span class="op">=</span><span class="fl">0.1</span><span class="op">)</span></span></code></pre></div>
+<span><span class="co"># deseq_list = lapply(desq_est_list, function(x){</span></span>
+<span><span class="co">#   read_data(x, "deseq_estimate")</span></span>
+<span><span class="co"># })</span></span>
+<span><span class="co"># </span></span>
+<span><span class="co"># pval_est_list &lt;- lapply(deseq_list, function(sample_list) {</span></span>
+<span><span class="co">#   lapply(sample_list, function(sim_df) {</span></span>
+<span><span class="co">#     sim_df$padj</span></span>
+<span><span class="co">#   })</span></span>
+<span><span class="co"># })</span></span>
+<span><span class="co"># </span></span>
+<span><span class="co"># </span></span>
+<span><span class="co"># logfoldchange_list  =   read_data(countdata_sims_list,"logfoldchange_list")</span></span>
+<span><span class="co"># logmean_list        =   read_data(countdata_sims_list,"logmean_list")</span></span>
+<span><span class="co"># </span></span>
+<span><span class="co"># pow_ss &lt;- power_fun_ss(pval_est_list,</span></span>
+<span><span class="co">#                          logmean_list,</span></span>
+<span><span class="co">#                          nsample_vec = nsample_vec,</span></span>
+<span><span class="co">#                          logfoldchange_list,</span></span>
+<span><span class="co">#                          alpha_level=0.1)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="estimate-sample-size-for-a-given-statistical-power-fold-change-and-mean-abundance">Estimate sample size for a given statistical power, fold change and
 mean abundance<a class="anchor" aria-label="anchor" href="#estimate-sample-size-for-a-given-statistical-power-fold-change-and-mean-abundance"></a>
 </h3>
+<p>For a given target power, the sample size required to detect a taxon
+with a given fold change and mean abundance is obtained by a
+root-finding technique. Let
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>g</mi><mo stretchy="false" form="prefix">(</mo><msub><mi>x</mi><mrow><mn>1</mn><mi>i</mi></mrow></msub><mo>,</mo><msub><mi>x</mi><mrow><mn>2</mn><mi>i</mi></mrow></msub><mo>,</mo><msub><mi>n</mi><mi>k</mi></msub><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">g(x_{1i}, x_{2i}, n_k)</annotation></semantics></math>
+denote the estimated linear predictor from the fitted GAM. The predicted
+power is obtained via the logistic transformation</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable><mtr><mtd columnalign="right" style="text-align: right"><msub><mover><mi>p</mi><mo accent="true">̂</mo></mover><mi>i</mi></msub><mo>=</mo><mtext mathvariant="normal">Logist</mtext><mo minsize="120%" maxsize="120%" stretchy="true" form="prefix">(</mo><mi>g</mi><mo stretchy="false" form="prefix">(</mo><msub><mi>x</mi><mrow><mn>1</mn><mi>i</mi></mrow></msub><mo>,</mo><msub><mi>x</mi><mrow><mn>2</mn><mi>i</mi></mrow></msub><mo>,</mo><msub><mi>n</mi><mi>k</mi></msub><mo stretchy="false" form="postfix">)</mo><mo minsize="120%" maxsize="120%" stretchy="true" form="postfix">)</mo><mi>.</mi></mtd></mtr></mtable><annotation encoding="application/x-tex">\begin{align}
+\hat{p}_i = \text{Logist}\big(g(x_{1i}, x_{2i}, n_k)\big). 
+\end{align}</annotation></semantics></math></p>
+<p>Given
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>x</mi><mrow><mn>1</mn><mi>i</mi></mrow></msub><mo>,</mo><msub><mi>x</mi><mrow><mn>2</mn><mi>i</mi></mrow></msub></mrow><annotation encoding="application/x-tex">{x}_{1i}, {x}_{2i}</annotation></semantics></math>
+and a target power
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>p</mi><mo>*</mo></msup><annotation encoding="application/x-tex">p^\ast</annotation></semantics></math>,
+the required sample size
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>n</mi><mi>k</mi></msub><annotation encoding="application/x-tex">n_k</annotation></semantics></math>
+is estimated by finding the root of the equation:
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable><mtr><mtd columnalign="right" style="text-align: right"><mtext mathvariant="normal">Logist</mtext><mo minsize="120%" maxsize="120%" stretchy="true" form="prefix">(</mo><mi>g</mi><mo stretchy="false" form="prefix">(</mo><msub><mi>x</mi><mrow><mn>1</mn><mi>i</mi></mrow></msub><mo>,</mo><msub><mi>x</mi><mrow><mn>2</mn><mi>i</mi></mrow></msub><mo>,</mo><msub><mi>n</mi><mi>k</mi></msub><mo stretchy="false" form="postfix">)</mo><mo minsize="120%" maxsize="120%" stretchy="true" form="postfix">)</mo><mo>−</mo><msup><mi>p</mi><mo>*</mo></msup><mo>=</mo><mn>0</mn><mi>.</mi></mtd></mtr></mtable><annotation encoding="application/x-tex">\begin{align}
+\text{Logist}\big(g(x_{1i}, x_{2i}, n_k)\big) - p^\ast = 0.
+\end{align}</annotation></semantics></math></p>
+<div class="sourceCode" id="cb48"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">target_power</span> <span class="op">=</span>  <span class="fl">0.8</span>; <span class="va">model</span>  <span class="op">=</span>  <span class="va">pow_ss</span><span class="op">$</span><span class="va">gam_mod</span>; <span class="va">abs_lfc</span> <span class="op">=</span> <span class="fl">1.2</span>; <span class="va">logmean</span> <span class="op">=</span> <span class="fl">4</span></span>
+<span></span>
+<span><span class="va">ss_estimate</span> <span class="op">=</span> <span class="fu"><a href="../reference/uniroot_ss.html">uniroot_ss</a></span><span class="op">(</span><span class="va">target_power</span>, <span class="va">logmean</span>, <span class="va">abs_lfc</span>, <span class="va">model</span>,</span>
+<span>                        xmin <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log2</a></span><span class="op">(</span><span class="fl">10</span><span class="op">)</span>, xmax <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log2</a></span><span class="op">(</span><span class="fl">5000</span><span class="op">)</span>,</span>
+<span>                        maxiter <span class="op">=</span> <span class="fl">10000</span>,</span>
+<span>                        max_report <span class="op">=</span> <span class="fl">2000</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">ss_estimate</span></span></code></pre></div>
+<pre><code><span><span class="co">## $sample_size_per_group</span></span>
+<span><span class="co">## [1] 277.471</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## $conclusion</span></span>
+<span><span class="co">## [1] "Success."</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## $predicted_power_min_n</span></span>
+<span><span class="co">## [1] 0.004765494</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## $predicted_power_max_n</span></span>
+<span><span class="co">## [1] 0.9882709</span></span></code></pre>
+<div class="sourceCode" id="cb50"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">target_power_vec</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0.5</span>, <span class="fl">0.9</span>, <span class="fl">0.05</span><span class="op">)</span> <span class="co">#c(0.6, 0.7, 0.8, 0.9)</span></span>
+<span><span class="va">abs_lfc_vec</span>      <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.5</span>, <span class="fl">1.0</span>, <span class="fl">1.5</span>, <span class="fl">2.0</span><span class="op">)</span></span>
+<span><span class="va">logmean_vec</span>      <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">4</span>, <span class="fl">6</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">param_grid</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/expand.grid.html" class="external-link">expand.grid</a></span><span class="op">(</span></span>
+<span>  target_power <span class="op">=</span> <span class="va">target_power_vec</span>,</span>
+<span>  abs_lfc <span class="op">=</span> <span class="va">abs_lfc_vec</span>,</span>
+<span>  logmean <span class="op">=</span> <span class="va">logmean_vec</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">param_grid</span><span class="op">$</span><span class="va">sample_size_per_group</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/apply.html" class="external-link">apply</a></span><span class="op">(</span></span>
+<span>  <span class="va">param_grid</span>,</span>
+<span>  <span class="fl">1</span>,</span>
+<span>  <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span></span>
+<span>      <span class="fu"><a href="../reference/uniroot_ss.html">uniroot_ss</a></span><span class="op">(</span></span>
+<span>        target_power <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">x</span><span class="op">[</span><span class="st">"target_power"</span><span class="op">]</span><span class="op">)</span>,</span>
+<span>        logmean      <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">x</span><span class="op">[</span><span class="st">"logmean"</span><span class="op">]</span><span class="op">)</span>,</span>
+<span>        abs_lfc      <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">x</span><span class="op">[</span><span class="st">"abs_lfc"</span><span class="op">]</span><span class="op">)</span>,</span>
+<span>        model        <span class="op">=</span> <span class="va">pow_ss</span><span class="op">$</span><span class="va">gam_mod</span>,</span>
+<span>        xmin         <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log2</a></span><span class="op">(</span><span class="fl">10</span><span class="op">)</span>,</span>
+<span>        xmax         <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log2</a></span><span class="op">(</span><span class="fl">5000</span><span class="op">)</span>,</span>
+<span>        maxiter      <span class="op">=</span> <span class="fl">10000</span>,</span>
+<span>        max_report   <span class="op">=</span> <span class="fl">2000</span><span class="op">)</span><span class="op">$</span><span class="va">sample_size_per_group</span></span>
+<span>  <span class="op">}</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">param_grid</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">##   target_power abs_lfc logmean sample_size_per_group</span></span>
+<span><span class="co">## 1         0.50     0.5       2      761.879630397996</span></span>
+<span><span class="co">## 2         0.55     0.5       2      921.650526518332</span></span>
+<span><span class="co">## 3         0.60     0.5       2      1119.33443287526</span></span>
+<span><span class="co">## 4         0.65     0.5       2      1370.72189298116</span></span>
+<span><span class="co">## 5         0.70     0.5       2      1702.19099725221</span></span>
+<span><span class="co">## 6         0.75     0.5       2                &gt; 2000</span></span></code></pre>
+<div class="sourceCode" id="cb52"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">param_grid</span>,</span>
+<span>       <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">target_power</span>,</span>
+<span>           y <span class="op">=</span> <span class="va">sample_size_per_group</span>,</span>
+<span>           group <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_grid.html" class="external-link">facet_grid</a></span><span class="op">(</span></span>
+<span>    <span class="va">abs_lfc</span> <span class="op">~</span> <span class="va">logmean</span>,</span>
+<span>    labeller <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labeller.html" class="external-link">labeller</a></span><span class="op">(</span></span>
+<span>      abs_lfc <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"|log(fold change)| = "</span>, <span class="va">x</span><span class="op">)</span>,</span>
+<span>      logmean <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"log(mean count) = "</span>, <span class="va">x</span><span class="op">)</span></span>
+<span>    <span class="op">)</span></span>
+<span>  <span class="op">)</span> <span class="op">+</span></span>
+<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span></span>
+<span>    x <span class="op">=</span> <span class="st">"Target Power"</span>,</span>
+<span>    y <span class="op">=</span> <span class="st">"Estimated Sample Size per Group"</span>,</span>
+<span>    title <span class="op">=</span> <span class="st">"Estimated Sample Size by Target Power"</span></span>
+<span>  <span class="op">)</span> <span class="op">+</span> </span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_bw</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span></span>
+<span>    plot.title <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_text</a></span><span class="op">(</span>hjust <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span></code></pre></div>
+<p><img src="stub_files/figure-html/ss_grid_plot-1.png" class="r-plt" alt="" width="1056"></p>
 </div>
 </div>
 <div class="section level2">
@@ -924,22 +959,17 @@ mean abundance<a class="anchor" aria-label="anchor" href="#estimate-sample-size-
 <h4 id="data-description-and-parameter-estimates-from-actual-microbiome-datasets">Data description and parameter estimates from actual microbiome
 datasets<a class="anchor" aria-label="anchor" href="#data-description-and-parameter-estimates-from-actual-microbiome-datasets"></a>
 </h4>
-<pre><code><span><span class="co">## </span></span>
-<span><span class="co">## Attaching package: 'kableExtra'</span></span></code></pre>
-<pre><code><span><span class="co">## The following object is masked from 'package:dplyr':</span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">##     group_rows</span></span></code></pre>
 <table class="table table" style="margin-left: auto; margin-right: auto;">
 <thead>
 <tr>
 <th style="empty-cells: hide;border-bottom:hidden;" colspan="1">
 </th>
-<th style="border-bottom:hidden;padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="4">
+<th style="border-bottom:hidden;padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="8">
 <div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">
 Log mean count
 </div>
 </th>
-<th style="border-bottom:hidden;padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="5">
+<th style="border-bottom:hidden;padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="4">
 <div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">
 Log fold change
 </div>
@@ -947,10 +977,13 @@ Log fold change
 </tr>
 <tr>
 <th style="text-align:left;">
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>D</mi><mi>a</mi><mi>t</mi><mi>a</mi><mi>s</mi><mi>e</mi><mi>t</mi></mrow><annotation encoding="application/x-tex">Dataset</annotation></semantics></math>
+Dataset &lt;- c(“ArcticFireSoils”, “Blueberry”, “cdi_schubert”,
 </th>
-<th style="text-align:right;">
+<th style="text-align:left;">
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>n</mi><mrow><mi>c</mi><mi>o</mi><mi>m</mi><mi>p</mi></mrow></msub><annotation encoding="application/x-tex">n_{comp}</annotation></semantics></math>
+</th>
+<th style="text-align:left;">
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>p</mi><mn>1</mn></msub><annotation encoding="application/x-tex">p_1</annotation></semantics></math>
 </th>
 <th style="text-align:left;">
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>μ</mi><mn>1</mn></msub><annotation encoding="application/x-tex">\mu_1</annotation></semantics></math>
@@ -959,88 +992,1166 @@ Log fold change
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>σ</mi><mn>1</mn></msub><annotation encoding="application/x-tex">\sigma_1</annotation></semantics></math>
 </th>
 <th style="text-align:left;">
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>p</mi><mn>1</mn></msub><annotation encoding="application/x-tex">p_1</annotation></semantics></math>
 </th>
-<th style="text-align:right;">
+<th style="text-align:left;">
+</th>
+<th style="text-align:left;">
+</th>
+<th style="text-align:left;">
+</th>
+<th style="text-align:left;">
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>n</mi><mrow><mi>c</mi><mi>o</mi><mi>m</mi><mi>p</mi></mrow></msub><annotation encoding="application/x-tex">n_{comp}</annotation></semantics></math>
+</th>
+<th style="text-align:left;">
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>p</mi><mn>2</mn></msub><annotation encoding="application/x-tex">p_2</annotation></semantics></math>
 </th>
 <th style="text-align:left;">
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>μ</mi><mn>2</mn></msub><annotation encoding="application/x-tex">\mu_2</annotation></semantics></math>
 </th>
 <th style="text-align:left;">
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>σ</mi><mn>2</mn></msub><annotation encoding="application/x-tex">\sigma_2</annotation></semantics></math>
-</th>
-<th style="text-align:left;">
-p_2
-</th>
-<th style="text-align:left;">
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>x</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">f(x)</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mrow><mi>f</mi><mo stretchy="false" form="prefix">(</mo><mi>x</mi><mo stretchy="false" form="postfix">)</mo></mrow><msub><mi>σ</mi><mn>2</mn></msub></msub><annotation encoding="application/x-tex">{f(x)}_{\sigma_2}</annotation></semantics></math>
 </th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td style="text-align:left;">
-Example row 1
-</td>
-<td style="text-align:right;">
-5
+ArcticFireSoils
 </td>
 <td style="text-align:left;">
-(2,3,4,5,7)
+4
 </td>
 <td style="text-align:left;">
-(2,3,4,5,7)
+(0.10,0.38,0.37,0.15)
 </td>
 <td style="text-align:left;">
-(2,3,4,5,7)
-</td>
-<td style="text-align:right;">
-5
+(-2.81,-1.56,0.31,3.27)
 </td>
 <td style="text-align:left;">
-(2,3,4,5,7)
+(0.45,0.80,1.35,2.39)
 </td>
 <td style="text-align:left;">
-(2,3,4,5,7)
 </td>
 <td style="text-align:left;">
-(2,3,4,5,7)
 </td>
 <td style="text-align:left;">
-(2,3,4,5,7)
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:left;">
+(-3.88)
+</td>
+<td style="text-align:left;">
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>0.13</mn><mo>+</mo><mn>0.06</mn><msub><mi>x</mi><mi>i</mi></msub><mo>,</mo><mspace width="0.278em"></mspace><mo>−</mo><mn>1.55</mn><mo>−</mo><mn>0.62</mn><msub><mi>x</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">0.13 + 0.06x_i,\;-1.55 - 0.62x_i</annotation></semantics></math>
+</td>
+<td style="text-align:left;">
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>−</mi><mn>0.65</mn><mo>+</mo><mn>0.30</mn><msub><mi>x</mi><mi>i</mi></msub><mo>,</mo><mspace width="0.278em"></mspace><mn>0.44</mn><mo>+</mo><mn>0.46</mn><msub><mi>x</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">-0.65 + 0.30x_i,\;0.44 + 0.46x_i</annotation></semantics></math>
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
-Example row 2
+Blueberry
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
+4
+</td>
+<td style="text-align:left;">
+(0.37,0.22,0.29,0.12)
+</td>
+<td style="text-align:left;">
+(-0.47,-1.45,0.83,2.54)
+</td>
+<td style="text-align:left;">
+(0.71,0.52,1.05,1.66)
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:left;">
+(4.97)
+</td>
+<td style="text-align:left;">
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>0.16</mn><mo>−</mo><mn>4.31</mn><msub><mi>x</mi><mi>i</mi></msub><mo>,</mo><mspace width="0.278em"></mspace><mn>0.01</mn><mo>+</mo><mn>0.01</mn><msub><mi>x</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">0.16 - 4.31x_i,\;0.01 + 0.01x_i</annotation></semantics></math>
+</td>
+<td style="text-align:left;">
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>−</mi><mn>1.17</mn><mo>+</mo><mn>2.07</mn><msub><mi>x</mi><mi>i</mi></msub><mo>,</mo><mspace width="0.278em"></mspace><mo>−</mo><mn>1.07</mn><mo>+</mo><mn>0.13</mn><msub><mi>x</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">-1.17 + 2.07x_i,\;-1.07 + 0.13x_i</annotation></semantics></math>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+cdi_schubert
+</td>
+<td style="text-align:left;">
+3
+</td>
+<td style="text-align:left;">
+(0.54,0.37,0.09)
+</td>
+<td style="text-align:left;">
+(-2.02,0.78,4.17)
+</td>
+<td style="text-align:left;">
+(0.94,1.57,2.04)
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:left;">
+(-1.16)
+</td>
+<td style="text-align:left;">
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>−</mi><mn>1.42</mn><mo>−</mo><mn>0.37</mn><msub><mi>x</mi><mi>i</mi></msub><mo>,</mo><mspace width="0.278em"></mspace><mn>2.61</mn><mo>+</mo><mn>0.77</mn><msub><mi>x</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">-1.42 - 0.37x_i,\;2.61 + 0.77x_i</annotation></semantics></math>
+</td>
+<td style="text-align:left;">
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>−</mi><mn>0.27</mn><mo>+</mo><mn>0.54</mn><msub><mi>x</mi><mi>i</mi></msub><mo>,</mo><mspace width="0.278em"></mspace><mo>−</mo><mn>0.17</mn><mo>+</mo><mn>0.23</mn><msub><mi>x</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">-0.27 + 0.54x_i,\;-0.17 + 0.23x_i</annotation></semantics></math>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+cdi_vincent
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:left;">
+(0.56,0.44)
+</td>
+<td style="text-align:left;">
+(3.06,-0.03)
+</td>
+<td style="text-align:left;">
+(2.10,0.89)
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:left;">
+(4.93)
+</td>
+<td style="text-align:left;">
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1.04</mn><mo>−</mo><mn>1.14</mn><msub><mi>x</mi><mi>i</mi></msub><mo>,</mo><mspace width="0.278em"></mspace><mo>−</mo><mn>0.21</mn><mo>−</mo><mn>0.09</mn><msub><mi>x</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">1.04 - 1.14x_i,\;-0.21 - 0.09x_i</annotation></semantics></math>
+</td>
+<td style="text-align:left;">
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1.05</mn><mo>−</mo><mn>0.49</mn><msub><mi>x</mi><mi>i</mi></msub><mo>,</mo><mspace width="0.278em"></mspace><mn>0.18</mn><mo>+</mo><mn>0.13</mn><msub><mi>x</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">1.05 - 0.49x_i,\;0.18 + 0.13x_i</annotation></semantics></math>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Chemerin
+</td>
+<td style="text-align:left;">
+3
+</td>
+<td style="text-align:left;">
+(0.56,0.02,0.42)
+</td>
+<td style="text-align:left;">
+(-0.86,0.74,2.27)
+</td>
+<td style="text-align:left;">
+(1.14,0.09,2.32)
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:left;">
+(4.52)
+</td>
+<td style="text-align:left;">
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>2.95</mn><mo>+</mo><mn>3.42</mn><msub><mi>x</mi><mi>i</mi></msub><mo>,</mo><mspace width="0.278em"></mspace><mo>−</mo><mn>0.02</mn><mo>−</mo><mn>0.00</mn><msub><mi>x</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">2.95 + 3.42x_i,\;-0.02 - 0.00x_i</annotation></semantics></math>
+</td>
+<td style="text-align:left;">
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>−</mi><mn>1.25</mn><mo>−</mo><mn>2.24</mn><msub><mi>x</mi><mi>i</mi></msub><mo>,</mo><mspace width="0.278em"></mspace><mo>−</mo><mn>1.31</mn><mo>+</mo><mn>0.07</mn><msub><mi>x</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">-1.25 - 2.24x_i,\;-1.31 + 0.07x_i</annotation></semantics></math>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+crc_baxter
+</td>
+<td style="text-align:left;">
+4
+</td>
+<td style="text-align:left;">
+(0.16,0.33,0.20,0.32)
+</td>
+<td style="text-align:left;">
+(-3.13,-2.01,-0.49,2.73)
+</td>
+<td style="text-align:left;">
+(0.55,0.76,2.46,1.21)
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:left;">
+(4.65)
+</td>
+<td style="text-align:left;">
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>4.25</mn><mo>+</mo><mn>3.11</mn><msub><mi>x</mi><mi>i</mi></msub><mo>,</mo><mspace width="0.278em"></mspace><mo>−</mo><mn>0.09</mn><mo>−</mo><mn>0.03</mn><msub><mi>x</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">4.25 + 3.11x_i,\;-0.09 - 0.03x_i</annotation></semantics></math>
+</td>
+<td style="text-align:left;">
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>0.34</mn><mo>+</mo><mn>1.84</mn><msub><mi>x</mi><mi>i</mi></msub><mo>,</mo><mspace width="0.278em"></mspace><mo>−</mo><mn>0.39</mn><mo>+</mo><mn>0.43</mn><msub><mi>x</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">0.34 + 1.84x_i,\;-0.39 + 0.43x_i</annotation></semantics></math>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+crc_zeller
+</td>
+<td style="text-align:left;">
 5
 </td>
 <td style="text-align:left;">
-(2,3,4,5,7)
+(0.13,0.40,0.30,0.13,0.03)
 </td>
 <td style="text-align:left;">
-(2,3,4,5,7)
+(-2.32,-1.33,0.15,2.33,5.75)
 </td>
 <td style="text-align:left;">
-(2,3,4,5,7)
+(0.50,0.71,1.09,1.70,2.52)
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:left;">
+(3.66)
+</td>
+<td style="text-align:left;">
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>0.78</mn><mo>+</mo><mn>0.88</mn><msub><mi>x</mi><mi>i</mi></msub><mo>,</mo><mspace width="0.278em"></mspace><mo>−</mo><mn>0.16</mn><mo>−</mo><mn>0.02</mn><msub><mi>x</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">0.78 + 0.88x_i,\;-0.16 - 0.02x_i</annotation></semantics></math>
+</td>
+<td style="text-align:left;">
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1.53</mn><mo>−</mo><mn>0.39</mn><msub><mi>x</mi><mi>i</mi></msub><mo>−</mo><mn>1.30</mn><msubsup><mi>x</mi><mi>i</mi><mn>2</mn></msubsup><mo>,</mo><mspace width="0.278em"></mspace><mo>−</mo><mn>0.31</mn><mo>+</mo><mn>0.35</mn><msub><mi>x</mi><mi>i</mi></msub><mo>−</mo><mn>0.03</mn><msubsup><mi>x</mi><mi>i</mi><mn>2</mn></msubsup></mrow><annotation encoding="application/x-tex">1.53 - 0.39x_i - 1.30x_i^2,\;-0.31 + 0.35x_i - 0.03x_i^2</annotation></semantics></math>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+edd_singh
+</td>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:left;">
+(-0.42)
+</td>
+<td style="text-align:left;">
+(2.39)
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:left;">
+(-1.99)
+</td>
+<td style="text-align:left;">
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>0.09</mn><mo>+</mo><mn>0.01</mn><msub><mi>x</mi><mi>i</mi></msub><mo>,</mo><mspace width="0.278em"></mspace><mo>−</mo><mn>2.20</mn><mo>−</mo><mn>0.72</mn><msub><mi>x</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">0.09 + 0.01x_i,\;-2.20 - 0.72x_i</annotation></semantics></math>
+</td>
+<td style="text-align:left;">
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>0.13</mn><mo>+</mo><mn>0.28</mn><msub><mi>x</mi><mi>i</mi></msub><mo>,</mo><mspace width="0.278em"></mspace><mo>−</mo><mn>0.54</mn><mo>+</mo><mn>0.16</mn><msub><mi>x</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">0.13 + 0.28x_i,\;-0.54 + 0.16x_i</annotation></semantics></math>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Exercise
+</td>
+<td style="text-align:left;">
+3
+</td>
+<td style="text-align:left;">
+(0.15,0.48,0.36)
+</td>
+<td style="text-align:left;">
+(-1.20,0.17,2.39)
+</td>
+<td style="text-align:left;">
+(0.50,1.10,1.97)
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:left;">
+(-4.83)
+</td>
+<td style="text-align:left;">
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>0.03</mn><mo>−</mo><mn>0.02</mn><msub><mi>x</mi><mi>i</mi></msub><mo>,</mo><mspace width="0.278em"></mspace><mn>2.27</mn><mo>−</mo><mn>2.38</mn><msub><mi>x</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">0.03 - 0.02x_i,\;2.27 - 2.38x_i</annotation></semantics></math>
+</td>
+<td style="text-align:left;">
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>−</mi><mn>1.23</mn><mo>+</mo><mn>0.05</mn><msub><mi>x</mi><mi>i</mi></msub><mo>,</mo><mspace width="0.278em"></mspace><mo>−</mo><mn>1.55</mn><mo>+</mo><mn>1.39</mn><msub><mi>x</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">-1.23 + 0.05x_i,\;-1.55 + 1.39x_i</annotation></semantics></math>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+glass_plastic_oberbeckmann
+</td>
+<td style="text-align:left;">
+3
+</td>
+<td style="text-align:left;">
+(0.44,0.50,0.06)
+</td>
+<td style="text-align:left;">
+(-0.08,1.91,5.71)
+</td>
+<td style="text-align:left;">
+(0.64,1.23,1.18)
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:left;">
+(-3.83)
+</td>
+<td style="text-align:left;">
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>−</mi><mn>0.07</mn><mo>−</mo><mn>0.05</mn><msub><mi>x</mi><mi>i</mi></msub><mo>,</mo><mspace width="0.278em"></mspace><mn>2.17</mn><mo>+</mo><mn>0.13</mn><msub><mi>x</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">-0.07 - 0.05x_i,\;2.17 + 0.13x_i</annotation></semantics></math>
+</td>
+<td style="text-align:left;">
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>−</mi><mn>0.51</mn><mo>+</mo><mn>0.06</mn><msub><mi>x</mi><mi>i</mi></msub><mo>,</mo><mspace width="0.278em"></mspace><mo>−</mo><mn>1.39</mn><mo>+</mo><mn>0.51</mn><msub><mi>x</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">-0.51 + 0.06x_i,\;-1.39 + 0.51x_i</annotation></semantics></math>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+GWMC_ASIA_NA
+</td>
+<td style="text-align:left;">
+4
+</td>
+<td style="text-align:left;">
+(0.10,0.35,0.38,0.17)
+</td>
+<td style="text-align:left;">
+(-4.72,-3.18,-1.17,1.41)
+</td>
+<td style="text-align:left;">
+(0.61,0.98,1.50,2.28)
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:left;">
+(4.08)
+</td>
+<td style="text-align:left;">
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>3.69</mn><mo>−</mo><mn>0.21</mn><msub><mi>x</mi><mi>i</mi></msub><mo>,</mo><mspace width="0.278em"></mspace><mn>0.11</mn><mo>+</mo><mn>0.03</mn><msub><mi>x</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">3.69 - 0.21x_i,\;0.11 + 0.03x_i</annotation></semantics></math>
+</td>
+<td style="text-align:left;">
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>0.26</mn><mo>−</mo><mn>1.68</mn><msub><mi>x</mi><mi>i</mi></msub><mo>,</mo><mspace width="0.278em"></mspace><mn>0.55</mn><mo>+</mo><mn>0.46</mn><msub><mi>x</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">0.26 - 1.68x_i,\;0.55 + 0.46x_i</annotation></semantics></math>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+GWMC_HOT_COLD
+</td>
+<td style="text-align:left;">
 5
 </td>
 <td style="text-align:left;">
-(2,3,4,5,7)
+(0.14,0.35,0.37,0.00,0.14)
 </td>
 <td style="text-align:left;">
-(2,3,4,5,7)
+(-4.73,-3.16,-1.06,-0.93,1.57)
 </td>
 <td style="text-align:left;">
-(2,3,4,5,7)
+(0.69,1.55,1.05,0.07,2.28)
 </td>
 <td style="text-align:left;">
-(2,3,4,5,7)
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:left;">
+(3.58)
+</td>
+<td style="text-align:left;">
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1.62</mn><mo>+</mo><mn>0.25</mn><msub><mi>x</mi><mi>i</mi></msub><mo>,</mo><mspace width="0.278em"></mspace><mo>−</mo><mn>0.03</mn><mo>−</mo><mn>0.01</mn><msub><mi>x</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">1.62 + 0.25x_i,\;-0.03 - 0.01x_i</annotation></semantics></math>
+</td>
+<td style="text-align:left;">
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>0.33</mn><mo>+</mo><mn>0.36</mn><msub><mi>x</mi><mi>i</mi></msub><mo>,</mo><mspace width="0.278em"></mspace><mn>0.68</mn><mo>+</mo><mn>0.65</mn><msub><mi>x</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">0.33 + 0.36x_i,\;0.68 + 0.65x_i</annotation></semantics></math>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+hiv_dinh
+</td>
+<td style="text-align:left;">
+3
+</td>
+<td style="text-align:left;">
+(0.49,0.45,0.06)
+</td>
+<td style="text-align:left;">
+(0.42,2.15,5.79)
+</td>
+<td style="text-align:left;">
+(0.84,1.25,0.70)
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:left;">
+(-2.29)
+</td>
+<td style="text-align:left;">
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>0.33</mn><mo>+</mo><mn>0.11</mn><msub><mi>x</mi><mi>i</mi></msub><mo>,</mo><mspace width="0.278em"></mspace><mo>−</mo><mn>1.54</mn><mo>−</mo><mn>0.68</mn><msub><mi>x</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">0.33 + 0.11x_i,\;-1.54 - 0.68x_i</annotation></semantics></math>
+</td>
+<td style="text-align:left;">
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>−</mi><mn>0.36</mn><mo>+</mo><mn>0.14</mn><msub><mi>x</mi><mi>i</mi></msub><mo>,</mo><mspace width="0.278em"></mspace><mo>−</mo><mn>0.93</mn><mo>+</mo><mn>0.25</mn><msub><mi>x</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">-0.36 + 0.14x_i,\;-0.93 + 0.25x_i</annotation></semantics></math>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+hiv_lozupone
+</td>
+<td style="text-align:left;">
+3
+</td>
+<td style="text-align:left;">
+(0.30,0.28,0.42)
+</td>
+<td style="text-align:left;">
+(-0.12,1.30,3.80)
+</td>
+<td style="text-align:left;">
+(0.92,0.50,1.83)
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:left;">
+(-4.86)
+</td>
+<td style="text-align:left;">
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>0.30</mn><mo>+</mo><mn>0.24</mn><msub><mi>x</mi><mi>i</mi></msub><mo>,</mo><mspace width="0.278em"></mspace><mo>−</mo><mn>4.39</mn><mo>+</mo><mn>0.21</mn><msub><mi>x</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">0.30 + 0.24x_i,\;-4.39 + 0.21x_i</annotation></semantics></math>
+</td>
+<td style="text-align:left;">
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>−</mi><mn>0.04</mn><mo>+</mo><mn>0.17</mn><msub><mi>x</mi><mi>i</mi></msub><mo>,</mo><mspace width="0.278em"></mspace><mo>−</mo><mn>0.79</mn><mo>−</mo><mn>0.25</mn><msub><mi>x</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">-0.04 + 0.17x_i,\;-0.79 - 0.25x_i</annotation></semantics></math>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+hiv_noguerajulian
+</td>
+<td style="text-align:left;">
+4
+</td>
+<td style="text-align:left;">
+(0.09,0.46,0.25,0.19)
+</td>
+<td style="text-align:left;">
+(-2.83,-1.71,0.21,3.64)
+</td>
+<td style="text-align:left;">
+(0.46,0.75,1.33,2.32)
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:left;">
+(-2.44)
+</td>
+<td style="text-align:left;">
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>0.07</mn><mo>+</mo><mn>0.04</mn><msub><mi>x</mi><mi>i</mi></msub><mo>,</mo><mspace width="0.278em"></mspace><mo>−</mo><mn>0.47</mn><mo>−</mo><mn>0.19</mn><msub><mi>x</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">0.07 + 0.04x_i,\;-0.47 - 0.19x_i</annotation></semantics></math>
+</td>
+<td style="text-align:left;">
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>−</mi><mn>0.72</mn><mo>+</mo><mn>0.19</mn><msub><mi>x</mi><mi>i</mi></msub><mo>,</mo><mspace width="0.278em"></mspace><mo>−</mo><mn>0.18</mn><mo>−</mo><mn>0.20</mn><msub><mi>x</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">-0.72 + 0.19x_i,\;-0.18 - 0.20x_i</annotation></semantics></math>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ibd_papa
+</td>
+<td style="text-align:left;">
+3
+</td>
+<td style="text-align:left;">
+(0.06,0.49,0.45)
+</td>
+<td style="text-align:left;">
+(0.14,1.71,4.69)
+</td>
+<td style="text-align:left;">
+(0.69,0.57,0.98)
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:left;">
+(-1.31)
+</td>
+<td style="text-align:left;">
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>−</mi><mn>0.32</mn><mo>+</mo><mn>0.11</mn><msub><mi>x</mi><mi>i</mi></msub><mo>,</mo><mspace width="0.278em"></mspace><mn>0.57</mn><mo>+</mo><mn>0.11</mn><msub><mi>x</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">-0.32 + 0.11x_i,\;0.57 + 0.11x_i</annotation></semantics></math>
+</td>
+<td style="text-align:left;">
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>0.16</mn><mo>+</mo><mn>0.06</mn><msub><mi>x</mi><mi>i</mi></msub><mo>,</mo><mspace width="0.278em"></mspace><mo>−</mo><mn>1.30</mn><mo>+</mo><mn>0.48</mn><msub><mi>x</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">0.16 + 0.06x_i,\;-1.30 + 0.48x_i</annotation></semantics></math>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Ji_WTP_DS
+</td>
+<td style="text-align:left;">
+3
+</td>
+<td style="text-align:left;">
+(0.33,0.30,0.37)
+</td>
+<td style="text-align:left;">
+(-0.68,2.61,6.67)
+</td>
+<td style="text-align:left;">
+(0.84,2.69,1.84)
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:left;">
+(4.44)
+</td>
+<td style="text-align:left;">
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>2.59</mn><mo>−</mo><mn>1.66</mn><msub><mi>x</mi><mi>i</mi></msub><mo>,</mo><mspace width="0.278em"></mspace><mn>0.10</mn><mo>+</mo><mn>0.00</mn><msub><mi>x</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">2.59 - 1.66x_i,\;0.10 + 0.00x_i</annotation></semantics></math>
+</td>
+<td style="text-align:left;">
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>−</mi><mn>1.34</mn><mo>−</mo><mn>1.83</mn><msub><mi>x</mi><mi>i</mi></msub><mo>,</mo><mspace width="0.278em"></mspace><mo>−</mo><mn>0.78</mn><mo>+</mo><mn>0.04</mn><msub><mi>x</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">-1.34 - 1.83x_i,\;-0.78 + 0.04x_i</annotation></semantics></math>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+MALL
+</td>
+<td style="text-align:left;">
+3
+</td>
+<td style="text-align:left;">
+(0.39,0.11,0.50)
+</td>
+<td style="text-align:left;">
+(-0.65,0.65,3.26)
+</td>
+<td style="text-align:left;">
+(0.82,0.40,1.83)
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:left;">
+(4.26)
+</td>
+<td style="text-align:left;">
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>−</mi><mn>0.09</mn><mo>+</mo><mn>1.07</mn><msub><mi>x</mi><mi>i</mi></msub><mo>,</mo><mspace width="0.278em"></mspace><mn>0.08</mn><mo>+</mo><mn>0.05</mn><msub><mi>x</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">-0.09 + 1.07x_i,\;0.08 + 0.05x_i</annotation></semantics></math>
+</td>
+<td style="text-align:left;">
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>−</mi><mn>0.22</mn><mo>−</mo><mn>1.87</mn><msub><mi>x</mi><mi>i</mi></msub><mo>+</mo><mn>1.43</mn><msubsup><mi>x</mi><mi>i</mi><mn>2</mn></msubsup><mo>,</mo><mspace width="0.278em"></mspace><mn>0.11</mn><mo>+</mo><mn>0.20</mn><msub><mi>x</mi><mi>i</mi></msub><mo>−</mo><mn>0.03</mn><msubsup><mi>x</mi><mi>i</mi><mn>2</mn></msubsup></mrow><annotation encoding="application/x-tex">-0.22 - 1.87x_i + 1.43x_i^2,\;0.11 + 0.20x_i - 0.03x_i^2</annotation></semantics></math>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ob_goodrich
+</td>
+<td style="text-align:left;">
+4
+</td>
+<td style="text-align:left;">
+(0.15,0.16,0.62,0.06)
+</td>
+<td style="text-align:left;">
+(-3.89,-2.39,-0.17,3.31)
+</td>
+<td style="text-align:left;">
+(0.58,1.61,0.98,2.47)
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:left;">
+(4.90)
+</td>
+<td style="text-align:left;">
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>−</mi><mn>0.35</mn><mo>−</mo><mn>2.37</mn><msub><mi>x</mi><mi>i</mi></msub><mo>,</mo><mspace width="0.278em"></mspace><mo>−</mo><mn>0.09</mn><mo>−</mo><mn>0.02</mn><msub><mi>x</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">-0.35 - 2.37x_i,\;-0.09 - 0.02x_i</annotation></semantics></math>
+</td>
+<td style="text-align:left;">
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>−</mi><mn>2.92</mn><mo>+</mo><mn>1.76</mn><msub><mi>x</mi><mi>i</mi></msub><mo>,</mo><mspace width="0.278em"></mspace><mo>−</mo><mn>0.71</mn><mo>+</mo><mn>0.39</mn><msub><mi>x</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">-2.92 + 1.76x_i,\;-0.71 + 0.39x_i</annotation></semantics></math>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ob_ross
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:left;">
+(0.34,0.66)
+</td>
+<td style="text-align:left;">
+(-0.58,2.34)
+</td>
+<td style="text-align:left;">
+(0.75,1.98)
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:left;">
+(4.40)
+</td>
+<td style="text-align:left;">
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>0.81</mn><mo>+</mo><mn>0.42</mn><msub><mi>x</mi><mi>i</mi></msub><mo>,</mo><mspace width="0.278em"></mspace><mn>0.02</mn><mo>+</mo><mn>0.01</mn><msub><mi>x</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">0.81 + 0.42x_i,\;0.02 + 0.01x_i</annotation></semantics></math>
+</td>
+<td style="text-align:left;">
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>−</mi><mn>2.19</mn><mo>+</mo><mn>0.27</mn><msub><mi>x</mi><mi>i</mi></msub><mo>,</mo><mspace width="0.278em"></mspace><mo>−</mo><mn>0.11</mn><mo>+</mo><mn>0.01</mn><msub><mi>x</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">-2.19 + 0.27x_i,\;-0.11 + 0.01x_i</annotation></semantics></math>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ob_turnbaugh
+</td>
+<td style="text-align:left;">
+3
+</td>
+<td style="text-align:left;">
+(0.55,0.03,0.42)
+</td>
+<td style="text-align:left;">
+(-0.98,0.14,1.22)
+</td>
+<td style="text-align:left;">
+(0.79,0.08,1.66)
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:left;">
+(1.60)
+</td>
+<td style="text-align:left;">
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>−</mi><mn>1.24</mn><mo>−</mo><mn>0.36</mn><msub><mi>x</mi><mi>i</mi></msub><mo>,</mo><mspace width="0.278em"></mspace><mn>0.28</mn><mo>+</mo><mn>0.10</mn><msub><mi>x</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">-1.24 - 0.36x_i,\;0.28 + 0.10x_i</annotation></semantics></math>
+</td>
+<td style="text-align:left;">
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>−</mi><mn>0.38</mn><mo>+</mo><mn>0.46</mn><msub><mi>x</mi><mi>i</mi></msub><mo>,</mo><mspace width="0.278em"></mspace><mo>−</mo><mn>0.24</mn><mo>+</mo><mn>0.18</mn><msub><mi>x</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">-0.38 + 0.46x_i,\;-0.24 + 0.18x_i</annotation></semantics></math>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ob_zhu
+</td>
+<td style="text-align:left;">
+3
+</td>
+<td style="text-align:left;">
+(0.57,0.01,0.42)
+</td>
+<td style="text-align:left;">
+(-0.12,0.53,2.77)
+</td>
+<td style="text-align:left;">
+(0.82,0.04,1.97)
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:left;">
+(-2.12)
+</td>
+<td style="text-align:left;">
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>−</mi><mn>0.30</mn><mo>+</mo><mn>0.05</mn><msub><mi>x</mi><mi>i</mi></msub><mo>,</mo><mspace width="0.278em"></mspace><mn>1.03</mn><mo>+</mo><mn>0.47</mn><msub><mi>x</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">-0.30 + 0.05x_i,\;1.03 + 0.47x_i</annotation></semantics></math>
+</td>
+<td style="text-align:left;">
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>0.01</mn><mo>+</mo><mn>0.11</mn><msub><mi>x</mi><mi>i</mi></msub><mo>,</mo><mspace width="0.278em"></mspace><mo>−</mo><mn>0.61</mn><mo>+</mo><mn>0.19</mn><msub><mi>x</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">0.01 + 0.11x_i,\;-0.61 + 0.19x_i</annotation></semantics></math>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ob_zupancic
+</td>
+<td style="text-align:left;">
+3
+</td>
+<td style="text-align:left;">
+(0.45,0.32,0.23)
+</td>
+<td style="text-align:left;">
+(-1.98,-0.56,1.91)
+</td>
+<td style="text-align:left;">
+(0.87,1.42,0.41)
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:left;">
+(-1.90)
+</td>
+<td style="text-align:left;">
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>−</mi><mn>0.07</mn><mo>+</mo><mn>0.03</mn><msub><mi>x</mi><mi>i</mi></msub><mo>,</mo><mspace width="0.278em"></mspace><mn>1.26</mn><mo>+</mo><mn>0.18</mn><msub><mi>x</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">-0.07 + 0.03x_i,\;1.26 + 0.18x_i</annotation></semantics></math>
+</td>
+<td style="text-align:left;">
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>−</mi><mn>0.04</mn><mo>+</mo><mn>0.17</mn><msub><mi>x</mi><mi>i</mi></msub><mo>,</mo><mspace width="0.278em"></mspace><mo>−</mo><mn>0.74</mn><mo>−</mo><mn>0.29</mn><msub><mi>x</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">-0.04 + 0.17x_i,\;-0.74 - 0.29x_i</annotation></semantics></math>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+par_scheperjans
+</td>
+<td style="text-align:left;">
+3
+</td>
+<td style="text-align:left;">
+(0.39,0.32,0.28)
+</td>
+<td style="text-align:left;">
+(-1.71,-0.31,1.34)
+</td>
+<td style="text-align:left;">
+(0.71,1.02,1.58)
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:left;">
+(4.16)
+</td>
+<td style="text-align:left;">
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>0.88</mn><mo>+</mo><mn>0.44</mn><msub><mi>x</mi><mi>i</mi></msub><mo>,</mo><mspace width="0.278em"></mspace><mo>−</mo><mn>0.10</mn><mo>−</mo><mn>0.02</mn><msub><mi>x</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">0.88 + 0.44x_i,\;-0.10 - 0.02x_i</annotation></semantics></math>
+</td>
+<td style="text-align:left;">
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>−</mi><mn>0.07</mn><mo>+</mo><mn>0.62</mn><msub><mi>x</mi><mi>i</mi></msub><mo>,</mo><mspace width="0.278em"></mspace><mo>−</mo><mn>0.44</mn><mo>+</mo><mn>0.15</mn><msub><mi>x</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">-0.07 + 0.62x_i,\;-0.44 + 0.15x_i</annotation></semantics></math>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+sed_plastic_hoellein
+</td>
+<td style="text-align:left;">
+3
+</td>
+<td style="text-align:left;">
+(0.41,0.39,0.20)
+</td>
+<td style="text-align:left;">
+(-0.03,1.46,3.32)
+</td>
+<td style="text-align:left;">
+(0.65,1.05,1.67)
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:left;">
+(-4.73)
+</td>
+<td style="text-align:left;">
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>−</mi><mn>0.07</mn><mo>−</mo><mn>0.00</mn><msub><mi>x</mi><mi>i</mi></msub><mo>,</mo><mspace width="0.278em"></mspace><mo>−</mo><mn>0.52</mn><mo>+</mo><mn>0.41</mn><msub><mi>x</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">-0.07 - 0.00x_i,\;-0.52 + 0.41x_i</annotation></semantics></math>
+</td>
+<td style="text-align:left;">
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>−</mi><mn>0.42</mn><mo>+</mo><mn>0.10</mn><msub><mi>x</mi><mi>i</mi></msub><mo>,</mo><mspace width="0.278em"></mspace><mn>0.23</mn><mo>−</mo><mn>0.99</mn><msub><mi>x</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">-0.42 + 0.10x_i,\;0.23 - 0.99x_i</annotation></semantics></math>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+sed_plastic_rosato
+</td>
+<td style="text-align:left;">
+3
+</td>
+<td style="text-align:left;">
+(0.40,0.43,0.17)
+</td>
+<td style="text-align:left;">
+(-0.25,1.58,4.06)
+</td>
+<td style="text-align:left;">
+(0.70,1.23,1.93)
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:left;">
+(4.65)
+</td>
+<td style="text-align:left;">
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>−</mi><mn>0.25</mn><mo>−</mo><mn>1.49</mn><msub><mi>x</mi><mi>i</mi></msub><mo>,</mo><mspace width="0.278em"></mspace><mo>−</mo><mn>0.08</mn><mo>−</mo><mn>0.04</mn><msub><mi>x</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">-0.25 - 1.49x_i,\;-0.08 - 0.04x_i</annotation></semantics></math>
+</td>
+<td style="text-align:left;">
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>0.70</mn><mo>+</mo><mn>0.67</mn><msub><mi>x</mi><mi>i</mi></msub><mo>,</mo><mspace width="0.278em"></mspace><mo>−</mo><mn>1.61</mn><mo>+</mo><mn>0.19</mn><msub><mi>x</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">0.70 + 0.67x_i,\;-1.61 + 0.19x_i</annotation></semantics></math>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+sw_plastic_frere
+</td>
+<td style="text-align:left;">
+5
+</td>
+<td style="text-align:left;">
+(0.06,0.25,0.33,0.27,0.08)
+</td>
+<td style="text-align:left;">
+(-1.88,-1.04,0.19,1.93,4.08)
+</td>
+<td style="text-align:left;">
+(0.33,0.52,0.83,1.35,2.21)
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:left;">
+(2.68)
+</td>
+<td style="text-align:left;">
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1.82</mn><mo>+</mo><mn>0.35</mn><msub><mi>x</mi><mi>i</mi></msub><mo>,</mo><mspace width="0.278em"></mspace><mo>−</mo><mn>0.06</mn><mo>+</mo><mn>0.01</mn><msub><mi>x</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">1.82 + 0.35x_i,\;-0.06 + 0.01x_i</annotation></semantics></math>
+</td>
+<td style="text-align:left;">
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>0.43</mn><mo>−</mo><mn>0.40</mn><msub><mi>x</mi><mi>i</mi></msub><mo>,</mo><mspace width="0.278em"></mspace><mo>−</mo><mn>0.54</mn><mo>+</mo><mn>0.11</mn><msub><mi>x</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">0.43 - 0.40x_i,\;-0.54 + 0.11x_i</annotation></semantics></math>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+t1d_alkanani
+</td>
+<td style="text-align:left;">
+5
+</td>
+<td style="text-align:left;">
+(0.06,0.30,0.47,0.15,0.02)
+</td>
+<td style="text-align:left;">
+(-3.06,-2.54,-1.91,-0.87,0.82)
+</td>
+<td style="text-align:left;">
+(0.17,0.30,0.46,0.72,1.37)
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+5
+</td>
+<td style="text-align:left;">
+(0.23,-2.85,-4.30,4.83)
+</td>
+<td style="text-align:left;">
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>−</mi><mn>1.75</mn><mo>+</mo><mn>0.01</mn><msub><mi>x</mi><mi>i</mi></msub><mo>,</mo><mspace width="0.278em"></mspace><mo>−</mo><mn>0.36</mn><mo>−</mo><mn>2.61</mn><msub><mi>x</mi><mi>i</mi></msub><mo>,</mo><mspace width="0.278em"></mspace><mo>−</mo><mn>0.34</mn><mo>+</mo><mn>2.04</mn><msub><mi>x</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">-1.75 + 0.01x_i,\;-0.36 - 2.61x_i,\;-0.34 + 2.04x_i</annotation></semantics></math>
+</td>
+<td style="text-align:left;">
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>3.94</mn><mo>+</mo><mn>3.15</mn><msub><mi>x</mi><mi>i</mi></msub><mo>,</mo><mspace width="0.278em"></mspace><mo>−</mo><mn>1.28</mn><mo>−</mo><mn>1.36</mn><msub><mi>x</mi><mi>i</mi></msub><mo>,</mo><mspace width="0.278em"></mspace><mo>−</mo><mn>3.81</mn><mo>−</mo><mn>3.44</mn><msub><mi>x</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">3.94 + 3.15x_i,\;-1.28 - 1.36x_i,\;-3.81 - 3.44x_i</annotation></semantics></math>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>−</mi><mn>0.13</mn><mo>−</mo><mn>0.93</mn><msub><mi>x</mi><mi>i</mi></msub><mo>,</mo><mspace width="0.278em"></mspace><mo>−</mo><mn>0.03</mn><mo>−</mo><mn>0.02</mn><msub><mi>x</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">-0.13 - 0.93x_i,\;-0.03 - 0.02x_i</annotation></semantics></math>
+</td>
+<td style="text-align:left;">
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>−</mi><mn>2.31</mn><mo>+</mo><mn>3.62</mn><msub><mi>x</mi><mi>i</mi></msub><mo>,</mo><mspace width="0.278em"></mspace><mo>−</mo><mn>1.12</mn><mo>+</mo><mn>0.63</mn><msub><mi>x</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">-2.31 + 3.62x_i,\;-1.12 + 0.63x_i</annotation></semantics></math>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+t1d_mejialeon
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:left;">
+(0.47,0.53)
+</td>
+<td style="text-align:left;">
+(0.73,3.57)
+</td>
+<td style="text-align:left;">
+(0.92,1.94)
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:left;">
+(-2.93)
+</td>
+<td style="text-align:left;">
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>0.25</mn><mo>+</mo><mn>0.02</mn><msub><mi>x</mi><mi>i</mi></msub><mo>,</mo><mspace width="0.278em"></mspace><mo>−</mo><mn>3.32</mn><mo>+</mo><mn>0.13</mn><msub><mi>x</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">0.25 + 0.02x_i,\;-3.32 + 0.13x_i</annotation></semantics></math>
+</td>
+<td style="text-align:left;">
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>−</mi><mn>0.04</mn><mo>+</mo><mn>0.06</mn><msub><mi>x</mi><mi>i</mi></msub><mo>,</mo><mspace width="0.278em"></mspace><mo>−</mo><mn>0.25</mn><mo>+</mo><mn>0.35</mn><msub><mi>x</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">-0.04 + 0.06x_i,\;-0.25 + 0.35x_i</annotation></semantics></math>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+wood_plastic_kesy
+</td>
+<td style="text-align:left;">
+3
+</td>
+<td style="text-align:left;">
+(0.29,0.42,0.29)
+</td>
+<td style="text-align:left;">
+(-1.16,1.16,4.65)
+</td>
+<td style="text-align:left;">
+(0.70,1.43,2.46)
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:left;">
+(3.96)
+</td>
+<td style="text-align:left;">
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>0.28</mn><mo>+</mo><mn>2.24</mn><msub><mi>x</mi><mi>i</mi></msub><mo>,</mo><mspace width="0.278em"></mspace><mo>−</mo><mn>0.00</mn><mo>−</mo><mn>0.01</mn><msub><mi>x</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">0.28 + 2.24x_i,\;-0.00 - 0.01x_i</annotation></semantics></math>
+</td>
+<td style="text-align:left;">
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>0.12</mn><mo>+</mo><mn>0.67</mn><msub><mi>x</mi><mi>i</mi></msub><mo>,</mo><mspace width="0.278em"></mspace><mo>−</mo><mn>1.31</mn><mo>+</mo><mn>0.10</mn><msub><mi>x</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">0.12 + 0.67x_i,\;-1.31 + 0.10x_i</annotation></semantics></math>
 </td>
 </tr>
 </tbody>
@@ -1065,13 +2176,12 @@ Effero, Mahdiya Adnan, Mir Akbaar Khaled, Nevin Xu, Nicole Padoun, Riya
 Srivastava, and Shaira Habib (University of Alberta: Alim Tuguzbay,
 Arjya Bhattacharjee, Atiyah Sulaiman, George Vinichenko, Josh Effero,
 Mahdiya Adnan, Mir Akbaar Khaled, Nevin Xu, and Shaira Habib; McMaster
-University: Nicole Padoun and Riya Srivastava).</p>
-<!--We also sincerely appreciate the following people for running the functions in this package on the microbiome datasets published in [@Nearing2022] to provide users with plausible parameter values for thier research work: Alim Tuguzbay, Nevin Nu, Mir Akbaar Khaled, Gosh, logfoldchangeFit, Alim, Akja, etc. and Roda (all from University of Alberta) and mmm (McMaster University)-->
+University: Nicole Padoun and Riya Srivastava.</p>
 </div>
 <div class="section level2">
 <h2 class="unnumbered" id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
 </h2>
-<div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0">
+<div id="refs" class="references csl-bib-body hanging-indent">
 <div id="ref-agronah2025novel" class="csl-entry">
 Agronah, Michael. 2025. <span>“A Novel Approach for Simulation-Based
 Power Estimation and Joint Modeling of Microbiome Counts.”</span> PhD
@@ -1103,15 +2213,12 @@ Love, Michael I, Wolfgang Huber, and Simon Anders. 2014.
 Data with DESeq2.”</span> <em>Genome Biology</em> 15 (12): 1–21.
 </div>
 <div id="ref-magnusson2017package" class="csl-entry">
-Magnusson, Arni, Hans Skaug, Anders Nielsen, Casper Berg, Kasper
-Kristensen, Martin Maechler, Koen van Bentham, Ben Bolker, Mollie
-Brooks, and Maintainer Mollie Brooks. 2017. <span>“Package
+Magnusson, Arni, Hans Skaug, Anders Nielsen, et al. 2017. <span>“Package
 <span>‘Glmmtmb’</span>.”</span> <em>R Package Version 0.2. 0</em> 25.
 </div>
 <div id="ref-Nearing2022" class="csl-entry">
-Nearing, Jacob T., Gavin M. Douglas, Matilda G. Hayes, Jacquelyn
-MacDonald, Devika K. Desai, Nicholas Allward, Caitlin Jones, et al.
-2022. <span>“Microbiome Differential Abundance Methods Produce Different
+Nearing, Jacob T., Gavin M. Douglas, Matilda G. Hayes, et al. 2022.
+<span>“Microbiome Differential Abundance Methods Produce Different
 Results Across 38 Datasets.”</span> <em>Nature Communications</em> 13:
 342. <a href="https://doi.org/10.1038/s41467-022-28034-z" class="external-link">https://doi.org/10.1038/s41467-022-28034-z</a>.
 </div>

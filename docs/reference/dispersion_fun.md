@@ -32,8 +32,8 @@ A numeric value representing the dispersion.
 
 ## Details
 
-The dispersion is calculated using the formula: \$\$\text{dispersion} =
-\text{asymptDisp} + \frac{\text{extraPois}}{\text{mean_abund}}\$\$
+The dispersion is calculated using the formula: \$\$dispersion =
+asymptDisp + \frac{extraPois}{meanAbund}\$\$
 
 ## Examples
 

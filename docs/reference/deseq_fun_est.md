@@ -1,6 +1,6 @@
-# Fold change and p-value estimations for a many simulations
+# Fold change and p-value estimations for simulations
 
-Fold change and p-value estimations for a many simulations
+Fold change and p-value estimations for simulations
 
 ## Usage
 
@@ -11,7 +11,7 @@ deseq_fun_est(
   alpha_level = 0.1,
   group_colname,
   sample_colname,
-  num_cores = 2,
+  num_cores = 1,
   ref_name = NULL
 )
 ```

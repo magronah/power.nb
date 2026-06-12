@@ -9,7 +9,7 @@
   : Simulate Count Data for Microbiome Studies
 
 - [`deseq_fun_est()`](https://michaelagronah.com/power.nb/reference/deseq_fun_est.md)
-  : Fold change and p-value estimations for a many simulations
+  : Fold change and p-value estimations for simulations
 
 - [`deseqfun()`](https://michaelagronah.com/power.nb/reference/deseqfun.md)
   :
@@ -86,4 +86,4 @@
   power
 
 - [`uniroot_ss()`](https://michaelagronah.com/power.nb/reference/uniroot_ss.md)
-  : Sample Size estimation function uisng uniroot
+  : Sample Size estimation function using uniroot

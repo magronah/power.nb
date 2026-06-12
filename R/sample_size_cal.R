@@ -112,6 +112,7 @@ power_fun_ss <- function(pval_est_list,
 
   comb$logsample_size <- log2(comb$sample_size)
 
+
   # Fit simpler model (always)
   simple_mod <- tryCatch(
     {
